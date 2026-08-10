@@ -72,9 +72,10 @@ agent sop run --root ./sop --package analysis --inputs '["4","7"]'</code></pre>
     <h2>Isolation boundary</h2>
     <p>Command code runs in a Node <code>vm</code> context. The context omits process, filesystem, network, module loading, clocks, randomness, and oracle services. String and WebAssembly code generation are disabled, and synchronous execution has a timeout. Production execution of hostile multi-tenant code requires process-level memory, CPU, and operating-system isolation that this runtime does not implement.</p>
     <div class="callout">Current runtime scope: explicit circuit calls, local checks and invariants, canonical values, and receipts. Planned scope: semantic indexes, mandatory matchers, closure, persistent caches, trust profiles, and mediated effects. See <a href="specsLoader.html?spec=DS005-compiler-runtime.md">DS005</a>.</div>
-    <p>For example, a task command may parse a policy JSON string and return a canonical object. It cannot open the policy file
-      itself, read a secret from the environment, or call a web service. The coding agent must place required data on circuit
-      inputs, and future effectful operations must use explicit capability brokers defined by the security architecture.</p>
+    <p>For example, a coding agent may convert a policy paragraph into a command that calculates a deadline from explicit date
+      and rule inputs. The command cannot open the policy file itself, read a secret from the environment, or call a web
+      service. Required data must enter through circuit inputs or generated SOP source; future effectful operations must use
+      explicit capability brokers defined by the security architecture.</p>
   </article></main>
   <div data-include="partials/footer.html"></div>
   <script src="partials-loader.js"></script>

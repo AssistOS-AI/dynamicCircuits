@@ -7,15 +7,16 @@ This case evaluates whether a circuit can apply a legal-style minimum-period rul
 ## Inputs and task
 
 - `input/rule.md` is the normative prose rule.
-- `input/policy.json` is the explicit structured interpretation used by the circuit.
-- `input/cases.json` contains three review cases.
+- `input/cases.md` is the human-readable table of three review cases.
 - `input/task.md` fixes the requested outputs and requires a classification for every case.
 
-The coding-agent interpretation boundary is visible: the Markdown rule remains the source, while `policy.json` is the reviewable interpretation passed to the executable circuit.
+All coding-agent inputs are text documents. The generated SOP files are the reviewable executable interpretation: the rule
+is implemented in `policy.sop`, and each row from `cases.md` becomes an explicit task-local circuit call in `analysis.sop`.
 
 ## Circuits
 
-`sop/policy.sop` implements rule application and produces per-case witnesses plus aggregate statistics. `sop/analysis.sop` composes the policy circuit, checks that all cases were classified, and exposes findings and statistics.
+`sop/policy.sop` implements the reusable rule for one case through scalar inputs. `sop/analysis.sop` encodes the three
+interpreted cases, calls the policy circuit once per case, aggregates findings, computes statistics, and verifies coverage.
 
 ## Result
 
@@ -25,8 +26,8 @@ The deterministic run classified case A as a violation, case B as compliant thro
 
 ```bash
 node ../../../src/cli.mjs sop run \
-  --root sop --prefix eval1 --package eval1.analysis \
-  --inputs '["{\"minimumDays\":30,\"expeditedDays\":10,\"requiresWrittenConsent\":true}","[{\"id\":\"A\",\"noticeDays\":10,\"expedited\":false,\"writtenConsent\":false},{\"id\":\"B\",\"noticeDays\":10,\"expedited\":true,\"writtenConsent\":true},{\"id\":\"C\",\"noticeDays\":30,\"expedited\":false,\"writtenConsent\":false}]"]'
+  --root sop --prefix eval1 --package eval1.analysis
 ```
 
-Complexity: four input artifacts, two SOP packages, two public outputs, one nested circuit call, one goal, three semantic branches, and a receipt tree covering both packages.
+Complexity: three source documents, two SOP packages, three nested policy instances, two public outputs, one coverage goal,
+three semantic paths, and a receipt tree covering the root and all child instances.

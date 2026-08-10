@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Circuits Documentation</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="../../index.html">Dynamic Circuits Documentation</a>
+    <nav><a href="../index.html">All evaluations</a><a href="../../evaluation.html">Testing guide</a><a href="../../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a></nav>
+  </header>
+  <main class="page">
+    <p class="breadcrumbs"><a href="../index.html">Evaluation catalog</a> / Eval 1</p>
+    <h1>Eval 1: notice-period exception</h1>
+    <p class="lead">This case checks whether a coding-agent interpretation preserves an ordinary 30-day rule, applies a 10-day exception only when both expedited treatment and written consent are present, and classifies every supplied case.</p>
+    <h2>How the evaluation works</h2>
+    <p>The source side consists entirely of prose and a Markdown table. <code>rule.md</code> states the policy,
+      <code>cases.md</code> states the facts, and <code>task.md</code> states the requested outputs. The generated
+      <code>policy.sop</code> turns the reusable rule into executable code with explicit case inputs. The task-specific
+      <code>analysis.sop</code> encodes the three interpreted cases as calls to that rule, aggregates findings, and verifies
+      complete classification.</p>
+    <p>The runtime executes <code>eval1.analysis</code> with no JSON input. Its public findings and statistics are compared with
+      <code>results/result.json</code>. The successful runtime outcome confirms that the executable interpretation produced
+      the committed result; the scope limit remains the authority and completeness of the supplied policy text.</p>
+    <div class="eval-browser">
+      <aside class="eval-menu"><h2>Files by purpose</h2><div id="eval-menu"></div></aside>
+      <section class="eval-viewer">
+        <div class="eval-case-summary"><h2 id="file-title">File</h2><p id="file-explanation"></p><span id="file-role" class="status"></span></div>
+        <pre class="file-view"><code id="file-content">Loading…</code></pre>
+      </section>
+    </div>
+  </main>
+  <script>
+    window.evalPage = {
+      caseRoot: "eval1", defaultFile: "README.md", groups: [
+        { title: "Evaluation contract", files: [
+          { file: "README.md", role: "Scope and reproduction", explanation: "Defines the evaluation question, identifies each artifact, states the observed result and limitation, and provides the command used to reproduce the circuit run." }
+        ]},
+        { title: "Source documents", files: [
+          { file: "input/rule.md", role: "Policy source", explanation: "Human-readable policy supplied to the coding agent. It defines the ordinary minimum, the expedited exception, and the evidence required to use that exception." },
+          { file: "input/cases.md", role: "Case facts", explanation: "Human-readable table of the three cases. The coding agent converts each row into an explicit call in the task-specific root circuit." },
+          { file: "input/task.md", role: "Requested analysis", explanation: "Defines which fields and aggregate counts the final analysis must produce and requires coverage of every case." }
+        ]},
+        { title: "Generated SOP code", files: [
+          { file: "sop/policy.sop", role: "Reusable rule circuit", explanation: "Executable interpretation of the prose policy. It accepts one case through explicit scalar inputs, selects the applicable minimum, and returns one structured finding." },
+          { file: "sop/analysis.sop", role: "Task root circuit", explanation: "Executable interpretation of the case table and task. It calls the reusable rule three times, aggregates results, calculates statistics, and checks complete coverage." }
+        ]},
+        { title: "Observed results", files: [
+          { file: "results/result.json", role: "Checked machine summary", explanation: "Machine-readable public result used by the automated test. JSON appears here as an output format, not as coding-agent input." },
+          { file: "results/report.md", role: "Human report", explanation: "Explains each case classification and states the policy-scope limitation in reader-facing form." }
+        ]}
+      ]
+    };
+  </script>
+  <script src="../eval-browser.js"></script>
+</body>
+</html>

@@ -7,13 +7,15 @@ This case evaluates the distinction between a positive aggregate statistic and a
 ## Inputs and task
 
 - `input/rule.md` defines refutation, malformed-data, and uncertainty behavior.
-- `input/dataset.json` contains eight finite observations including `-2`.
+- `input/dataset.md` contains a human-readable ordered table of eight finite observations including `-2`.
 - `input/claim.md` states both a mean claim and an incorrect universal claim.
 - `input/task.md` asks for a grounded verdict and counterexample.
 
 ## Circuits
 
-`sop/counterexample.sop` parses the dataset, computes the mean, searches every observation, and returns an explicit witness. `sop/analysis.sop` verifies that a refuted verdict contains a valid witness drawn from the dataset.
+`sop/dataset.sop` is the coding-agent conversion of the Markdown table into canonical executable data.
+`sop/counterexample.sop` validates the data, computes the mean, searches every observation, and returns an explicit witness.
+`sop/analysis.sop` composes both packages and verifies that a refuting witness belongs to the observations.
 
 ## Result
 
@@ -23,8 +25,8 @@ The run returned `REFUTED`, witness `-2`, positive mean `5.25`, and a passing gr
 
 ```bash
 node ../../../src/cli.mjs sop run \
-  --root sop --prefix eval2 --package eval2.analysis \
-  --inputs '["[3,7,8,-2,5,6,9,6]"]'
+  --root sop --prefix eval2 --package eval2.analysis
 ```
 
-Complexity: four input documents, two circuit packages, exhaustive scan of eight observations, three public outputs, one witness-grounding goal, and explicit refusal for invalid JSON or non-finite values.
+Complexity: four source documents, three circuit packages, exhaustive scan of eight observations, three public outputs, one
+witness-grounding goal, and explicit refusal for empty or non-finite observation arrays.

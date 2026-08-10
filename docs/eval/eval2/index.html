@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Circuits Documentation</title><link rel="stylesheet" href="../../styles.css">
+  <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="../../index.html">Dynamic Circuits Documentation</a>
+    <nav><a href="../index.html">All evaluations</a><a href="../../evaluation.html">Testing guide</a><a href="../../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a></nav>
+  </header>
+  <main class="page">
+    <p class="breadcrumbs"><a href="../index.html">Evaluation catalog</a> / Eval 2</p>
+    <h1>Eval 2: universal claim and counterexample</h1>
+    <p class="lead">This case checks whether executable analysis separates an aggregate statistic from a universal claim and returns a source witness when one observation refutes that claim.</p>
+    <h2>How the evaluation works</h2>
+    <p><code>claim.md</code>, <code>rule.md</code>, <code>dataset.md</code>, and <code>task.md</code> are the documents available to
+      the coding agent. The generated <code>dataset.sop</code> is the explicit executable interpretation of the Markdown table.
+      <code>counterexample.sop</code> is a reusable circuit that accepts an observation array, validates it, calculates the
+      mean, and finds the first non-positive witness. <code>analysis.sop</code> composes both packages and grounds the witness.</p>
+    <p>The runtime executes the root circuit with no JSON source input. It succeeds technically while returning semantic
+      verdict <code>REFUTED</code>. This distinction is the main evaluation target: a successful analysis can correctly produce
+      a negative domain conclusion.</p>
+    <div class="eval-browser">
+      <aside class="eval-menu"><h2>Files by purpose</h2><div id="eval-menu"></div></aside>
+      <section class="eval-viewer"><div class="eval-case-summary"><h2 id="file-title">File</h2><p id="file-explanation"></p><span id="file-role" class="status"></span></div><pre class="file-view"><code id="file-content">Loading…</code></pre></section>
+    </div>
+  </main>
+  <script>
+    window.evalPage = {
+      caseRoot: "eval2", defaultFile: "README.md", groups: [
+        { title: "Evaluation contract", files: [
+          { file: "README.md", role: "Scope and reproduction", explanation: "Defines the scientific reasoning error under test, the circuit composition, exact result, reproduction command, complexity, and dataset scope." }
+        ]},
+        { title: "Source documents", files: [
+          { file: "input/claim.md", role: "Claim under review", explanation: "States both a correct aggregate claim and an incorrect universal conclusion, creating the distinction the circuit must preserve." },
+          { file: "input/rule.md", role: "Evaluation rule", explanation: "Defines refutation by one non-positive witness and the required behavior for incomplete or invalid observations." },
+          { file: "input/dataset.md", role: "Observation source", explanation: "Human-readable ordered table supplied to the coding agent. Its fourth observation is the first valid counterexample." },
+          { file: "input/task.md", role: "Requested analysis", explanation: "Requires a universal-claim verdict, a separately calculated mean, an explicit witness, and witness grounding." }
+        ]},
+        { title: "Generated SOP code", files: [
+          { file: "sop/dataset.sop", role: "Dataset interpretation", explanation: "Coding-agent conversion of the Markdown observation table into canonical executable data while preserving source order." },
+          { file: "sop/counterexample.sop", role: "Reusable analysis circuit", explanation: "Validates an observation array, scans it exhaustively, calculates the mean, and returns a semantic verdict plus witness." },
+          { file: "sop/analysis.sop", role: "Task root circuit", explanation: "Connects the interpreted dataset to the reusable analysis and verifies that a refuting witness belongs to the source observations." }
+        ]},
+        { title: "Observed results", files: [
+          { file: "results/result.json", role: "Checked machine summary", explanation: "Expected public result used by the automated runtime test; JSON is used only to serialize the produced result." },
+          { file: "results/report.md", role: "Human report", explanation: "Explains why the positive mean and refuted universal claim are compatible and identifies the exact witness." }
+        ]}
+      ]
+    };
+  </script>
+  <script src="../eval-browser.js"></script>
+</body>
+</html>

@@ -62,9 +62,9 @@ budgets.
 
 ### Operational example
 
-A `parsePolicy` command receives `{policyJson}` through its declared formal, returns a canonical object, and calls
-`ctx.reject("invalid_json")` for malformed input. A thrown parser exception is recorded as `ERROR`; returning false is an
-ordinary domain value and remains distinct from both outcomes.
+A `calculateDeadline` command receives explicit date and duration values through declared formals, returns a canonical date,
+and calls `ctx.reject("invalid_date")` for a malformed date. A thrown implementation exception is recorded as `ERROR`;
+returning false is an ordinary domain value and remains distinct from both outcomes.
 
 ## Decisions & Questions
 

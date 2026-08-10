@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Circuits Documentation</title><link rel="stylesheet" href="../../styles.css">
+  <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="../../index.html">Dynamic Circuits Documentation</a>
+    <nav><a href="../index.html">All evaluations</a><a href="../../evaluation.html">Testing guide</a><a href="../../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a></nav>
+  </header>
+  <main class="page">
+    <p class="breadcrumbs"><a href="../index.html">Evaluation catalog</a> / Eval 3</p>
+    <h1>Eval 3: cross-document consistency</h1>
+    <p class="lead">This case checks whether repeated document interpretation preserves source identity and whether synthesis reports every conflicting launch date and definition without inventing a precedence rule.</p>
+    <h2>How the evaluation works</h2>
+    <p>The coding agent receives three prose chapters, one review-policy document, and one task document. The generated
+      <code>interpretation.sop</code> extracts dates and the definition of “Node” from one chapter while retaining its source
+      label. <code>root.sop</code> creates three independent child instances and sends their outputs to
+      <code>consistency.sop</code>. The final goal requires both expected conflict classes.</p>
+    <p>Unlike eval 1 and eval 2, this runtime case still supplies chapter text through circuit inputs because the reusable
+      interpretation circuit is the behavior under test. The inputs are source text, not JSON. The result keeps both
+      alternatives and their source labels because the documents contain no supersession rule.</p>
+    <div class="eval-browser">
+      <aside class="eval-menu"><h2>Files by purpose</h2><div id="eval-menu"></div></aside>
+      <section class="eval-viewer"><div class="eval-case-summary"><h2 id="file-title">File</h2><p id="file-explanation"></p><span id="file-role" class="status"></span></div><pre class="file-view"><code id="file-content">Loading…</code></pre></section>
+    </div>
+  </main>
+  <script>
+    window.evalPage = {
+      caseRoot: "eval3", defaultFile: "README.md", groups: [
+        { title: "Evaluation contract", files: [
+          { file: "README.md", role: "Scope and reproduction", explanation: "Defines the cross-document obligations, circuit composition, observed conflicts, reproduction command, complexity, and unresolved-precedence limit." }
+        ]},
+        { title: "Policy and task", files: [
+          { file: "input/review-rules.md", role: "Consistency policy", explanation: "Defines when multiple dates or definitions constitute a conflict and requires source attribution and preservation of uncertainty." },
+          { file: "input/task.md", role: "Requested synthesis", explanation: "Requires independent interpretation of each chapter followed by a consolidated conflict report." }
+        ]},
+        { title: "Source chapters", files: [
+          { file: "input/chapter-01.md", role: "Schedule source", explanation: "Supplies launch date 2026-06-15 and the executable-circuit definition of Node." },
+          { file: "input/chapter-02.md", role: "Operations source", explanation: "Supplies launch date 2026-07-01 and explicitly lacks a supersession statement." },
+          { file: "input/chapter-03.md", role: "Data-model source", explanation: "Supplies the mutable-database-row definition of Node and no launch date." }
+        ]},
+        { title: "Generated SOP code", files: [
+          { file: "sop/interpretation.sop", role: "Reusable chapter interpreter", explanation: "Extracts the fact families needed by this task from one text input and attaches the supplied source label." },
+          { file: "sop/consistency.sop", role: "Cross-document comparison", explanation: "Aggregates three interpretations, retains each source claim, and sets timeline and terminology conflict flags." },
+          { file: "sop/root.sop", role: "Task root circuit", explanation: "Creates three child interpretation instances, invokes comparison, and verifies both requested conflict classes." }
+        ]},
+        { title: "Observed results", files: [
+          { file: "results/result.json", role: "Checked machine summary", explanation: "Expected report object used by the automated runtime test, including both values and their source labels." },
+          { file: "results/report.md", role: "Human report", explanation: "Presents both conflict classes and explains why the analysis leaves them unresolved." }
+        ]}
+      ]
+    };
+  </script>
+  <script src="../eval-browser.js"></script>
+</body>
+</html>
