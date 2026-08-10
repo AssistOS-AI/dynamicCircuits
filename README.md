@@ -6,8 +6,8 @@ Dynamic Circuits is a Node.js CLI that prepares document-analysis workspaces for
 npm test
 node src/cli.mjs prepare -kbdir ./kb -workdir /tmp/dynamic-task
 node src/cli.mjs -kbdir ./kb -workdir /tmp/dynamic-task -agent codex --dry-run
-node src/cli.mjs sop compile --root ./eval/eval1/sop --prefix eval --package eval.analysis
-node src/cli.mjs sop run --root ./eval/eval1/sop --prefix eval --package eval.analysis --inputs '["4","7"]'
+node src/cli.mjs sop compile --kb-root ./kb/circuits --root ./eval/eval1/sop --prefix eval --package eval.analysis
+node src/cli.mjs sop run --kb-root ./kb/circuits --root ./eval/eval1/sop --prefix eval --package eval.analysis --inputs '["4","7"]'
 ```
 
 A prepared workdir contains `input/`, `results/`, `sop/`, `.dynamic-circuits/`, and a `circuitSkills` symbolic link. Normal analysis treats the KB as read-only. `--learn` permits Codex to write reviewable material under `KB/candidates/`; it does not authorize promotion into trusted `KB/circuits/`.
