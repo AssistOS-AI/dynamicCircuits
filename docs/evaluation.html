@@ -14,10 +14,21 @@
   <div data-include="partials/header.html"></div>
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="index.html">Documentation</a> / Evaluation</p>
-    <h1>Deterministic tests and agent evaluations</h1>
-    <p class="lead">Unit suites establish language and orchestration mechanics. Three browsable evaluation workspaces test legal exception handling, scientific counterexamples, and cross-document conflicts using executable circuits and committed evidence.</p>
+    <h1>Tests and evaluation cases</h1>
+    <p class="lead">Unit tests cover the parser, compiler, runtime, CLI, workspace preparation, agent adapters, documentation links, and historical integrity. Three evaluation workspaces execute legal, scientific, and cross-document analysis circuits against committed inputs.</p>
+
+    <h2>Purpose and relationship to the system</h2>
+    <p>The project has two verification levels. Unit tests isolate one contract, such as free-wire detection or workspace
+      symlink creation. Evaluation cases combine source documents, multiple circuit packages, goals, expected outputs, and
+      reports in the same directory shape used by a task. Together they show whether the implementation primitives work
+      individually and whether they compose into a meaningful analysis.</p>
+    <p>The evaluation fixtures currently validate deterministic circuit behavior. They provide reference material for future
+      coding-agent benchmarks, but they do not claim that a particular agent version independently recreated each circuit
+      from the prose sources.</p>
 
     <h2>Unit test organization</h2>
+    <p>The table groups tests by the public boundary they exercise. A regression belongs in the smallest suite that can
+      reproduce it, while cross-package eval behavior remains under <code>tests/runtime/eval.test.mjs</code>.</p>
     <table>
       <thead><tr><th>Suite</th><th>Contract under test</th></tr></thead>
       <tbody>
@@ -31,26 +42,31 @@
         <tr><td><code>tests/docs/</code></td><td>Relative specification links remain valid below a static mount prefix.</td></tr>
       </tbody>
     </table>
-    <p><a href="specsLoader.html?spec=DS001-coding-style.md">DS001</a> is authoritative for test organization. Run <code>npm test</code> for code and <code>npm run check</code> for code plus documentation verification.</p>
+    <p>The first three rows protect SOP semantics. Workspace, agent, and CLI suites protect orchestration. Integrity and docs
+      suites protect the immutable historical source and portable static documentation. <a href="specsLoader.html?spec=DS001-coding-style.md">DS001</a>
+      is authoritative for this organization. Run <code>npm test</code> for implementation tests and <code>npm run check</code>
+      to add matrix regeneration and documentation verification.</p>
 
     <h2>Evaluation cases</h2>
-    <pre class="mermaid">flowchart TD
-      E[docs/eval/evalN] --> I[input and rules]
-      E --> S[sop]
-      E --> R[results]
-      E --> L[circuitSkills link]
-      I --> A[Coding-agent evaluation]
-      S --> A
-      A --> R</pre>
+    <p>Each case contains four artifact groups: <code>input/</code> stores the source documents and evaluation task;
+      <code>sop/</code> stores the executable circuits; <code>results/</code> stores the checked machine summary and human
+      report; and <code>README.md</code> states the evaluation question, reproduction command, observed result, complexity,
+      and limitations.</p>
     <table>
       <thead><tr><th>Case</th><th>What is evaluated</th><th>Observed result</th></tr></thead>
       <tbody>
-        <tr><td><a href="eval/eval1/index.html">Eval 1</a></td><td>Ordinary notice period plus written-consent exception, across three cases.</td><td>One violation, two compliant cases, including one evidenced exception.</td></tr>
-        <tr><td><a href="eval/eval2/index.html">Eval 2</a></td><td>Universal positive-value claim versus exhaustive counterexample search and mean.</td><td>Claim refuted by <code>-2</code> despite positive mean <code>5.25</code>.</td></tr>
-        <tr><td><a href="eval/eval3/index.html">Eval 3</a></td><td>Three-document timeline and terminology reconciliation with source attribution.</td><td>Both conflict classes retained; neither alternative chosen silently.</td></tr>
+        <tr><td><a href="eval/index.html?eval=eval1">Eval 1</a></td><td>Ordinary notice period plus written-consent exception, across three cases.</td><td>One violation, two compliant cases, including one evidenced exception.</td></tr>
+        <tr><td><a href="eval/index.html?eval=eval2">Eval 2</a></td><td>Universal positive-value claim versus exhaustive counterexample search and mean.</td><td>Claim refuted by <code>-2</code> despite positive mean <code>5.25</code>.</td></tr>
+        <tr><td><a href="eval/index.html?eval=eval3">Eval 3</a></td><td>Three-document timeline and terminology reconciliation with source attribution.</td><td>Both conflict classes retained; neither alternative chosen silently.</td></tr>
       </tbody>
     </table>
-    <p>Open the <a href="eval/index.html">full evaluation catalog</a> for direct links to every rule, input, circuit, report, and JSON result. Runtime <code>SUCCEEDED</code> means the circuit completed; each case separately states its semantic verdict and limitations.</p>
+    <p>The three rows exercise different failure risks. Eval 1 checks that an exception does not replace the base rule for
+      unrelated cases. Eval 2 checks that an aggregate statistic does not answer a universal claim. Eval 3 checks that
+      repeated interpretation and synthesis preserve incompatible source claims. Open the <a href="eval/index.html">evaluation
+      file browser</a> to select any rule, input, circuit, report, or JSON result in a single two-pane view.</p>
+    <p>Runtime <code>SUCCEEDED</code> means the circuit completed and its local goals passed. The domain result can still be a
+      violation, a refuted claim, or an unresolved conflict; each case therefore states runtime outcome, semantic result, and
+      scope limit separately.</p>
 
     <h2>Historical integrity</h2>
     <p>The original design package remains an immutable baseline. Initialization and later migrations must compare its aggregate file hash before and after work. Current requirements live in the contiguous DS set and must be regenerated into the <a href="specsLoader.html?spec=matrix.md">specification matrix</a>.</p>

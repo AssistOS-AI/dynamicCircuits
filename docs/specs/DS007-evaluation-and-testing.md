@@ -10,7 +10,8 @@ summary: Defines modular unit suites, reproducible eval workspaces, verification
 
 ## Introduction
 
-Dynamic Circuits separates deterministic implementation tests from end-to-end coding-agent evaluations. Both use the same public workspace and circuit contracts.
+Deterministic unit tests verify parser, compiler, runtime, CLI, workspace, adapter, documentation, and integrity contracts.
+Committed evaluation workspaces exercise complete SOP tasks with source documents, circuits, checked results, and reports.
 
 ## Core Content
 

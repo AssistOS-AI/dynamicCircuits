@@ -10,7 +10,8 @@ summary: Defines external coding-agent selection, Codex defaults, future adapter
 
 ## Introduction
 
-Document interpretation and circuit authoring require a capable coding agent, but the circuit runtime itself must remain independent from direct model APIs.
+An external coding-agent process performs document interpretation and circuit authoring. The SOP runtime receives circuit
+files and input values and therefore remains independent from model APIs and model credentials.
 
 ## Core Content
 

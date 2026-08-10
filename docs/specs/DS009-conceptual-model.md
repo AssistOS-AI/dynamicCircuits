@@ -10,9 +10,9 @@ summary: Defines the entities, trust states, truth distinctions, and boundaries 
 
 ## Introduction
 
-Dynamic Circuits is an orchestration and assurance meta-IR. Its vocabulary separates source interpretation, executable
-mechanics, reusable knowledge, task attempts, and acceptance authority so that an agent-generated answer is not confused
-with an accepted result.
+Dynamic Circuits represents a document analysis as source artifacts, interpreted facts, executable commands and circuits,
+reusable templates, task attempts, assurance obligations, and receipts. Separate terms identify what the source states,
+what a circuit derives, what a verifier checks, and what an assurance profile accepts.
 
 ## Core Content
 

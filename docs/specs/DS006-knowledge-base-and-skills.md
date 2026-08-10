@@ -10,7 +10,8 @@ summary: Defines KB circuits, candidates, and the analyze-task, author-sop-circu
 
 ## Introduction
 
-Reusable executable knowledge and one analysis attempt have different lifecycles. The repository's skill catalog teaches coding agents to preserve that boundary.
+Reviewed reusable circuits persist in the knowledge base. Task-specific circuits and reports remain in one workdir. The
+runtime skill catalog gives coding agents separate workflows for analysis, SOP authoring, and KB candidate extraction.
 
 ## Core Content
 

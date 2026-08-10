@@ -14,31 +14,65 @@
   <div data-include="partials/header.html"></div>
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="index.html">Documentation</a> / CLI and workspaces</p>
-    <h1>One KB, one current task</h1>
-    <p class="lead">The CLI keeps reusable knowledge separate from the current analysis. It prepares the directory contract before any coding-agent process starts.</p>
+    <h1>CLI workspaces</h1>
+    <p class="lead">The presence of <code>--workdir</code> selects task analysis; its absence selects KB learning. Workspace preparation creates the required directories, manifests, instructions, and skill links before launching a coding agent.</p>
+
+    <h2>Purpose and relationship to the runtime</h2>
+    <p>This page explains how a filesystem location becomes a coding-agent workspace. The CLI owns directory creation,
+      input inventory, generated guidance, skill discovery, and external process invocation. The coding agent owns document
+      interpretation and SOP authoring. The compiler and runtime described in the <a href="sop-runtime.html">SOP runtime
+      guide</a> execute the resulting circuit files.</p>
+    <p>There are two modes because reusable knowledge and one task have different lifetimes. Learning produces reviewable KB
+      candidates for future tasks. Analysis produces task-local circuits and reports for the current input set.</p>
 
     <h2>Learn reusable circuits</h2>
+    <p>Start with a KB containing documents under <code>input/</code>. The following commands prepare the directory, run Codex,
+      or inspect the invocation without starting Codex:</p>
     <pre><code>agent prepare -kbdir ./kb
 agent -kbdir ./kb -agent codex
 agent -kbdir ./kb -agent codex --dry-run</code></pre>
-    <p>The absence of <code>--workdir</code> selects learning. Place sources in <code>./kb/input</code>; the agent may read trusted <code>circuits/</code>, write proposed packages only to <code>candidates/</code>, and write learning reports to <code>results/</code>. Promotion remains a separate review action.</p>
+    <ol>
+      <li>The CLI scans <code>./kb/input</code> and writes a hash manifest.</li>
+      <li>It links the runtime skills and generates learning instructions.</li>
+      <li>The agent reads the input documents and existing reviewed <code>circuits/</code>.</li>
+      <li>It writes proposed packages and tests to <code>candidates/</code> and a coverage report to <code>results/</code>.</li>
+      <li>A reviewer decides whether a tested candidate is suitable for promotion.</li>
+    </ol>
 
     <h2>Analyze a current task</h2>
+    <p>Start with task documents under <code>./work/task-001/input</code>. The KB path identifies reusable reviewed circuits;
+      the workdir identifies the only task directory where generated SOP files and reports belong:</p>
     <pre><code>agent prepare -kbdir ./kb -workdir ./work/task-001
 agent -kbdir ./kb -workdir ./work/task-001 -agent codex
 agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
-    <p>Both single-dash and conventional double-dash forms are accepted for KB, workdir, and agent options. Preparation creates missing directories, inventories inputs, and links the project skill catalog at <code>circuitSkills</code> and <code>.agents/skills</code>. It refuses overlapping KB/work roots and conflicting skill-link paths.</p>
+    <ol>
+      <li>The CLI creates missing task directories and inventories every regular file under <code>input/</code>.</li>
+      <li>The coding agent reads the manifest, task documents, and applicable KB circuit interfaces.</li>
+      <li>It writes task-specific circuits to <code>sop/</code>, compiles them, and executes the circuits used by the analysis.</li>
+      <li>It writes reports and its coverage summary to <code>results/</code>.</li>
+    </ol>
+    <p>Both single-dash and conventional double-dash forms are accepted. KB and work roots may not overlap because overlap
+      would make read/write authority and input discovery ambiguous. Existing user guidance is preserved, and conflicting
+      skill-link paths produce a structured error.</p>
 
-    <pre class="mermaid">flowchart TD
-      K[KB root and learning cwd] --> KI[input sources]
-      K --> KC[circuits: trusted]
-      K --> KN[candidates: review required]
-      K --> KR[learning results]
-      W[Work root] --> I[input]
-      W --> P[sop]
+    <h3>Knowledge-base directories</h3>
+    <pre class="mermaid">flowchart LR
+      K[KB] --> I[input]
+      K --> C[circuits]
+      K --> N[candidates]
+      K --> R[results]</pre>
+    <p>The KB diagram shows the learning data lifecycle. <code>input/</code> contains evidence to extract; <code>circuits/</code>
+      contains reviewed reusable packages; <code>candidates/</code> contains generated proposals awaiting review; and
+      <code>results/</code> contains learning coverage and validation reports.</p>
+    <h3>Task-workspace directories</h3>
+    <pre class="mermaid">flowchart LR
+      W[Task workspace] --> I[input]
+      W --> S[sop]
       W --> R[results]
-      W --> D[.dynamic-circuits manifests]
-      W --> L[circuitSkills symlink]</pre>
+      W --> M[manifests and skill links]</pre>
+    <p>The task diagram shows the analysis boundary. Source files remain under <code>input/</code>, generated circuit source
+      remains under <code>sop/</code>, and reports remain under <code>results/</code>. The manifest and skill links under the same
+      workspace tell the coding agent what to process and how to author supported SOP Lang.</p>
 
     <h2>Agent authority</h2>
     <p>Analysis treats the KB as read-only. Learning uses the KB as the coding agent's current directory, while generated instructions restrict reusable output to <code>candidates/</code>. This restriction is currently instructional rather than a host-mediated filesystem capability; <a href="specsLoader.html?spec=DS008-security-and-trust.md">DS008</a> records the limitation. The former explicit learn flag is rejected because mode is now inferred unambiguously.</p>
@@ -46,6 +80,10 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
 
     <h2>Workspace skill catalog</h2>
     <p><code>analyze-task</code> enforces complete input coverage and grounded results. <code>author-sop-circuit</code> supplies the implemented syntax and verification loop. <code>circuit-learner</code> separates reusable candidates from task-specific facts. The CLI links the catalog as one directory so the same instructions govern normal tasks and evaluation cases.</p>
+    <p>Example: an analysis agent uses <code>analyze-task</code> to enumerate every input, switches to
+      <code>author-sop-circuit</code> when it needs a deadline calculation, then returns to <code>analyze-task</code> to connect
+      the circuit output and receipt to the final report. A KB learning run uses <code>circuit-learner</code> instead and writes
+      the same reusable calculation as a candidate with provenance and tests.</p>
   </article></main>
   <div data-include="partials/footer.html"></div>
   <script src="partials-loader.js"></script>

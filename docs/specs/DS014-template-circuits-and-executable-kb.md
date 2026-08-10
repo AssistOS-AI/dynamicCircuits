@@ -10,8 +10,8 @@ summary: Defines reusable circuit templates, their metadata, review lifecycle, v
 
 ## Introduction
 
-The knowledge base is executable knowledge, not a prompt collection. A template circuit captures a recurring reasoning or
-verification pattern so a task can instantiate it with explicit evidence and preserve an auditable execution graph.
+The knowledge base stores reviewed, versioned circuit packages. A template circuit defines a recurring transformation,
+reasoning rule, or verification pattern with explicit inputs, outputs, applicability metadata, provenance, and tests.
 
 ## Core Content
 

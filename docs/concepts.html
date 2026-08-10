@@ -4,34 +4,58 @@
 <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
 <body><div data-include="partials/header.html"></div><main class="page"><article class="page__panel">
 <p class="breadcrumbs"><a href="index.html">Documentation</a> / Design / Concepts</p>
-<h1>From source evidence to explicit circuits</h1>
-<p class="lead">The design keeps source assertions, interpreted facts, derived values, verified propositions, and accepted outcomes distinct. SOP Lang is the deterministic composition layer between them.</p>
+<h1>Concept model</h1>
+<p class="lead">Source files are stored as identified artifacts. Interpretation circuits publish provenance-linked facts. SOP commands transform those facts through immutable wires, and receipts record the executed dependencies and outputs.</p>
+
+<h2>Purpose and relationship to the system</h2>
+<p>This page defines the objects named throughout the CLI, runtime, assurance, and operations documentation. It explains how
+a source file becomes circuit input, how values move through a circuit, and which record connects a final value back to its
+source. The <a href="sop-runtime.html">runtime page</a> describes the implemented mechanics; the
+<a href="assurance.html">assurance page</a> adds applicability and acceptance rules.</p>
 
 <h2>Conceptual model</h2>
 <pre class="mermaid">flowchart LR
-  S[Immutable source artifact] --> I[Interpretation circuit]
-  I --> F[Provenance-linked facts]
-  F --> M[Matcher: MATCH / NO_MATCH / UNKNOWN]
-  M --> T[Template instance]
-  T --> V[Derived canonical values]
-  V --> G[Checks, invariants, goals]
-  G --> R[Receipts and qualified outcome]</pre>
-<p>A source is identified content plus media type, origin, digest, locators, access policy, and epoch. Interpretation publishes facts and claims without pretending that a source assertion is true. Wires name immutable local values. Commands perform one declared transformation; circuits compose commands and child circuits; templates describe reusable circuit families; matchers prove when a template applies.</p>
+  S[Source artifact] --> I[Interpretation]
+  I --> F[Facts and claims]
+  F --> P[Source provenance]</pre>
+<p>The first diagram describes interpretation. A source artifact contains bytes plus identity metadata such as media type,
+origin, digest, locators, access policy, and epoch. Interpretation turns selected source spans into facts or claims. Each
+published item retains a source locator, so later derivations can identify the exact document evidence. Interpretation may
+also record uncertainty or conflicting readings.</p>
+<pre class="mermaid">flowchart LR
+  F[Input facts] --> C[Circuit instance]
+  C --> V[Derived values]
+  V --> G[Checks and goals]
+  G --> R[Receipt]</pre>
+<p>The second diagram describes execution. Input facts enter one circuit instance, commands derive canonical values, and
+checks or goals evaluate declared conditions over those values. The receipt records the package, instance, executed nodes,
+input/output hashes, and check outcomes. Child circuits repeat the same structure behind an explicit ordered interface.</p>
 <p>The full vocabulary—including attempts, profiles, trust states, receipts, closure, cache entries, artifacts, hooks, and epochs—is normative in <a href="specsLoader.html?spec=DS009-conceptual-model.md">DS009</a>.</p>
+
+<h3>Example: interpreting a policy date</h3>
+<p>A policy source states that ordinary notice requires 30 days. Interpretation can publish a fact such as
+<code>{minimumDays: 30}</code> with a locator to the policy paragraph. A task circuit combines that fact with a case value
+such as <code>{noticeDays: 10}</code>. Its derived compliance value is false, its goal checks that every case was classified,
+and its receipt connects the result to both input values and the rule package.</p>
 
 <h2>Values, wires, and composition</h2>
 <p>Values are canonical JSON-like data plus explicit absence and content-addressed artifact references. Local wires are single-assignment: an input or node output defines a wire exactly once. Identity is based on canonical content and producing context, not mutable object identity or filesystem path. Child circuits receive ordered input values and return ordered outputs; their internal wires never leak into the caller.</p>
 <p>This SSA model makes dependencies, dead work, parallel opportunities, refusal propagation, hashing, and provenance inspectable. See <a href="specsLoader.html?spec=DS010-values-wires-and-circuit-composition.md">DS010</a>.</p>
 
 <h2>Surface, packages, and ABI</h2>
+<p>The table separates four contracts that operate on the same circuit source. Reading across a row shows what that layer is
+responsible for and which DS is authoritative when implementation or documentation changes.</p>
 <table><thead><tr><th>Layer</th><th>Contract</th><th>Authority</th></tr></thead><tbody>
 <tr><td>Surface</td><td>Ports, command definitions, calls, goals/invariants, and atomic template metadata.</td><td><a href="specsLoader.html?spec=DS004-sop-language.md">DS004</a></td></tr>
 <tr><td>Command ABI</td><td>Positional bindings, canonical outputs, checks, structured refusal, effects and future capabilities.</td><td><a href="specsLoader.html?spec=DS011-command-abi-effects-and-capabilities.md">DS011</a></td></tr>
 <tr><td>Packages and IR</td><td>Path-derived names, deterministic resolution, normalized nodes, validation, and hashes.</td><td><a href="specsLoader.html?spec=DS012-packages-ir-and-resolution.md">DS012</a></td></tr>
 <tr><td>Core</td><td>Small portable deterministic command set; future Assurance Core remains separate.</td><td><a href="specsLoader.html?spec=DS022-core-and-assurance-commands.md">DS022</a></td></tr>
 </tbody></table>
+<p>The surface defines what authors write. The command ABI defines how JavaScript receives and returns values. Package and IR
+rules turn symbolic calls into resolved graph nodes. Core supplies portable deterministic commands. Keeping these contracts
+separate prevents syntax, runtime behavior, and future assurance policy from becoming one implicit mechanism.</p>
 
 <h2>Implemented boundary</h2>
 <p>The current parser and compiler support explicit ports, JSON string arguments, local JavaScript command descriptors, immutable wires, nested positional circuits, goals and invariants, and parsed matcher metadata. The runtime executes relevant graph slices in a restricted Node VM and emits structured receipts. Semantic indexing, automatic matcher wiring, effects/capability brokers, and rich types are designed but not yet implemented.</p>
-<p class="callout">A coding agent can author a circuit, but only the parser/compiler/runtime determine whether the supported source compiles and what it executes. Agent prose is never substituted for a receipt.</p>
+<p class="callout">The coding agent authors circuit source. The parser, compiler, and runtime determine whether it compiles, which nodes execute, and which receipt is emitted.</p>
 </article></main><div data-include="partials/footer.html"></div><script src="partials-loader.js"></script></body></html>

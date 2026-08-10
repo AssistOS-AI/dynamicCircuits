@@ -25,6 +25,12 @@ Evaluation cases under `docs/eval/` are statically browsable reproducible exampl
 
 Source files should remain reviewable in one sitting. Run `fileSizesCheck.sh` after substantial changes; a file exceeding its configured limits should be split by responsibility unless cohesion provides a documented reason. Prefer lines that remain readable without horizontal scrolling, generally below 120 characters, while preserving commands and machine-readable fixtures when wrapping would reduce clarity.
 
+HTML documentation must use the available viewport width for prose, tables, diagrams, and code. The shared shell must use
+compact page spacing and headings; the specification loader must suppress the duplicate Markdown H1 because its shell
+already displays the active DS title. Documentation prose must begin with the component, input, operation, or result being
+explained. Slogans, rhetorical contrasts, and claims framed mainly as what the system is not should be replaced with direct
+operational descriptions.
+
 AchillesAgentLib is authorized but is not installed for the current external-agent architecture. A future in-process integration must route every LLM interaction through `LLMAgent`, use runtime configuration and environment variables, permit explicit code-level configuration overrides, and attach metadata tags for documentation, specification, orchestration, bootstrap, and testing work.
 
 ## Decisions & Questions

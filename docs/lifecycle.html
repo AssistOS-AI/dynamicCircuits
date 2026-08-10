@@ -4,33 +4,67 @@
 <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
 <body><div data-include="partials/header.html"></div><main class="page"><article class="page__panel">
 <p class="breadcrumbs"><a href="index.html">Documentation</a> / Design / Lifecycle</p>
-<h1>The complete analysis lifecycle</h1>
-<p class="lead">The design follows evidence from immutable source bytes through interpretation, reusable knowledge, execution, assurance, repair, and qualified publication.</p>
+<h1>Analysis lifecycle</h1>
+<p class="lead">The lifecycle ingests source artifacts, extracts provenance-linked facts, selects and executes circuits, evaluates assurance requirements, records repair attempts, and publishes the resulting report and receipt.</p>
+
+<h2>Purpose and relationship to the system</h2>
+<p>This page orders the concepts from the other documentation into one end-to-end process. The
+<a href="cli.html">CLI</a> prepares the source and workspace boundary. The <a href="concepts.html">concept model</a> defines
+artifacts, facts, templates, and attempts. The <a href="sop-runtime.html">runtime</a> compiles and executes explicit circuits.
+The <a href="assurance.html">assurance layer</a> evaluates completeness and acceptance, while the
+<a href="operations.html">operations layer</a> persists receipts and manages reuse.</p>
+<p>The complete lifecycle is a target architecture. The current release implements workspace preparation, explicit circuit
+authoring, compilation, execution, local checks and goals, and runtime receipts. The sections below identify the later
+registry, closure, acceptance, attempt, and publication responsibilities in their execution order.</p>
 
 <h2>Phases A–I</h2>
+<h3>Prepare the graph</h3>
 <pre class="mermaid">flowchart LR
-  A[A Ingest] --> B[B Interpret]
-  B --> C[C Discover]
-  C --> D[D Wire]
-  D --> E[E Execute]
-  E --> F[F Close]
-  F --> G[G Assure]
-  G -->|failure evidence| H[H Repair new attempt]
-  H --> D
-  G -->|accepted| I[I Publish receipt and report]</pre>
-<p>Ingest captures immutable artifacts, digests, locators, access policy, and epoch. Interpretation publishes facts with provenance and uncertainty. Discovery proposes templates and deterministic matchers verify applicability. Wiring creates explicit instances; execution schedules only the relevant dependency slice; closure exhausts mandatory obligations; assurance applies goals, trust, conflicts, budgets, and profile gates. Repair creates an immutable child attempt. Publication never labels a partial or failed result as accepted.</p>
-<p><a href="specsLoader.html?spec=DS027-end-to-end-lifecycle.md">DS027</a> includes legal exception, scientific counterexample, and cross-document conflict reference flows. Their current executable forms are browsable in the <a href="eval/index.html">evaluation catalog</a>.</p>
+  A[Ingest sources] --> B[Interpret facts]
+  B --> C[Discover circuits]
+  C --> D[Wire instances]</pre>
+<p>Graph preparation starts by storing immutable source artifacts with digests and locators. Interpretation publishes facts
+and claims tied to those locators. Registry discovery finds candidate templates, deterministic matchers verify applicability,
+and wiring creates explicit circuit instances with bound inputs. The output of this stage is a compiled dependency graph.</p>
+<h3>Execute and evaluate</h3>
+<pre class="mermaid">flowchart LR
+  D[Compiled graph] --> E[Execute]
+  E --> F[Mandatory closure]
+  F --> G[Assurance gates]</pre>
+<p>Execution evaluates only nodes required by outputs and obligations. Mandatory closure indexes new facts, runs every
+applicable mandatory matcher, executes new instances, and repeats to a fixed point. Assurance then checks goals, invariants,
+trust, conflicts, capabilities, budgets, and receipt completeness.</p>
+<h3>Publish or repair</h3>
+<pre class="mermaid">flowchart LR
+  G[Assurance result] -->|accepted| P[Publish]
+  G -->|failed| A[New attempt]
+  A --> E[Execute revised graph]</pre>
+<p>An accepted assurance result publishes the requested report, artifacts, and final receipt. A refusal, rejection,
+inconclusive result, or technical error creates diagnostic evidence. Repair preserves the failed attempt, records the changed
+packages and reason, and executes a child attempt. This lineage lets reviewers compare exactly what changed.</p>
+<p><a href="specsLoader.html?spec=DS027-end-to-end-lifecycle.md">DS027</a> includes legal exception, scientific counterexample, and cross-document conflict reference flows. Their inputs, circuits, and results are available in the <a href="eval/index.html">evaluation file browser</a>.</p>
 
 <h2>Knowledge learning versus task analysis</h2>
+<p>The lifecycle can enter through KB learning or through one task. The table compares the process working directory and its
+read/write contract; it is the same distinction implemented by the CLI.</p>
 <table><thead><tr><th>Invocation</th><th>Agent cwd</th><th>Reads</th><th>Writes</th></tr></thead><tbody>
 <tr><td><code>agent -kbdir ./kb</code></td><td><code>./kb</code></td><td><code>input/</code>, trusted <code>circuits/</code></td><td><code>candidates/</code>, <code>results/</code></td></tr>
 <tr><td><code>agent -kbdir ./kb -workdir ./work/task-001</code></td><td>task workdir</td><td>all task <code>input/</code>, applicable KB circuits</td><td>task <code>sop/</code>, <code>results/</code></td></tr>
 </tbody></table>
-<p>Codex is the default external coding agent. Adapters may later support OpenCode, Claude Code, or others without placing a model API inside circuit execution. Details are in <a href="specsLoader.html?spec=DS026-agent-api-and-workspace-protocol.md">DS026</a>.</p>
+<p>The first row produces reusable candidates and learning reports. The second row produces task-local circuits and analysis
+reports while keeping reviewed KB circuits read-only. Codex is the default external coding agent. Adapters may later support
+OpenCode, Claude Code, or others through the same filesystem contract. Details are in
+<a href="specsLoader.html?spec=DS026-agent-api-and-workspace-protocol.md">DS026</a>.</p>
+
+<h3>Example across the lifecycle</h3>
+<p>For the notice-period eval, ingest stores the rule, structured policy, and three cases. Interpretation exposes policy and
+case values. The root circuit wires them to the policy circuit. Execution produces three findings and aggregate statistics.
+The current local goal confirms that every case has a finding. A future strict profile would additionally prove matcher
+coverage, package trust, conflict handling, and final receipt completeness before publishing an acceptance certificate.</p>
 
 <h2>Roadmap and design choices</h2>
-<p>The staged roadmap moves from syntax and deterministic IR through runtime, workspace orchestration, persistent evidence, semantic templates, mandatory closure, hardened capabilities, and distributed scale. Implemented subsets never imply the next stage. Module and schema compatibility rules are in <a href="specsLoader.html?spec=DS024-roadmap-and-module-boundaries.md">DS024</a>.</p>
-<p>The architecture deliberately combines compiler/dataflow SSA, rule-system fixed points, workflow-style effects and attempts, and proof/evidence-style receipts. Datalog, CHR, attribute grammars, semantic parsing, rewriting systems, proof assistants, proof-carrying computation, e-graphs, dataflow engines, and workflow systems each inform a layer but do not cover the entire problem alone. The comparative rationale and rejected surface choices are preserved in <a href="specsLoader.html?spec=DS025-alternative-architectures-and-rationale.md">DS025</a>.</p>
+<p>The staged roadmap starts with syntax and deterministic IR, then adds runtime execution, workspace orchestration, persistent evidence, semantic templates, mandatory closure, hardened capabilities, and distributed processing. Each milestone has its own implementation and conformance requirements. Module and schema compatibility rules are in <a href="specsLoader.html?spec=DS024-roadmap-and-module-boundaries.md">DS024</a>.</p>
+<p>The architecture uses compiler/dataflow SSA for circuit execution, rule-system fixed points for mandatory closure, workflow-style effects and attempts for operations, and proof/evidence-style receipts for audit. <a href="specsLoader.html?spec=DS025-alternative-architectures-and-rationale.md">DS025</a> compares these choices with Datalog, CHR, attribute grammars, semantic parsing, rewriting systems, proof assistants, e-graphs, dataflow engines, and workflow systems.</p>
 
 <h2>What exists now</h2>
 <p>The current repository delivers parser, package discovery, graph compiler, deterministic runtime, local checks/invariants, receipts, inferred CLI modes, skill-linked agent workspaces, three serious evals, and documentation/integrity tests. Attempts, semantic indexing, automatic wiring, closure, profiles, trust registry, persistent cache, artifact store, production isolation, certificates, and distributed execution remain planned.</p>

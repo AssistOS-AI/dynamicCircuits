@@ -10,8 +10,8 @@ summary: Defines language, runtime, assurance, security, agent, domain, and scal
 
 ## Introduction
 
-Conformance must test observable contracts, not implementation structure. Benchmarks measure both useful throughput and the
-cost of maintaining provenance, closure, and acceptance evidence.
+Conformance tests exercise observable language, runtime, workspace, assurance, and security contracts. Benchmarks report
+execution throughput together with provenance, closure, receipt, storage, and verification costs.
 
 ## Core Content
 

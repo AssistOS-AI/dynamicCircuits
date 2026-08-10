@@ -14,8 +14,15 @@
   <div data-include="partials/header.html"></div>
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="index.html">Documentation</a> / SOP runtime</p>
-    <h1>A small executable circuit kernel</h1>
-    <p class="lead">The reference implementation preserves the stable syntax decisions from the historical design while limiting its claims to parser, compiler, and local execution behavior covered by tests.</p>
+    <h1>SOP compiler and runtime</h1>
+    <p class="lead">The parser reads SOP files, the compiler resolves packages and builds an immutable dependency graph, and the runtime executes the required graph slice and emits structured receipts.</p>
+
+    <h2>Purpose and relationship to task analysis</h2>
+    <p>A coding agent can interpret a document in many ways, so Dynamic Circuits stores the calculations and checks that
+      support a conclusion as SOP source. The compiler turns that source into a graph with explicit producers and consumers.
+      The runtime then evaluates the graph independently of the coding agent. This page explains the implemented language
+      subset and execution path; the <a href="concepts.html">concept model</a> defines its broader vocabulary, and the
+      <a href="assurance.html">assurance page</a> describes planned acceptance checks above the runtime.</p>
 
     <h2>Authoring surface</h2>
     <pre><code>@input left right
@@ -26,26 +33,48 @@
     function check({ left, right }, output) { return output === left + right }
     return { run, check }
 
-@total add $left $right</code></pre>
-    <p>Ports and calls are positional. String literals are JSON strings. Commands return one value; circuits may expose multiple ordered outputs. Wires are local and immutable, and nested circuits exchange values only through their declared interfaces. Arrays and plain objects returned from a command's VM realm are normalized into host canonical values before they are frozen and hashed.</p>
+    @total add $left $right</code></pre>
+    <p>The example defines a circuit with two ordered inputs and one ordered output. The local <code>add</code> command receives
+      an object whose keys match the declared formals, returns their sum, and checks the returned value. The final line creates
+      wire <code>total</code> by passing the input wires to that command. The compiler rejects a missing wire, duplicate wire,
+      surplus argument, or undeclared output before execution.</p>
+    <p>Ports and calls are positional. String literals are JSON strings. Commands return one value; circuits may expose
+      multiple ordered outputs. Wires are local and immutable, and nested circuits exchange values only through their
+      declared interfaces. Arrays and plain objects returned from a command's VM realm are normalized into host canonical
+      values before they are frozen and hashed.</p>
 
     <h2>Compilation and execution</h2>
+    <h3>Compilation</h3>
     <pre class="mermaid">flowchart LR
-      F[.sop files] --> G[Package registry]
-      G --> P[Parser]
+      F[SOP files] --> P[Parser]
       P --> C[Compiler]
-      C --> V{SSA, arity,
-      coverage, cycles}
-      V -->|valid| E[Slice executor]
-      V -->|invalid| D[Structured diagnostic]
-      E --> X[Structured receipt]</pre>
-    <p>The compiler resolves core, local, qualified, and nested circuit calls. It marks dead nodes outside output and assurance slices. The executor distinguishes success, refusal, rejection, and error; failed child circuits do not leak partial public outputs.</p>
+      C -->|valid| G[Dependency graph]
+      C -->|invalid| D[Diagnostic]</pre>
+    <p>The compilation diagram has two possible results. Valid source becomes a dependency graph whose nodes contain resolved
+      callees, arguments, outputs, dependencies, and source locations. Invalid source stops before runtime and returns a
+      diagnostic such as <code>FREE_WIRE</code>, <code>CIRCUIT_ARITY_MISMATCH</code>, or <code>GRAPH_CYCLE</code>.</p>
+    <h3>Execution</h3>
+    <pre class="mermaid">flowchart LR
+      G[Dependency graph] --> S[Required slice]
+      S --> E[Execute nodes]
+      E --> R[Outputs and receipt]</pre>
+    <p>The execution diagram begins with the validated graph. The runtime selects nodes required by public outputs, goals, and
+      invariants; nodes outside that slice are recorded as dead and remain unexecuted. Required nodes run in topological order.
+      The result contains public outputs only after successful execution and always includes the corresponding receipt.</p>
+    <p>The executor distinguishes success, refusal, rejection, and error. A refusal represents an unmet command precondition;
+      rejection represents a failed check, goal, or invariant; error represents an execution failure. A failed child circuit
+      contributes its child receipt to the parent failure and exposes no partial child outputs.</p>
+    <p>The commands below compile package <code>analysis</code> from <code>./sop</code> and then run it with two string values.
+      The JSON printed by <code>run</code> contains the outcome, ordered outputs, and receipt:</p>
     <pre><code>agent sop compile --root ./sop --package analysis
 agent sop run --root ./sop --package analysis --inputs '["4","7"]'</code></pre>
 
     <h2>Isolation boundary</h2>
-    <p>Command code runs in a Node <code>vm</code> context without process, filesystem, network, module loading, clocks, randomness, or oracle services. String and WebAssembly code generation are disabled and synchronous execution has a timeout. This is a development guard for reviewable code, not a production sandbox for hostile multi-tenant programs.</p>
-    <div class="callout">The runtime parses matcher metadata but does not yet execute semantic indexes, mandatory matchers, closure, persistent caches, trust profiles, or external effects. The exact current contract is in <a href="specsLoader.html?spec=DS005-compiler-runtime.md">DS005</a>.</div>
+    <p>Command code runs in a Node <code>vm</code> context. The context omits process, filesystem, network, module loading, clocks, randomness, and oracle services. String and WebAssembly code generation are disabled, and synchronous execution has a timeout. Production execution of hostile multi-tenant code requires process-level memory, CPU, and operating-system isolation that this runtime does not implement.</p>
+    <div class="callout">Current runtime scope: explicit circuit calls, local checks and invariants, canonical values, and receipts. Planned scope: semantic indexes, mandatory matchers, closure, persistent caches, trust profiles, and mediated effects. See <a href="specsLoader.html?spec=DS005-compiler-runtime.md">DS005</a>.</div>
+    <p>For example, a task command may parse a policy JSON string and return a canonical object. It cannot open the policy file
+      itself, read a secret from the environment, or call a web service. The coding agent must place required data on circuit
+      inputs, and future effectful operations must use explicit capability brokers defined by the security architecture.</p>
   </article></main>
   <div data-include="partials/footer.html"></div>
   <script src="partials-loader.js"></script>

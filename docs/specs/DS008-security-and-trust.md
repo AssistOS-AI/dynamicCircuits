@@ -10,7 +10,9 @@ summary: Defines path safety, agent write authority, JavaScript execution limits
 
 ## Introduction
 
-Dynamic Circuits executes agent-authored JavaScript and launches external coding agents. Its first release must make authority explicit and avoid presenting development guards as complete isolation.
+Dynamic Circuits executes agent-authored JavaScript and launches external coding-agent processes. The security contract
+defines each writable directory, the capabilities absent from command contexts, the limits of Node `vm`, and the additional
+isolation required for hostile code.
 
 ## Core Content
 

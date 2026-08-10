@@ -10,7 +10,8 @@ summary: Specifies inferred KB learning and workdir analysis modes, input discov
 
 ## Introduction
 
-The CLI translates two user-controlled paths into a predictable analysis environment without conflating durable reusable knowledge with one task's artifacts.
+The CLI prepares a persistent knowledge-base directory and, when supplied, a separate directory for one analysis task. Each
+directory has explicit read/write locations, manifests, coding-agent instructions, and skill-discovery links.
 
 ## Core Content
 

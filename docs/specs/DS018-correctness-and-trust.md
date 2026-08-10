@@ -10,8 +10,9 @@ summary: Defines conditional correctness, trust states, the trusted computing ba
 
 ## Introduction
 
-Dynamic Circuits cannot guarantee real-world truth merely because a program ran. It can make a narrower, valuable claim:
-given identified sources, code, rules, profile, and environment, the accepted result followed the declared contracts.
+The correctness claim is conditional on identified sources, package code, rules, assurance profile, registry snapshot, and
+execution environment. An accepted result states that these declared inputs passed the required compilation, execution,
+closure, verification, trust, and receipt checks.
 
 ## Core Content
 

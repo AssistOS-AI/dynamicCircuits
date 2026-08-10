@@ -10,17 +10,18 @@ summary: Defines inferred learning and analysis workspaces, external coding-agen
 
 ## Introduction
 
-Dynamic Circuits turns documents and reusable rules into explicit, executable analysis graphs. A coding agent interprets
-documents and authors circuits; a deterministic kernel validates and runs those circuits; receipts preserve what actually
-happened. The original v1 design remains immutable history while the current DS set preserves its full theory and labels
-the narrower implementation-backed subset honestly.
+Dynamic Circuits processes document folders through two components. An external coding agent interprets the documents and
+authors SOP circuits. A deterministic local kernel validates those circuits, executes their dependency graphs, and emits
+outputs and receipts. The current DS set defines both the implemented subset and the planned assurance components; the
+original v1 design remains immutable historical input.
 
 ## Core Content
 
-The problem is not merely running scripts. Document analysis needs traceable sources, reusable rules with exceptions and
-priorities, explicit intermediate values, deterministic composition, classified failure, completeness obligations, and a
-way to distinguish source claims from verified or accepted conclusions. The long-term design covers legal, scientific,
-policy, technical, financial, compliance, and large-document analysis without embedding domain truth in the kernel.
+Document analysis combines source files, interpreted facts, reusable rules, exceptions, priorities, intermediate values,
+and conclusions. The system must identify every source, preserve provenance from outputs to source spans, represent reusable
+rules as executable packages, classify execution failures, and keep source assertions separate from verified propositions
+and accepted outcomes. The architecture supports legal, scientific, policy, technical, financial, compliance, and
+large-document analysis through domain packages rather than domain-specific kernel code.
 
 The primary product is a CLI with two inferred modes. `-kbdir ./kb` learns reviewable candidate circuits from `./kb/input`.
 Adding `-workdir ./work/task-001` performs the default task analysis over `input/`, writes reports to `results/`, creates
@@ -55,5 +56,6 @@ Response: External invocation satisfies the present requirement to use coding ag
 
 ## Conclusion
 
-The project succeeds by making analysis more reusable and auditable without disguising agent judgment as deterministic proof
-or future assurance architecture as already implemented software.
+The implemented release prepares both workspace modes, invokes a selected coding-agent adapter, compiles and executes the
+supported SOP subset, emits receipts, and reproduces the committed evaluation cases. Later DS files define the additional
+components required for mandatory closure and conditional acceptance certificates.

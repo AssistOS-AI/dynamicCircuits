@@ -4,26 +4,53 @@
 <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
 <body><div data-include="partials/header.html"></div><main class="page"><article class="page__panel">
 <p class="breadcrumbs"><a href="index.html">Documentation</a> / Design / Assurance</p>
-<h1>Completeness before acceptance</h1>
-<p class="lead">A successful computation is not automatically a correct domain conclusion. The assurance design requires explicit applicability, exhaustive declared obligations, independent verification, trust policy, and auditable evidence.</p>
+<h1>Assurance model</h1>
+<p class="lead">Assurance evaluates whether applicable rules were executed, required checks and goals passed, trust and budget policies were satisfied, and the final receipt contains the evidence required by the active profile.</p>
+
+<h2>Purpose and relationship to execution</h2>
+<p>The SOP runtime answers a technical question: did the selected graph execute, refuse, fail a check, or raise an error?
+Assurance answers a broader task question: were all declared applicable rules selected, were the required verifiers trusted,
+were conflicts and resource limits handled according to policy, and is the evidence sufficient for publication?</p>
+<p>This page explains the planned layer above the current runtime. The <a href="concepts.html">concept page</a> defines facts,
+templates, and receipts. The <a href="operations.html">operations page</a> explains how evidence, cache state, and capability
+decisions are stored. The current implementation boundary is stated at the end of this page.</p>
 
 <h2>Discovery, verification, and closure</h2>
-<pre class="mermaid">flowchart TD
-  F[Semantic facts] --> D[High-recall candidate discovery]
+<pre class="mermaid">flowchart LR
+  F[Semantic facts] --> D[Candidate search]
   D --> M[Deterministic matcher]
-  M -->|MATCH + bindings| I[Create unique template instance]
-  M -->|NO_MATCH| N[Record reason]
-  M -->|UNKNOWN| U[Unresolved prerequisite]
-  I --> E[Execute and index outputs]
-  E --> F
-  F --> C{No new facts or instances?}
-  C -->|yes| A[Compare expected vs executed mandatory set]
-  C -->|no| D</pre>
-<p>Approximate search may rank optional candidates, but it cannot authorize mandatory work. Matchers return three states and preserve evidence. Closure runs mandatory matchers to a monotone fixed point, suppresses duplicate instances by canonical key, records each round, and audits the expected instance set against what executed. Limits yield <code>INCONCLUSIVE</code>, never success. See <a href="specsLoader.html?spec=DS015-semantic-index-matching-and-wiring.md">DS015</a> and <a href="specsLoader.html?spec=DS016-mandatory-closure.md">DS016</a>.</p>
+  M -->|MATCH| I[Template instance]
+  M -->|NO MATCH or UNKNOWN| O[Recorded outcome]</pre>
+<p>The first diagram separates retrieval from applicability. Candidate search uses metadata or approximate similarity to find
+plausible templates. A deterministic matcher examines semantic facts and returns <code>MATCH</code> with bindings,
+<code>NO_MATCH</code> with a reason, or <code>UNKNOWN</code> with missing prerequisites. Only <code>MATCH</code> creates a
+template instance.</p>
+<pre class="mermaid">flowchart LR
+  F[New facts] --> M[Mandatory matchers]
+  M --> I[New instances]
+  I --> C[Fixed point]
+  C --> A[Expected/executed audit]</pre>
+<p>The second diagram shows mandatory closure. New facts activate the mandatory matchers registered for those fact families.
+Matches create new instances, and instance outputs may publish more facts. The cycle ends when one complete round adds
+nothing. The final audit compares all expected instance keys with the instances that actually executed; an unresolved
+matcher or configured limit produces <code>INCONCLUSIVE</code>. See <a href="specsLoader.html?spec=DS015-semantic-index-matching-and-wiring.md">DS015</a>
+and <a href="specsLoader.html?spec=DS016-mandatory-closure.md">DS016</a>.</p>
+
+<h3>Example: ordinary rule and exception</h3>
+<p>A notice-period task publishes the ordinary 30-day rule, case facts, and evidence of written consent. Candidate search
+finds both the base rule and expedited exception. Deterministic matchers bind the base rule to every case and the exception
+only to the case with consent. Closure audits that all expected case/rule combinations executed before acceptance proceeds.</p>
 
 <h2>Seven acceptance gates</h2>
 <ol><li>Compilation and static validation succeed.</li><li>Required execution has no refusal, error, or blocked dependency.</li><li>Mandatory closure reaches a verified fixed point.</li><li>Blocking checks and invariants pass.</li><li>Every goal is verified by an allowed verifier.</li><li>Trust, capability, budget, conflict, and profile policies pass.</li><li>The final receipt is complete, canonical, and publishable.</li></ol>
 <p>The classified alternatives are deliberate: malformed execution is <code>ERROR</code>; unmet preconditions are <code>REFUSED</code>; false obligations are <code>REJECTED</code>; unresolved evidence or exhausted budgets are <code>INCONCLUSIVE</code>; only every-gate success is <code>ACCEPTED</code>. Full contracts are in <a href="specsLoader.html?spec=DS017-goals-invariants-and-acceptance.md">DS017</a>.</p>
+<pre class="mermaid">flowchart LR
+  E[Execution evidence] --> C[Closure and checks]
+  C --> P[Trust and policy]
+  P --> R[Final receipt]</pre>
+<p>The acceptance diagram groups the seven gates into three stages. Execution evidence supplies node and circuit outcomes.
+Closure and checks establish coverage and local obligations. Trust and policy evaluate allowed packages, capabilities,
+budgets, conflicts, and goal verifiers. A final receipt is publishable only after all three stages pass.</p>
 
 <h2>Conditional correctness and trust</h2>
 <p>An acceptance certificate means the declared computation followed the identified sources, code, rules, profile, registry, and environment. It remains conditional on source authenticity and completeness, command semantics, matcher coverage, verifier correctness, runtime integrity, and oracle behavior. Trust is versioned and scoped: <code>UNTRUSTED</code>, <code>CANDIDATE</code>, <code>REVIEWED</code>, <code>VERIFIED</code>, or <code>REVOKED</code>.</p>

@@ -10,8 +10,8 @@ summary: Defines layered discovery, sharding, section pipelines, parallel execut
 
 ## Introduction
 
-Large knowledge bases and book-scale sources cannot be handled by loading everything into one prompt or graph. The design
-scales by separating storage, discovery, verification, compilation, execution, and synthesis.
+Large knowledge bases use layered catalogs, metadata indexes, registry shards, and content-addressed stores. Large documents
+use stable sections, per-section interpretation circuits, provenance-linked summaries, and cross-section synthesis circuits.
 
 ## Core Content
 

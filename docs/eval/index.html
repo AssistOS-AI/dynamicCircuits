@@ -1,23 +1,174 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Evaluation Catalog — Dynamic Circuits</title><link rel="stylesheet" href="../styles.css">
-<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
-<body><header class="site-header"><a class="brand" href="../index.html">Dynamic Circuits Documentation</a><nav><a href="../evaluation.html">Evaluation guide</a><a href="../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a><a href="../specsLoader.html?spec=matrix.md">Specifications</a></nav></header>
-<main class="page"><article class="page__panel"><p class="breadcrumbs"><a href="../index.html">Documentation</a> / Evaluation / Catalog</p>
-<h1>Executable evaluation evidence</h1>
-<p class="lead">Each case commits the source rules, task, structured data, SOP packages, deterministic outputs, human report, reproduction command, and an explicit statement of what the result does not prove.</p>
-<pre class="mermaid">flowchart LR
-  I[Source documents and rules] --> C[Task SOP packages]
-  C --> K[Compiler and runtime]
-  K --> J[Exact JSON result]
-  J --> H[Grounded human report]
-  K --> U[Automated unit assertion]</pre>
-<table><thead><tr><th>Case</th><th>Reasoning pressure</th><th>Scale</th><th>Result</th></tr></thead><tbody>
-<tr><td><a href="eval1/index.html">Eval 1: notice period</a></td><td>Default rule, evidenced exception, per-case witness, complete classification.</td><td>4 inputs, 2 packages, 3 cases, 1 nested call, 1 goal.</td><td>1 violation; 2 compliant, one via exception.</td></tr>
-<tr><td><a href="eval2/index.html">Eval 2: scientific claim</a></td><td>Universal quantifier versus average; exhaustive witness search.</td><td>4 inputs, 2 packages, 8 observations, 1 goal.</td><td>Refuted by <code>-2</code>; mean <code>5.25</code>.</td></tr>
-<tr><td><a href="eval3/index.html">Eval 3: document consistency</a></td><td>Repeated interpretation, synthesis, source attribution, unresolved alternatives.</td><td>5 inputs, 3 packages, 3 child instances, 2 conflict classes.</td><td>Timeline and terminology conflicts retained.</td></tr>
-</tbody></table>
-<h2>What is actually tested</h2>
-<p><code>tests/runtime/eval.test.mjs</code> reads the committed source data and text, executes all three circuit graphs, and checks exact public outputs and assurance goals. Other suites independently test parser/compiler failure paths, workspace mode inference and links, coding-agent invocation, CLI migration behavior, static documentation links, and historical integrity.</p>
-<p class="callout">These are deterministic circuit evaluations, not recorded claims about a particular model's quality. A future coding-agent benchmark can run the same workspaces from raw prose and compare its authored circuits and reports against these committed contracts.</p>
-</article></main></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Circuits Documentation</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html">Dynamic Circuits Documentation</a>
+    <nav aria-label="Primary navigation">
+      <a href="../index.html">Overview</a>
+      <a href="../evaluation.html">Testing</a>
+      <a href="../specsLoader.html?spec=DS007-evaluation-and-testing.md">Evaluation specification</a>
+    </nav>
+  </header>
+  <main class="page">
+    <p class="breadcrumbs"><a href="../index.html">Documentation</a> / Evaluation file browser</p>
+    <h1>Evaluation file browser</h1>
+    <p class="lead">Select an evaluation and a file on the left. The right side explains the evaluation question, the executed circuit, the observed result, and then displays the selected file.</p>
+
+    <h2>What these evaluations measure</h2>
+    <p>The three cases test the deterministic SOP implementation against committed reference tasks. Each unit test reads the
+      committed inputs, executes the committed circuit packages, and compares their public outputs with
+      <code>results/result.json</code>. The cases cover exception handling, exhaustive counterexample search, repeated child
+      circuits, cross-document aggregation, source attribution, and goals.</p>
+    <p>These fixtures evaluate circuit and runtime behavior. They do not currently measure how reliably a particular version
+      of Codex authors the same circuits from raw documents. A future coding-agent benchmark can use these inputs and expected
+      results as its reference dataset.</p>
+
+    <div class="eval-browser">
+      <aside class="eval-menu" aria-label="Evaluation files">
+        <h2>Evaluations</h2>
+        <div id="eval-menu"></div>
+      </aside>
+      <section class="eval-viewer" aria-live="polite">
+        <div id="eval-summary" class="eval-case-summary"></div>
+        <div class="file-heading">
+          <h2 id="file-title">Select a file</h2>
+          <span id="file-role" class="status"></span>
+        </div>
+        <pre class="file-view"><code id="file-content">Loading…</code></pre>
+      </section>
+    </div>
+  </main>
+  <script>
+    const evaluations = {
+      eval1: {
+        title: "Eval 1 — Notice-period exception",
+        question: "Does the circuit apply the ordinary 30-day rule, use the 10-day exception only when written consent exists, and classify every case?",
+        execution: "analysis.sop calls policy.sop, receives one finding per case, calculates aggregate statistics, and checks that the number of findings equals the number of inputs.",
+        result: "SUCCEEDED. Case A is a violation; case B is compliant through the documented exception; case C is ordinarily compliant. The completeness goal passes.",
+        limits: "The supplied policy interpretation is treated as the rule for this fixture. The case does not establish legal authority or jurisdictional applicability.",
+        files: [
+          ["README.md", "Evaluation contract and reproduction"],
+          ["input/rule.md", "Source rule"],
+          ["input/policy.json", "Structured rule interpretation"],
+          ["input/cases.json", "Cases under review"],
+          ["input/task.md", "Requested outputs"],
+          ["sop/policy.sop", "Rule circuit"],
+          ["sop/analysis.sop", "Root circuit and goal"],
+          ["results/result.json", "Checked result summary"],
+          ["results/report.md", "Human-readable result"]
+        ]
+      },
+      eval2: {
+        title: "Eval 2 — Universal claim and counterexample",
+        question: "Does the circuit distinguish a positive average from the universal claim that every observation is positive?",
+        execution: "counterexample.sop parses and validates the dataset, scans every observation, returns the first non-positive witness, and calculates the mean. analysis.sop verifies that the witness belongs to the dataset.",
+        result: "SUCCEEDED with semantic verdict REFUTED, witness -2, mean 5.25, and a passing witness-grounding goal.",
+        limits: "The verdict applies to the committed dataset. Sampling quality, measurement validity, and external generalization are outside this fixture.",
+        files: [
+          ["README.md", "Evaluation contract and reproduction"],
+          ["input/rule.md", "Refutation rule"],
+          ["input/dataset.json", "Observations"],
+          ["input/claim.md", "Claims under review"],
+          ["input/task.md", "Requested outputs"],
+          ["sop/counterexample.sop", "Search and mean circuit"],
+          ["sop/analysis.sop", "Root circuit and goal"],
+          ["results/result.json", "Checked result summary"],
+          ["results/report.md", "Human-readable result"]
+        ]
+      },
+      eval3: {
+        title: "Eval 3 — Cross-document consistency",
+        question: "Does the circuit interpret three chapters independently and report every conflicting launch date and definition with its source?",
+        execution: "root.sop calls interpretation.sop three times, passes the three interpretations to consistency.sop, and checks that both required conflict classes are present.",
+        result: "SUCCEEDED. The report retains launch dates 2026-06-15 and 2026-07-01 and two incompatible definitions of Node, each with its source chapter.",
+        limits: "The source documents define no precedence or supersession rule, so the circuit reports the alternatives and leaves the conflicts unresolved.",
+        files: [
+          ["README.md", "Evaluation contract and reproduction"],
+          ["input/review-rules.md", "Consistency rules"],
+          ["input/chapter-01.md", "Source chapter 1"],
+          ["input/chapter-02.md", "Source chapter 2"],
+          ["input/chapter-03.md", "Source chapter 3"],
+          ["input/task.md", "Requested outputs"],
+          ["sop/interpretation.sop", "Per-chapter interpretation"],
+          ["sop/consistency.sop", "Cross-document comparison"],
+          ["sop/root.sop", "Root circuit and goal"],
+          ["results/result.json", "Checked result summary"],
+          ["results/report.md", "Human-readable result"]
+        ]
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    let activeEval = evaluations[params.get("eval")] ? params.get("eval") : "eval1";
+    let activeFile = params.get("file") || "README.md";
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+      })[character]);
+    }
+
+    function renderMenu() {
+      const menu = document.getElementById("eval-menu");
+      menu.innerHTML = Object.entries(evaluations).map(([id, item]) => `
+        <section>
+          <h3>${escapeHtml(item.title)}</h3>
+          <ul>${item.files.map(([file, role]) => `
+            <li><button type="button" data-eval="${id}" data-file="${escapeHtml(file)}"
+              aria-current="${id === activeEval && file === activeFile}">${escapeHtml(file)}</button></li>
+          `).join("")}</ul>
+        </section>
+      `).join("");
+      menu.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => {
+        activeEval = button.dataset.eval;
+        activeFile = button.dataset.file;
+        loadSelection();
+      }));
+    }
+
+    function renderSummary(item) {
+      document.getElementById("eval-summary").innerHTML = `
+        <h2>${escapeHtml(item.title)}</h2>
+        <p><strong>Evaluation question:</strong> ${escapeHtml(item.question)}</p>
+        <p><strong>Execution:</strong> ${escapeHtml(item.execution)}</p>
+        <p><strong>Observed result:</strong> ${escapeHtml(item.result)}</p>
+        <p><strong>Scope limit:</strong> ${escapeHtml(item.limits)}</p>
+      `;
+    }
+
+    async function loadSelection() {
+      const item = evaluations[activeEval];
+      if (!item.files.some(([file]) => file === activeFile)) activeFile = "README.md";
+      const role = item.files.find(([file]) => file === activeFile)[1];
+      renderMenu();
+      renderSummary(item);
+      document.getElementById("file-title").textContent = `${activeEval}/${activeFile}`;
+      document.getElementById("file-role").textContent = role;
+      document.getElementById("file-content").textContent = "Loading…";
+      const url = `${activeEval}/${activeFile.split("/").map(encodeURIComponent).join("/")}`;
+      history.replaceState(null, "", `?eval=${encodeURIComponent(activeEval)}&file=${encodeURIComponent(activeFile)}`);
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        let content = await response.text();
+        if (activeFile.endsWith(".json")) content = JSON.stringify(JSON.parse(content), null, 2);
+        document.getElementById("file-content").textContent = content;
+      } catch (error) {
+        document.getElementById("file-content").textContent = `Cannot load ${url}: ${error.message}`;
+      }
+    }
+
+    loadSelection();
+  </script>
+</body>
+</html>

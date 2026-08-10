@@ -10,8 +10,9 @@ summary: Defines staged delivery from deterministic kernel to assurance, scale, 
 
 ## Introduction
 
-The complete design is intentionally larger than the first implementation. Staging keeps every release internally honest:
-implemented guarantees are testable, while planned assurance features remain explicit contracts rather than implied claims.
+The roadmap delivers the parser, compiler, runtime, agent workspaces, persistent evidence, semantic registry, assurance
+engine, security isolation, and distributed processing as separate milestones. Every milestone has explicit module
+boundaries and testable exit requirements.
 
 ## Core Content
 

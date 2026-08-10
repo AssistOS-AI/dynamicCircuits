@@ -10,8 +10,9 @@ summary: Defines exhaustive mandatory matching, monotone closure, expected-versu
 
 ## Introduction
 
-An assurance claim is unsound if a relevant mandatory rule can be skipped. Closure therefore turns declared mandatory
-matchers into an exhaustive fixed-point computation over the semantic facts available in one epoch.
+Mandatory closure evaluates every declared mandatory matcher against the semantic facts in one epoch. It creates applicable
+circuit instances, indexes their outputs, repeats until no facts or instances are added, and audits the expected instance set
+against the executed set.
 
 ## Core Content
 

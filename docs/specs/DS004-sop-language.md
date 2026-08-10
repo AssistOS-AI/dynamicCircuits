@@ -10,7 +10,8 @@ summary: Defines the implemented syntax, positional interfaces, command ABI, cor
 
 ## Introduction
 
-This specification extracts the implemented language contract from the broader historical v1 design. The historical package remains informative for future milestones but does not expand current runtime guarantees.
+This specification defines the SOP syntax accepted by the current parser and compiler. Planned syntax and runtime features
+from the historical v1 design are identified separately in the relevant later specifications.
 
 ## Core Content
 

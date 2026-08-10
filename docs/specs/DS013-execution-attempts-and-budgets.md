@@ -10,8 +10,9 @@ summary: Defines relevant-slice scheduling, node and circuit states, refusal pro
 
 ## Introduction
 
-Execution materializes the compiled graph without conflating technical completion with semantic acceptance. Attempts and
-budgets make repair and uncertainty explicit.
+Execution evaluates the required slice of a compiled graph and returns a classified technical outcome. Assurance evaluates
+semantic acceptance separately. Immutable attempts record repairs, while budgets bound time, resources, instances, and
+external work.
 
 ## Core Content
 

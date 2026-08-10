@@ -10,8 +10,9 @@ summary: Compares logic, rule, grammar, rewriting, proof, dataflow, and workflow
 
 ## Introduction
 
-SOP Lang is a hybrid because no single established architecture simultaneously provides approachable circuit syntax,
-deterministic dataflow, extensible executable knowledge, exhaustive obligations, and evidence-first operation.
+SOP Lang combines compiler-style SSA dataflow, rule-system fixed points, workflow-style effects and attempts, and
+proof-oriented receipts. This specification compares the selected responsibilities with established alternatives and
+records which parts may use those systems directly.
 
 ## Core Content
 
