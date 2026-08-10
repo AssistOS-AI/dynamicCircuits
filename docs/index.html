@@ -16,14 +16,14 @@
     <p class="breadcrumbs">Documentation / Current experiment</p>
     <h1>What Dynamic Circuits can do today</h1>
     <p class="lead">The repository tests whether a coding agent can turn readable task documents into executable SOP
-      circuits, then use a deterministic local runtime to produce inspectable findings and receipts. Eight committed
-      evaluation domains with 24 task runs work now; unrestricted natural-language question answering and automatic discovery of every relevant KB
-      rule do not.</p>
+      circuits, then use a deterministic local runtime to produce inspectable findings and receipts. Ten committed
+      evaluation domains with 30 task runs work now. The executor also discovers every instance declared by loaded reviewed
+      exact-key mandatory matchers; unrestricted language understanding and externally trusted acceptance remain outside the current runtime.</p>
 
     <section class="status-summary" aria-label="Current status summary">
-      <div class="status-card status-card--verified"><strong>8 domains / 24 runs</strong><span>Reasoning, scale, text generation, and independent verification</span></div>
+      <div class="status-card status-card--verified"><strong>10 domains / 30 runs</strong><span>Reasoning, scale, generation, verification, and mandatory closure</span></div>
       <div class="status-card status-card--agent"><strong>2 agent workflows</strong><span>Task analysis and KB candidate learning through Codex</span></div>
-      <div class="status-card status-card--planned"><strong>Planned assurance</strong><span>Automatic matching, complete closure, trust profiles, and certificates</span></div>
+      <div class="status-card status-card--verified"><strong>Mandatory closure</strong><span>Exact-key publications, reviewed matchers, complete local instance audit</span></div>
     </section>
 
     <h2>What the experiment tests</h2>
@@ -98,6 +98,20 @@
           <td>3 notices pass, including a supplied-term boundary case</td>
           <td><a href="eval/eval8/index.html">Eval 8 files</a></td>
         </tr>
+        <tr class="capability-row capability-row--verified">
+          <td><span class="capability-badge">Verified</span></td>
+          <td>10 reviewed mandatory matchers and 3 different control subsets</td>
+          <td>Indexes explicit publications, runs every matching control instance automatically, and audits expected against executed identities.</td>
+          <td>4/4, 3/3, and 4/4 instances; none missing</td>
+          <td><a href="eval/eval9/index.html">Eval 9 files</a></td>
+        </tr>
+        <tr class="capability-row capability-row--verified">
+          <td><span class="capability-badge">Verified</span></td>
+          <td>Raw orders whose normalization creates new assessment facts</td>
+          <td>Repeats matching across rounds and branches each normalized order into approval and currency rules.</td>
+          <td>6/6, 3/3, and 6/6 instances; none missing</td>
+          <td><a href="eval/eval10/index.html">Eval 10 files</a></td>
+        </tr>
         <tr class="capability-row capability-row--agent">
           <td><span class="capability-badge">Agent run</span></td>
           <td>Arbitrary readable files placed in one task <code>input/</code> folder</td>
@@ -107,16 +121,16 @@
         </tr>
         <tr class="capability-row capability-row--planned">
           <td><span class="capability-badge">Planned</span></td>
-          <td>Large KB requiring automatic discovery of every semantically applicable rule</td>
-          <td>Future registry search, deterministic matchers, mandatory closure, trust checks, and final acceptance.</td>
+          <td>Open-ended KB discovery with ontology search, external trust, and certified acceptance</td>
+          <td>Future version solving, richer tri-state matchers, trust profiles, signatures, and final acceptance.</td>
           <td>No current end-to-end implementation</td>
-          <td><a href="assurance.html">Planned coverage flow</a></td>
+          <td><a href="assurance.html">Remaining assurance flow</a></td>
         </tr>
       </tbody>
     </table>
-    <p>The first eight rows use committed executable SOP, so <code>npm test</code> reruns their public results. They do not prove
+    <p>The first ten rows use committed executable SOP, so <code>npm test</code> reruns their public results. They do not prove
       that Codex will recreate identical SOP from prose on every live run. The next row is the live experiment for that
-      source-to-code step. The last row is maintained architecture and is labeled planned wherever it appears.</p>
+      source-to-code step. The last row identifies assurance work beyond registry-relative closure.</p>
 
     <h2>What knowledge is built in</h2>
     <p>The runtime has no built-in facts about law, science, Socrate, project dates, or document terminology. It knows how to
@@ -163,10 +177,10 @@
           <td>Eval 4 reasoner handles direct facts and one-premise unary rules after interpretation.</td>
           <td>Add binary relations, multiple premises, explicit negation, and proof paths.</td>
         </tr>
-        <tr class="capability-row capability-row--planned">
-          <td>“Use every relevant rule in this large KB”</td><td>Not guaranteed</td>
-          <td>The agent selects explicit calls; automatic semantic matching and mandatory closure are planned.</td>
-          <td>Implement DS015–DS017 and coverage receipts.</td>
+        <tr class="capability-row capability-row--verified">
+          <td>“Use every reviewed mandatory rule matching these published keys”</td><td>Works</td>
+          <td>The executor enumerates every loaded matcher binding and closes new publications to a fixed point.</td>
+          <td>Add richer predicates and profile-selected trusted registries.</td>
         </tr>
         <tr class="capability-row capability-row--unsupported">
           <td>Hostile circuit code with production isolation</td><td>Not supported</td>
@@ -177,7 +191,7 @@
     </table>
     <p>The table separates a useful current experiment from stronger claims. “Works through Codex” means the repository can
       prepare the task and verify generated SOP, but the interpretation remains agent-produced and must be reviewed. “Not
-      guaranteed” means a successful explicit graph may still omit an applicable rule. “Not supported” identifies an absent
+      guaranteed beyond the loaded registry” means unencoded rules and misinterpreted facts remain possible. “Not supported” identifies an absent
       entry path or safety boundary rather than a bad answer.</p>
 
     <h2>Exact implemented surface</h2>
@@ -199,8 +213,8 @@
         </tr>
         <tr class="capability-row capability-row--verified">
           <td>SOP source</td>
-          <td>Ordered inputs/outputs, local JavaScript commands, immutable wires, nested circuits, goals, invariants, and parsed matcher metadata</td>
-          <td>Richer types, named arguments, loops, effects, and automatic matcher wiring are absent</td>
+          <td>Ordered inputs/outputs, local JavaScript commands, immutable wires, nested circuits, goals, invariants, publications, and mandatory matcher metadata</td>
+          <td>Richer types, named arguments, loops, effects, and general semantic predicates are absent</td>
           <td><a href="sop-runtime.html">Language example</a></td>
         </tr>
         <tr class="capability-row capability-row--verified">
@@ -211,7 +225,7 @@
         </tr>
         <tr class="capability-row capability-row--verified">
           <td>Runtime</td>
-          <td>Topological required-node execution, child circuits, checks, goals, invariants, classified outcomes, canonical values, and nested receipts</td>
+          <td>Topological execution, child circuits, checks, goals, invariants, exact semantic index, mandatory closure, canonical values, and nested receipts</td>
           <td>In-memory only; no persistent cache, external effects, or production hostile-code isolation</td>
           <td><a href="operations.html">Evidence limits</a></td>
         </tr>
@@ -219,19 +233,20 @@
           <td>Core commands</td>
           <td><code>value</code>, <code>absent</code>, <code>alias</code>, <code>get</code>, <code>hash</code>, <code>equal</code>,
             <code>compare</code>, <code>parseNumber</code>, <code>assertInvariant</code>, <code>emptyList</code>,
-            <code>append</code>, and <code>concat</code></td>
+            <code>append</code>, <code>concat</code>, <code>publish</code>, <code>select</code>, <code>bind</code>,
+            <code>join</code>, and <code>distinct</code></td>
           <td>Domain rules belong in circuit packages, not in Core</td>
           <td><a href="specsLoader.html?spec=DS022-core-and-assurance-commands.md">DS022</a></td>
         </tr>
       </tbody>
     </table>
     <p>The green status means these mechanics have deterministic tests. It does not make every agent-authored domain rule
-      correct. Source interpretation still needs review, and exhaustive KB applicability still needs the planned assurance
-      layer.</p>
+      correct. Source interpretation and matcher promotion still need review, while trust profiles and certified acceptance
+      remain future assurance layers.</p>
 
     <h2>Try it in three steps</h2>
     <ol>
-      <li>Run <code>npm test</code> to reproduce all five committed evaluation circuits.</li>
+      <li>Run <code>npm test</code> to reproduce all ten committed evaluation domains.</li>
       <li>Run Eval 4 directly with <code>node src/cli.mjs sop run --kb-root docs/eval/eval4/kb/circuits --root docs/eval/eval4/task/sop --prefix eval4 --package eval4.analysis</code>.</li>
       <li>Follow the <a href="tutorial.html">manual CLI tutorial</a> to copy readable documents into a new workdir, inspect the Codex invocation, and run a live source-to-code experiment.</li>
     </ol>

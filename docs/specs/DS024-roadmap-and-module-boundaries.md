@@ -24,9 +24,10 @@ policy into an interface that later milestones cannot replace.
 
 The lexical/parser layer produces source-spanned AST; the compiler resolves packages and emits normalized graph IR; the
 runtime schedules only the relevant slice and emits node/circuit receipts; the standard library supplies deterministic
-commands; workspace and agent adapters prepare external coding-agent runs; documentation and evals expose contracts. Future
-modules add artifact storage, semantic index, registry, matcher engine, closure engine, profiles/goals, trust, cache/epochs,
-final receipt service, and capability brokers. No layer may reach backward into mutable internals of another.
+commands; workspace and agent adapters prepare external coding-agent runs; documentation and evals expose contracts. The
+semantic index and mandatory-closure modules consume compiled packages without changing parser or base-runtime ownership.
+Future modules add persistent artifacts, richer registry search, profiles/goals, trust, cache/epochs, final receipts, and
+capability brokers. No layer may reach backward into mutable internals of another.
 
 ### Milestones
 
@@ -44,7 +45,9 @@ The inherited roadmap is preserved as eleven incremental milestones:
 9. add capability isolation, brokers, hardened workers, signatures, redaction, and operational controls; and
 10. add sharding, distributed execution, large-document pipelines, scale benchmarks, and governance tooling.
 
-Milestones 1–5 have useful implemented subsets in this repository; none is declared complete merely by its presence. Each
+Milestones 1–5 have useful implemented subsets. Milestone 7 now includes exact semantic publications, restricted reviewed
+matchers, and automatic target wiring; milestone 8 includes bounded registry-relative closure and its audit receipt. Rich
+discovery, profiles, trust, conflicts, and certificates remain future work. No milestone is declared complete merely by its presence. Each
 milestone exits only with public contracts, negative tests, receipt behavior, migration notes, documentation, and a threat
 review proportionate to its authority.
 
@@ -54,10 +57,9 @@ Source, IR, receipt, profile, and package schemas evolve independently with decl
 require explicit migration or rejection. Generated files remain reproducible. Historical `sop_lang_circuits_design_specs_v1/`
 is immutable evidence; current DS files are the maintained authority.
 
-Operational example: semantic matching is a milestone-7 feature. Adding matcher metadata to the parser is not enough to
-declare it implemented. The registry query, deterministic tri-state matcher, automatic circuit wiring, receipts, negative
-tests, documentation, and migration behavior must all exist at their declared module boundaries before the milestone can
-be presented as executable.
+Operational example: the implemented milestone-7 subset requires more than parsed metadata. It includes exact index query,
+compiler-enforced matcher restrictions, automatic circuit wiring, receipts, negative tests, documentation, and evals. It is
+described as an exact-key subset because general tri-state matching, ranking, version solving, and migration remain absent.
 
 ## Decisions & Questions
 

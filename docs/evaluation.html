@@ -15,7 +15,7 @@
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="index.html">Documentation</a> / Evaluation</p>
     <h1>Tests and evaluation cases</h1>
-    <p class="lead">Unit tests cover the deterministic implementation. Eight evaluation domains add 24 real task workspaces spanning policy, scientific claims, document consistency, contextual reasoning, large governance review, and three generator–verifier families.</p>
+    <p class="lead">Unit tests cover the deterministic implementation. Ten evaluation domains add 30 real task workspaces spanning policy, scientific claims, document consistency, contextual reasoning, large governance review, three generator–verifier families, and mandatory closure.</p>
 
     <h2>Purpose and relationship to the system</h2>
     <p>The project has two verification levels. Unit tests isolate one contract, such as free-wire detection or workspace
@@ -66,14 +66,17 @@
         <tr><td><a href="eval/eval6/index.html">Eval 6</a></td><td>Constrained literary generation followed by an independent verifier.</td><td>One explicit length failure and two fully passing compact variants.</td></tr>
         <tr><td><a href="eval/eval7/index.html">Eval 7</a></td><td>Operational handoff-document generation and independent structural/factual verification.</td><td>Three distinct handoff SOPs execute and pass verification without operational effects.</td></tr>
         <tr><td><a href="eval/eval8/index.html">Eval 8</a></td><td>Fact-bounded contractual notice generation and unsupported-addition checks.</td><td>Three notices pass, including a supplied-term boundary case.</td></tr>
+        <tr><td><a href="eval/eval9/index.html">Eval 9</a></td><td>Selective discovery from ten reviewed mandatory matchers without direct target calls.</td><td>All three subsets close with 4/4, 3/3, and 4/4 instances and none missing.</td></tr>
+        <tr><td><a href="eval/eval10/index.html">Eval 10</a></td><td>Multi-round normalization that publishes facts for two independent later assessments.</td><td>All runs reach closure with 6/6, 3/3, and 6/6 instances and none missing.</td></tr>
       </tbody>
     </table>
-    <p>The eight rows exercise different failure risks across three runs each. Eval 1 checks that an exception does not replace the base rule for
+    <p>The ten rows exercise different failure risks across three runs each. Eval 1 checks that an exception does not replace the base rule for
       unrelated cases. Eval 2 checks that an aggregate statistic does not answer a universal claim. Eval 3 checks that
       repeated interpretation and synthesis preserve incompatible source claims. Eval 4 checks direct evidence, rule-derived
       evidence, and open-world unknown behavior after coding-agent interpretation. Eval 5 checks real source-to-SOP learning,
       reviewed promotion, real task-to-SOP interpretation, 10 repeated review instances, 100 nested rule instances, refusal,
       and boundary coverage. Eval 6–8 verify generated prose through separate circuits rather than trusting the generator.
+      Eval 9 verifies complete subset discovery in a ten-matcher registry. Eval 10 verifies branching closure across rounds.
       Open the <a href="eval/index.html">evaluation catalog</a>, choose one evaluation, then select any
       source, circuit, review record, or report in that case's two-pane view.</p>
     <p>Runtime <code>SUCCEEDED</code> means the circuit completed and its local goals passed. The domain result can still be a

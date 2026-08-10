@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mandatory rules and closure — Dynamic Circuits</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs"><a href="index.html">Documentation</a> / Mandatory rules</p>
+    <h1>Mandatory rules and closure</h1>
+    <p class="lead">A reviewed matcher marks when a reusable KB circuit is compulsory. The runtime discovers every binding produced by the loaded mandatory matcher registry, executes each target, indexes any newly published facts, and repeats until no new instance exists.</p>
+
+    <h2>The problem this feature solves</h2>
+    <p>A coding agent can inspect many KB packages, but a final result must not depend on whether it remembered every relevant call. Dynamic Circuits therefore separates three responsibilities. Task SOP publishes current facts under explicit semantic keys. Reviewed KB matchers decide which published values bind to a rule. The executor enumerates and runs the complete discovered instance set.</p>
+    <p>The guarantee has a precise boundary: it covers all instances returned by every reviewed <code>kb.*</code> mandatory matcher loaded for the run. It does not claim that an absent matcher exists, that unrestricted prose was interpreted perfectly, or that the registry is trusted by an external authority. Exact publication keys and reviewed matcher code make the implemented claim testable.</p>
+
+    <figure class="diagram-card">
+      <figcaption><strong>Applicability is separate from rule logic</strong><span>The same evaluator can be mandatory for one published fact family and optional in another calling context.</span></figcaption>
+      <div class="mermaid">
+flowchart LR
+  T[Task facts] --> P((publish))
+  P --> M{Reviewed matcher}
+  M -->|binding exists| R[Reusable rule]
+  M -->|no binding| N[No instance]
+      </div>
+    </figure>
+    <p>The task-facts node contains values extracted from current input. <code>publish</code> registers one immutable value, semantic key, provenance label, and stable handle. The matcher reads the index and returns handle tuples. A tuple activates the named target; an empty matcher result means that matcher has no current instance and the executor invents nothing.</p>
+
+    <h2>The source convention</h2>
+    <p>The mandatory marker belongs on a small, reviewed matcher package—not on the target rule. This lets a generic target remain reusable and makes applicability independently testable. Trigger keys are dotted identifiers such as <code>order.raw</code>; the compiler requires the matcher to select exactly its declared trigger keys.</p>
+    <pre><code>@template mandatory
+@trigger "order.raw"
+@apply kb.order.normalize
+@input index delta
+@output matches
+@entries select $index "order.raw"
+@matches bind $entries</code></pre>
+    <p><code>@template mandatory</code> places this reviewed <code>kb.*</code> package in the automatic registry. <code>@trigger</code> declares the semantic family that can activate it. <code>@apply</code> names an existing circuit whose input arity must match every returned tuple. The fixed two-input matcher interface receives a deterministic index snapshot and the newest publications; its single output is the complete tuple list.</p>
+    <p>Mandatory matchers cannot contain local JavaScript. They use the restricted deterministic commands <code>select</code>, <code>bind</code>, <code>join</code>, <code>distinct</code>, <code>concat</code>, and <code>emptyList</code>. A one-key matcher selects publications and wraps each handle in a one-element tuple. A two-key matcher may join two selected sets by equal JSON-pointer fields before deduplication.</p>
+
+    <h2>What task circuits publish</h2>
+    <pre><code>@order task.orders
+@rawPublication publish $order "order.raw" "orders.md#OA-1"</code></pre>
+    <p>The first call reads a value from a task-local package generated from human input. The second call exposes that value to matching. It does not invoke normalization, approval, or currency policy. The coding agent must publish a key only when the input really provides the corresponding fact shape; semantic publication is an explicit interpretation decision recorded in task SOP.</p>
+
+    <figure class="diagram-card">
+      <figcaption><strong>A closure can branch across rounds</strong><span>Normalization publishes a new fact; two independent obligations then appear.</span></figcaption>
+      <div class="mermaid">
+flowchart TD
+  A[order.raw publications] --> B[Normalize every order]
+  B --> C((order.normalized))
+  C --> D[Approval assessment]
+  C --> E[Currency assessment]
+      </div>
+    </figure>
+    <p>Every raw-order handle creates one normalization instance. Successful normalization returns both a value and a new <code>order.normalized</code> publication. That publication activates two different reviewed matchers, so each order creates an approval instance and a currency instance. With two raw orders, the expected fixed point contains two normalization plus four assessment instances.</p>
+
+    <h2>How the executor proves closure</h2>
+    <ol>
+      <li>Execute the no-input root <code>task.analysis</code> and index every semantic publication in its public outputs.</li>
+      <li>Load all compiled mandatory matcher packages under the <code>kb.</code> namespace in stable name order.</li>
+      <li>Run active matchers, validate handle tuples and target arity, deduplicate instance identities, and execute every new target instance.</li>
+      <li>Index publications returned by successful targets and repeat matching with the enlarged fact set.</li>
+      <li>Recompute the expected instance set and compare it with the executed set. Success requires zero missing instances.</li>
+    </ol>
+    <p>The closure receipt contains the matcher-registry hash, registry size, semantic keys, rounds, publication count, expected identities, executed identities, missing identities, failure evidence, and its own hash. The executor report also renders each automatically applied target's actual public outputs. A policy finding may say <code>compliant: false</code> while execution remains successful; refusal, rejection, error, or an exhausted budget prevents a successful closure claim.</p>
+
+    <h2>Implemented boundary and next assurance layers</h2>
+    <table>
+      <thead><tr><th>Capability</th><th>Current behavior</th><th>Evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Semantic publication</td><td>Implemented for dotted exact keys with immutable values and provenance labels.</td><td>Root outputs and index handles</td></tr>
+        <tr><td>Mandatory discovery</td><td>Implemented for loaded, reviewed <code>kb.*</code> matchers using restricted deterministic commands.</td><td>Matcher metadata and registry hash</td></tr>
+        <tr><td>Fixed-point closure</td><td>Implemented with instance deduplication, final expected-versus-executed audit, and round/instance budgets.</td><td>Closure receipt</td></tr>
+        <tr><td>Richer semantic search</td><td>Not implemented. No embeddings, ontology expansion, version solving, or open-ended natural-language matching participates in a mandatory decision.</td><td>No claim beyond exact matcher outputs</td></tr>
+        <tr><td>Trust and final acceptance</td><td>Not implemented. A closed local registry is not a trust profile, signature, or acceptance certificate.</td><td>Outcome remains runtime <code>SUCCEEDED</code>, not certified <code>ACCEPTED</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Run the two concrete evaluations</h2>
+    <p><a href="eval/eval9/index.html">Eval 9</a> checks selective discovery against a ten-matcher registry. <a href="eval/eval10/index.html">Eval 10</a> checks multi-round publication and branching closure. To reproduce them manually, follow <a href="tutorial.html">the CLI tutorial</a>. The normative details are in <a href="specsLoader.html?spec=DS015-semantic-index-matching-and-wiring.md">DS015</a>, <a href="specsLoader.html?spec=DS016-mandatory-closure.md">DS016</a>, and <a href="specsLoader.html?spec=DS019-receipts-provenance-and-audit.md">DS019</a>.</p>
+  </article></main>
+  <div data-include="partials/footer.html"></div><script src="partials-loader.js"></script>
+</body>
+</html>

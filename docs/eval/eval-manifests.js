@@ -71,6 +71,35 @@ const evaluationFiles = {
       { root: "task3", input: ["brief.md"], sop: ["brief.sop", "analysis.sop"] },
     ],
   },
+  eval9: {
+    kbSource: ["kb/input/mandatory-controls.md"],
+    kbSop: [
+      "kb/circuits/mandatory_controls/evaluate.sop",
+      ...["r01", "r02", "r03", "r04", "r05", "r06", "r07", "r08", "r09", "r10"]
+        .map((name) => `kb/circuits/matchers/${name}.sop`),
+    ],
+    tasks: [
+      { root: "task", input: ["review.md"], sop: ["review.sop", "analysis.sop"], expected: "expected.md" },
+      { root: "task2", input: ["review.md"], sop: ["review.sop", "analysis.sop"] },
+      { root: "task3", input: ["review.md"], sop: ["review.sop", "analysis.sop"] },
+    ],
+  },
+  eval10: {
+    kbSource: ["kb/input/order-closure.md"],
+    kbSop: [
+      "kb/circuits/order/normalize.sop",
+      "kb/circuits/order/approval.sop",
+      "kb/circuits/order/currency.sop",
+      "kb/circuits/matchers/normalize.sop",
+      "kb/circuits/matchers/approval.sop",
+      "kb/circuits/matchers/currency.sop",
+    ],
+    tasks: [
+      { root: "task", input: ["orders.md"], sop: ["orders.sop", "analysis.sop"], expected: "expected.md" },
+      { root: "task2", input: ["orders.md"], sop: ["orders.sop", "analysis.sop"] },
+      { root: "task3", input: ["orders.md"], sop: ["orders.sop", "analysis.sop"] },
+    ],
+  },
 };
 
 const sourceFile = (file) => ({

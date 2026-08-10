@@ -56,8 +56,10 @@ arguments, circuit input mismatch, output mismatch, invalid coverage, package co
 missing helper, and unsupported cycle. Diagnostics must identify code, severity, package/file, line, affected symbol, and
 message when the information exists.
 
-Static policy checks are planned for permitted hashes, capabilities, mandatory matcher restrictions, trusted blocking
-verifiers, and write effects. Incremental compilation may cache parse and IR by package hash; interface or code changes must
+The compiler implements mandatory matcher restrictions: the apply target must resolve, interface and selected dotted keys
+must agree with metadata, local JavaScript is forbidden, and only the matching Core subset is callable. Static policy checks
+remain planned for permitted hashes, capabilities, trusted blocking verifiers, and write effects. Incremental compilation
+may cache parse and IR by package hash; interface or code changes must
 invalidate callers or execution caches according to dependency.
 
 ### Operational example

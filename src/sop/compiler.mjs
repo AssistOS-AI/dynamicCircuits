@@ -1,6 +1,54 @@
 import { coreCommands } from "./core-commands.mjs";
 import { fail } from "./errors.mjs";
 
+const MANDATORY_MATCHER_CORE = new Set(["select", "bind", "join", "distinct", "concat", "emptyList"]);
+
+function validateTemplateMetadata(registry, owner, nodes) {
+  if (!owner.ast.template) return;
+  if (!registry.has(owner.ast.apply)) {
+    fail("UNKNOWN_APPLY_TARGET", `Matcher ${owner.packageName} applies missing package ${owner.ast.apply}`, {
+      file: owner.filePath,
+    });
+  }
+  if (owner.ast.template !== "mandatory") return;
+  if (owner.ast.inputs.join(" ") !== "index delta" || owner.ast.outputs.join(" ") !== "matches") {
+    fail("INVALID_MANDATORY_MATCHER", "Mandatory matcher interface must be @input index delta and @output matches", {
+      file: owner.filePath,
+    });
+  }
+  if (owner.ast.commands.length) {
+    fail("INVALID_MANDATORY_MATCHER", "Mandatory matchers cannot define JavaScript commands", { file: owner.filePath });
+  }
+  const selectedKeys = new Set();
+  for (const node of nodes) {
+    if (node.resolved.kind !== "core" || !MANDATORY_MATCHER_CORE.has(node.resolved.commandName)) {
+      fail("INVALID_MANDATORY_MATCHER", `Mandatory matcher cannot call ${node.callee}`, {
+        file: owner.filePath,
+        line: node.line,
+      });
+    }
+    if (node.resolved.commandName === "select") {
+      const key = node.args[1];
+      if (!key || key.kind !== "literal" || typeof key.value !== "string") {
+        fail("INVALID_MANDATORY_MATCHER", "Mandatory select requires a literal semantic key", {
+          file: owner.filePath,
+          line: node.line,
+        });
+      }
+      selectedKeys.add(key.value);
+    }
+  }
+  const triggerKeys = [...owner.ast.trigger].sort();
+  const actualKeys = [...selectedKeys].sort();
+  if (triggerKeys.join("\n") !== actualKeys.join("\n")) {
+    fail("INVALID_MANDATORY_MATCHER", "@trigger keys must exactly equal the keys selected by a mandatory matcher", {
+      file: owner.filePath,
+      triggers: triggerKeys,
+      selected: actualKeys,
+    });
+  }
+}
+
 function resolveCallee(registry, owner, node) {
   if (owner.ast.commands.some((command) => command.name === node.callee)) {
     return { kind: "command", packageName: owner.packageName, commandName: node.callee };
@@ -129,6 +177,7 @@ export function compilePackage(registry, packageName, cache = new Map(), stack =
     return { ...node, resolved, formals, dependencies: dependenciesFor(node, producers, owner) };
   });
   const orderedNodes = topologicalOrder(nodes, owner);
+  validateTemplateMetadata(registry, owner, orderedNodes);
   const nodeById = new Map(nodes.map((node) => [node.nodeId, node]));
   const declarations = [...owner.ast.outputs, ...owner.ast.invariants.flatMap((item) => [item.wire, ...item.covers]), ...owner.ast.goals.flatMap((item) => [item.wire, ...item.covers])];
   for (const wire of declarations) {

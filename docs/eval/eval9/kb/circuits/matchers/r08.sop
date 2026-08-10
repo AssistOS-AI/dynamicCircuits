@@ -1,0 +1,7 @@
+@template mandatory
+@trigger "control.r08"
+@apply kb.mandatory_controls.evaluate
+@input index delta
+@output matches
+@entries select $index "control.r08"
+@matches bind $entries

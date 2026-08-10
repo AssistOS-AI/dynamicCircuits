@@ -4,6 +4,7 @@ import { compilePackage } from "./sop/compiler.mjs";
 import { SopError } from "./sop/errors.mjs";
 import { PackageRegistry } from "./sop/registry.mjs";
 import { SopRuntime } from "./sop/runtime.mjs";
+import { executeWithMandatoryClosure } from "./sop/mandatory-closure.mjs";
 
 export const TASK_ENTRYPOINT = "task.analysis";
 
@@ -90,6 +91,42 @@ export function renderRuntimeReport({ packageName, outputNames, result }) {
     lines.push("");
   }
 
+  if (result.receipt.closure) {
+    const closure = result.receipt.closure;
+    lines.push(
+      "## Mandatory closure",
+      "",
+      "| Field | Observed value |",
+      "| --- | --- |",
+      `| Status | **${safeText(closure.status)}** |`,
+      `| Registered mandatory matchers | ${closure.matcherCount} |`,
+      `| Closure rounds | ${closure.rounds.length} |`,
+      `| Indexed publications | ${closure.publicationCount} |`,
+      `| Expected mandatory instances | ${closure.expectedInstances.length} |`,
+      `| Executed mandatory instances | ${closure.executedInstances.length} |`,
+      `| Missing mandatory instances | ${closure.missingInstances.length} |`,
+      `| Closure receipt | \`${safeText(closure.receiptHash)}\` |`,
+      "",
+    );
+    if (closure.failure) lines.push("### Blocking closure evidence", "", renderValue(closure.failure), "");
+    if (result.mandatoryResults?.length) {
+      lines.push("### Automatically applied rules", "");
+      for (const instance of result.mandatoryResults) {
+        lines.push(
+          `#### ${safeText(instance.target)}`,
+          "",
+          `Matcher: \`${safeText(instance.matcher)}\`  `,
+          `Instance: \`${safeText(instance.instanceKey)}\`  `,
+          `Outcome: **${safeText(instance.outcome)}**`,
+          "",
+        );
+        instance.outputs.forEach((value, index) => {
+          lines.push(`**${safeText(instance.outputNames[index] ?? `output-${index + 1}`)}**`, "", renderValue(value), "");
+        });
+      }
+    }
+  }
+
   lines.push(
     "## Receipt summary",
     "",
@@ -109,7 +146,8 @@ export async function executeWorkspaceCircuit({ kbDir, workDir, packageName = TA
     { path: path.join(workDir, "sop"), prefix: "" },
   ]);
   const compiled = compilePackage(registry, packageName);
-  const result = await new SopRuntime(registry).execute(packageName, []);
+  const runtime = new SopRuntime(registry);
+  const result = await executeWithMandatoryClosure(runtime, packageName, []);
   const report = renderRuntimeReport({ packageName, outputNames: compiled.outputs, result });
   const resultsDir = path.join(workDir, "results");
   await mkdir(resultsDir, { recursive: true });

@@ -17,7 +17,7 @@ the HTML pages and DS contracts synchronized with observable implementation beha
 
 ## Core Content
 
-Production code must use Node.js ECMAScript modules under `src/` and must support Node.js 20 or newer. Runtime code must avoid external package dependencies. Modules must have explicit responsibilities: `src/sop/` contains language mechanics, `src/agents/` contains coding-agent adapters, `src/workspace.mjs` owns workspace preparation, `src/incremental.mjs` owns analysis invalidation, `src/runtime-report.mjs` owns fixed-root execution and report rendering, and `src/cli.mjs` owns argument handling and process orchestration.
+Production code must use Node.js ECMAScript modules under `src/` and must support Node.js 20 or newer. Runtime code must avoid external package dependencies. Modules must have explicit responsibilities: `src/sop/` contains language mechanics, `src/sop/semantic-index.mjs` owns immutable semantic publications and exact-key indexing, `src/sop/mandatory-closure.mjs` owns registry-relative fixed-point execution, `src/agents/` contains coding-agent adapters, `src/workspace.mjs` owns workspace preparation, `src/incremental.mjs` owns analysis invalidation, `src/runtime-report.mjs` owns fixed-root execution and report rendering, and `src/cli.mjs` owns argument handling and process orchestration.
 
 Functions should remain deterministic unless their boundary explicitly represents an effect. Errors crossing module or CLI boundaries must use stable codes and structured details. Canonical data must not contain non-finite numbers, functions, or unstable object identities. Code must not use hidden globals to transfer runtime values.
 
@@ -37,8 +37,9 @@ operational descriptions.
 The primary site navigation must have one maintained source under `docs/partials/`. Reader pages at every nesting level,
 including evaluation catalogs and individual evaluation browsers, must load that partial through the shared loader instead
 of copying header markup. The top-level navigation must group related destinations into compact submenus with three or four
-vertical choices where the available pages permit it. The loader must resolve partial links from the documentation root so
-the same source works beneath an arbitrary static mount prefix.
+vertical choices where the available pages permit it. Opening one submenu closes its siblings; clicking outside navigation
+or pressing Escape closes every submenu. The loader must resolve partial links from the documentation root so the same
+source works beneath an arbitrary static mount prefix.
 
 Each durable HTML page must restate enough project context to be understandable without an earlier page, define local terms,
 give at least one concrete file or execution example, and link to the relevant runnable guide and normative DS. Every diagram

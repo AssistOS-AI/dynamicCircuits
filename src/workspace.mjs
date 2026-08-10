@@ -85,11 +85,12 @@ Analyze every file listed in \`.dynamic-circuits/input-manifest.json\`. Read the
 
 The semantic source boundary for this run is strict: read task evidence and requests from \`input/\`, executable reusable knowledge from the configured KB \`circuits/\`, and only the project skills/runtime documentation needed to author valid SOP. Do not inspect evaluation expectations, prior results, evaluation README or HTML pages, KB candidates, KB learning reports, or sibling task workspaces. If such content is encountered accidentally, do not use it to construct the circuit.
 
-Load reviewed reusable circuits from ${JSON.stringify(path.join(kbDir, "circuits"))}. Treat the analysis as three explicit symbolic stages:
+Load reviewed reusable circuits from ${JSON.stringify(path.join(kbDir, "circuits"))}. Treat the analysis as four explicit symbolic stages:
 
 1. Translate the human-readable task sources into one or more task-local SOP packages under \`sop/task/\`. These packages represent the task request and current facts; they must not duplicate policy logic already supplied by KB circuits.
-2. Create the larger root package \`task.analysis\` under \`sop/task/analysis.sop\`. It must obtain the task values from those input packages, invoke the applicable reviewed \`kb.*\` packages, require no external inputs, and expose the complete analysis result through public outputs.
-3. Compile and test \`task.analysis\`. After the coding agent exits, the CLI executes this fixed entrypoint and writes \`results/runtime-result.md\` directly from runtime outputs and the receipt.
+2. Inspect reviewed \`kb.*\` metadata. For every applicable \`@template mandatory\` matcher, publish the current values under its exact \`@trigger\` semantic keys and do not call its \`@apply\` target manually. Explicitly invoke applicable optional or legacy packages that have no mandatory matcher.
+3. Create the larger no-input root package \`task.analysis\` under \`sop/task/analysis.sop\`. It must obtain task values from those input packages and expose task outputs plus semantic publications as public outputs.
+4. Compile and test \`task.analysis\`, including the mandatory closure section. After the coding agent exits, the CLI executes this fixed entrypoint and writes \`results/runtime-result.md\` directly from runtime outputs and receipts.
 
 SOP files are executable intermediate artifacts, not the user-facing report. Do not create \`result.json\`, and do not write a semantic result report. The coding agent may write \`results/agent-summary.md\` only as a provenance journal covering input coverage, generated packages, compile/test attempts, assumptions, and limitations. It is not an analysis result and must not restate or reinterpret the circuit verdict. The executor-owned \`runtime-result.md\` is the only authoritative run result.
 
@@ -220,8 +221,9 @@ export function buildAnalysisPrompt(workspace) {
     `Inspect relevant reusable circuits in ${workspace.kbDir}/circuits.`,
     "Use only task input/ and reviewed KB circuits as semantic sources. Do not inspect expected outcomes, prior results, evaluation README/HTML, KB candidates or learning reports, or sibling workspaces.",
     "Encode the task request and current facts as task-local SOP packages under sop/task/ without copying KB policy logic.",
-    "Author the no-input root package task.analysis at sop/task/analysis.sop; it must consume those packages, invoke reviewed kb.* circuits, and expose the complete result as public outputs.",
-    "Compile and test task.analysis. The CLI will execute it after you exit and will generate results/runtime-result.md itself.",
+    "Inspect reviewed kb.* matcher metadata. Publish values for applicable mandatory matchers instead of manually invoking their @apply targets; explicitly call only applicable optional or legacy packages.",
+    "Author the no-input root package task.analysis at sop/task/analysis.sop; it must consume task packages and expose task outputs plus semantic publications as public outputs.",
+    "Compile and test task.analysis, including mandatory closure. The CLI will execute it after you exit and will generate results/runtime-result.md itself.",
     "Never create result.json or a semantic result report. Do not edit or pre-create results/runtime-result.md.",
     "You may write results/agent-summary.md only as a provenance journal: input coverage, generated/reused circuits, compile/test attempts, assumptions, limitations, and reusable discoveries.",
     "Do not put verdicts or interpretations of circuit output in that journal. Do not use direct LLM API integrations.",

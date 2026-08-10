@@ -58,5 +58,5 @@ required and production code has no external package dependency.
 - Runtime source: `src/`
 - Modular tests: `tests/`
 - Coding-agent skills: `circuitSkills/`
-- Evaluation workspaces and static evidence: contiguous `docs/eval/evalN/` folders, currently `eval1/` through `eval5/`; reusable material is under `kb/`, while current inputs, SOP, and results are under `task/`
+- Evaluation workspaces and static evidence: contiguous `docs/eval/evalN/` folders, currently `eval1/` through `eval10/`; reusable material is under `kb/`, while current inputs, SOP, and results are under `task/`, `task2/`, and `task3/`
 - Historical design package: `sop_lang_circuits_design_specs_v1/`

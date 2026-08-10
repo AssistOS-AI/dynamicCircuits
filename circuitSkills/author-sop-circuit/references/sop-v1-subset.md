@@ -53,6 +53,27 @@ objects, freezes canonical values, and emits receipts. Runtime values must be st
 arrays, plain string-keyed objects, or the deliberately accepted undefined sentinel; functions, cycles, exotic prototypes,
 and non-finite numbers fail canonicalization.
 
-`@template mandatory|optional`, `@trigger "..."`, and `@apply qualified.package` are accepted only as a complete metadata
-set. They are not executed. Mandatory matching, semantic indexing, automatic wiring, closure, persistent cache, effect
-capabilities, assurance profiles, and trust enforcement are later milestones and must not be claimed as implemented.
+Semantic publication and mandatory matcher commands are also available:
+
+```text
+@published publish $case "case.notice" "task.md#case-A"
+@items select $index "case.notice"
+@matches bind $items
+@pairs join $events $policies "/subject" "/subject"
+@unique distinct $pairs
+```
+
+`publish` registers an explicit canonical value under a dotted semantic key. `select` exhaustively reads one key from the
+finite index. `bind` creates one-input handle tuples. `join` creates two-input tuples whose JSON-pointer values are equal.
+`distinct` removes only exact duplicate tuples. `concat` and `emptyList` may combine finite matcher results.
+
+`@template mandatory`, `@trigger "..."`, and `@apply qualified.package` form one mandatory matcher contract. An executable
+mandatory matcher has exactly `@input index delta` and `@output matches`, defines no JavaScript, uses only the restricted
+commands above, and selects exactly its declared trigger keys. During CLI execution every reviewed `kb.*` mandatory matcher
+whose trigger key exists is evaluated; all returned handle tuples instantiate the target circuit until no new publication
+or instance appears. The receipt compares expected and executed instance keys. Target refusal or failure blocks closure;
+budget exhaustion or matcher uncertainty returns `INCONCLUSIVE`.
+
+This local milestone provides exact-key discovery, one-key binding, two-key equality joins, deterministic deduplication,
+bounded closure, and a completeness audit relative to the loaded registry. Optional ranking, richer predicates, version
+solving, trust profiles, effect capabilities, persistent closure state, and final acceptance certificates remain planned.

@@ -25,14 +25,17 @@ citations, document spans, and relationships. Every fact carries provenance back
 package version, and epoch. Index entries are additive within an epoch; corrections create superseding facts rather than
 rewriting evidence invisibly.
 
-The registry supports exact keys, structured filters, dependency and capability constraints, and optional approximate
-search over descriptions or embeddings. Approximate search may rank candidates but never establish applicability. Index
-partitioning and retrieval must preserve stable identifiers and permit a strict exhaustive mode.
+The implemented in-memory index supports dotted exact keys, immutable canonical values, provenance labels, stable
+content-derived handles, deduplication, deterministic snapshots, and selection by key. Planned extensions add structured
+filters, dependency and capability constraints, persistent epochs, and optional approximate search over descriptions or
+embeddings. Approximate search may rank candidates but never establish mandatory applicability.
 
 ### Matchers and outcomes
 
-A matcher is a pure, versioned executable predicate over facts and profile context. It returns `MATCH` with canonical
-bindings and evidence, `NO_MATCH` with a reason, or `UNKNOWN` with missing prerequisites. It must declare the template it
+A matcher is a pure, versioned executable predicate over facts and profile context. The current subset returns a complete
+list of publication-handle tuples: each tuple is a match and an empty list is no match. Matcher execution failure makes
+closure inconclusive; it is never converted to no match. The broader model will add explicit `MATCH`, `NO_MATCH`, and
+`UNKNOWN` evidence records. Every matcher must declare the template it
 can instantiate, the fact families it consumes, exclusivity or priority rules, and its cost class. Matcher failures are
 diagnostics, not negative evidence.
 
@@ -47,8 +50,9 @@ inputs, and records matcher evidence. It then re-indexes outputs because they ma
 suppressed by a key over matcher, template version, canonical bindings, epoch, and assurance profile.
 
 Candidate discovery may be approximate for optional work. Mandatory discovery must be complete under the declared
-registry snapshot. The current runtime has explicit circuit calls only; semantic indexing, matcher execution, ranking, and
-automatic wiring are planned Assurance Core features.
+registry snapshot. The current runtime automatically wires only reviewed `kb.*` mandatory matchers whose exact trigger keys
+are published. One-key binding and equality joins over two selected fact families are implemented. Candidate ranking,
+ontology expansion, version solving, profile filtering, and general tri-state predicates remain planned.
 
 ### Operational example
 
@@ -66,6 +70,11 @@ whose inputs and reasons can be replayed and audited.
 ### Question #2: What prevents duplicate instances across closure rounds?
 
 Response: A canonical instance key and monotone registry state make the same matcher-template-binding tuple idempotent.
+
+### Question #3: What does “every applicable rule” mean in the current implementation?
+
+Response: Every unique binding returned by every loaded reviewed mandatory matcher over the explicit publication index.
+The claim is registry-relative and does not imply that unencoded prose or an absent matcher was discovered.
 
 ## Conclusion
 

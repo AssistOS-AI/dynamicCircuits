@@ -34,8 +34,9 @@ network, clock, random, or oracle capability is supplied.
 
 A command may succeed, return a structured core refusal, refuse through `ctx.reject`, fail its `check`, or raise an error.
 The scheduler records `PENDING`, `RUNNING`, `SUCCEEDED`, `REFUSED`, `REJECTED`, `ERROR`, `BLOCKED`, and dead-node evidence as
-applicable. Circuit outcomes distinguish `SUCCEEDED`, `REFUSED`, `REJECTED`, and `ERROR`; planned `INCONCLUSIVE`, caching,
-and cancellation are specified by DS013. A rejected or failed circuit exposes no successful public outputs. Receipts include
+applicable. Base-circuit outcomes distinguish `SUCCEEDED`, `REFUSED`, `REJECTED`, and `ERROR`; the mandatory-closure wrapper
+also returns `INCONCLUSIVE` when a matcher or configured closure budget prevents a completeness claim. Caching and
+cancellation are specified by DS013. A rejected or failed circuit exposes no successful public outputs. Receipts include
 package and instance identity, node states, source lines, input/output hashes, checks, child receipts, dead nodes, and a
 deterministic receipt hash.
 
@@ -44,15 +45,18 @@ their receipt is embedded or hash-linked. Resolution never depends on discovery 
 compiler's topological order, so independent-node source reordering cannot change pure results or receipt semantics.
 
 The `vm` boundary is a reference-development guard, not a production security sandbox. Asynchronous resource limits,
-worker isolation, runtime memoization, content-addressed cross-machine caching, effects, semantic indexes, mandatory closure,
-and trust-profile enforcement remain unsupported. DS003's timestamp-based workspace invalidation is a CLI orchestration
+worker isolation, runtime memoization, content-addressed cross-machine caching, effects, persistent semantic indexes,
+richer matcher predicates, and trust-profile enforcement remain unsupported. The implemented in-memory index and bounded
+mandatory closure operate over explicit publications and loaded reviewed matchers. DS003's timestamp-based workspace invalidation is a CLI orchestration
 optimization: it skips whole agent/executor stages when the existing report is newer than their file dependencies. It does
 not cache nodes, values, or receipts inside the runtime.
 
 For workspace analysis, the CLI registers `KB/circuits` with prefix `kb`, registers `WORK/sop` without a prefix, compiles
-the fixed no-input package `task.analysis`, executes it, and renders `WORK/results/runtime-result.md`. The renderer copies
-public output values, output hashes, goal and invariant checks, root-node statuses, child receipt hashes, package hash, and
-receipt hash. It performs no semantic summarization. Multiline string outputs are preserved as text blocks. An unsuccessful
+the fixed no-input package `task.analysis`, executes it, closes every loaded mandatory matcher instance, and renders
+`WORK/results/runtime-result.md`. The renderer copies public output values, output hashes, goal and invariant checks,
+root-node statuses, child receipt hashes, package hash, and receipt hash. When closure is active it also copies matcher
+count, rounds, publications, expected/executed/missing instance sets, the closure receipt hash, and the actual outputs of
+every automatically applied target. It performs no semantic summarization. Multiline string outputs are preserved as text blocks. An unsuccessful
 runtime still yields its available executor report before the CLI returns a classified analysis failure.
 
 ### Operational example
@@ -76,6 +80,12 @@ Response: Node `vm` can remove ambient globals and bound synchronous evaluation,
 Response: Canonical values and receipt hashes remain the executor evidence; Markdown makes those exact values statically
 browsable without introducing a hand-authored or agent-authored result object. Machine consumers can invoke `sop run`
 directly, while evaluation documentation compares a separate expectation document with the executor-owned report.
+
+### Question #4: What does a closed mandatory receipt prove?
+
+Response: It proves equality between expected and executed instances for the compiled reviewed matcher registry and
+semantic publications in that run. It does not prove that the registry contains every real-world rule or that an external
+trust profile accepts those packages.
 
 ## Conclusion
 

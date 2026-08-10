@@ -5,10 +5,11 @@ import { unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildAgentInvocation } from "./agents/registry.mjs";
-import { compilePackage } from "./sop/compiler.mjs";
+import { compilePackage, compileRegistry } from "./sop/compiler.mjs";
 import { SopError } from "./sop/errors.mjs";
 import { PackageRegistry } from "./sop/registry.mjs";
 import { SopRuntime } from "./sop/runtime.mjs";
+import { executeWithMandatoryClosure } from "./sop/mandatory-closure.mjs";
 import { executeWorkspaceCircuit } from "./runtime-report.mjs";
 import { planAnalysisRun } from "./incremental.mjs";
 import {
@@ -34,6 +35,8 @@ WORK/input and writes WORK/sop and WORK/results while treating the KB as read-on
 An analysis is incremental: a fresh runtime-result.md skips both stages; newer generated SOP
 runs only the executor; changed task input, changed reviewed KB circuits, or a deleted result
 runs the coding agent and executor again.
+SOP run and workspace analysis automatically execute reviewed kb.* mandatory matchers whose
+semantic triggers are published by the root or by another mandatory rule.
 The generic adapter also requires --agent-command PATH. Installed aliases are agent, dc-agent,
 and dynamic-circuits.`;
 }
@@ -210,6 +213,7 @@ async function handleSop(sopCommand, options) {
   const registry = await PackageRegistry.fromRoots(roots);
   const packageName = requireOption(options, "package");
   if (sopCommand === "compile") {
+    compileRegistry(registry);
     const compiled = compilePackage(registry, packageName);
     process.stdout.write(`${JSON.stringify(compiled, null, 2)}\n`);
     return;
@@ -219,7 +223,8 @@ async function handleSop(sopCommand, options) {
     try { inputs = JSON.parse(options.inputs); }
     catch { throw new SopError("CLI_ARGUMENT", "--inputs must be valid JSON"); }
   }
-  const result = await new SopRuntime(registry).execute(packageName, inputs);
+  const runtime = new SopRuntime(registry);
+  const result = await executeWithMandatoryClosure(runtime, packageName, inputs);
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   if (result.outcome !== "SUCCEEDED") process.exitCode = 2;
 }

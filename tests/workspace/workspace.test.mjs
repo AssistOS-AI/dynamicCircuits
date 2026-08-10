@@ -22,7 +22,9 @@ test("prepares isolated KB/work directories and inventories every regular input 
   const guidance = await readFile(path.join(workDir, "AGENTS.md"), "utf8");
   assert.match(guidance, /Treat the knowledge base as read-only/);
   assert.match(guidance, /Translate the human-readable task sources/);
-  assert.match(guidance, /larger root package `task\.analysis`/);
+  assert.match(guidance, /larger no-input root package `task\.analysis`/);
+  assert.match(guidance, /@template mandatory/);
+  assert.match(guidance, /mandatory closure section/);
   assert.match(guidance, /Do not create `result\.json`/);
   assert.match(guidance, /executor-owned `runtime-result\.md` is the only authoritative run result/);
 });

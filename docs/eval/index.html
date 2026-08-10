@@ -15,7 +15,7 @@
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="../index.html">Documentation</a> / Evaluation catalog</p>
     <h1>Evaluation catalog</h1>
-    <p class="lead">The catalog links all eight evaluation domains. Each domain page keeps one KB separate from three independent task runs and lets you inspect source text, generated SOP, and executor output without mixing their roles.</p>
+    <p class="lead">The catalog links all ten evaluation domains. Each domain page keeps one KB separate from three independent task runs and lets you inspect source text, generated SOP, and executor output without mixing their roles.</p>
 
     <h2>Purpose of the catalog</h2>
     <p>The catalog separates evaluation cases so the interface remains usable as the repository grows. An evaluation page
@@ -77,12 +77,25 @@
           <td>Three supplied briefs include ordinary facts plus a boundary case where a currency symbol and disputed phrase are explicitly authorized input.</td>
           <td>All roots succeeded; generated notices and independent verification reports pass their declared checks.</td>
         </tr>
+        <tr>
+          <td><a href="eval9/index.html">Eval 9: mandatory registry coverage</a></td>
+          <td>Can the executor discover every current control obligation from ten reviewed matchers without direct rule calls in task SOP?</td>
+          <td>Three tasks publish disjoint four-, three-, and four-control subsets, including compliant and non-compliant findings.</td>
+          <td>All roots succeeded; closure found and executed 4/4, 3/3, and 4/4 expected instances with none missing.</td>
+        </tr>
+        <tr>
+          <td><a href="eval10/index.html">Eval 10: multi-round mandatory closure</a></td>
+          <td>Do outputs from one mandatory rule activate every dependent second-round obligation?</td>
+          <td>Two-order, one-order, and two boundary-order tasks branch from normalization into approval and currency assessments.</td>
+          <td>All roots succeeded; closure executed 6/6, 3/3, and 6/6 instances across multiple rounds with none missing.</td>
+        </tr>
       </tbody>
     </table>
-    <p>The table compares the evaluation intent and the source-to-circuit transformation across 24 task runs. Eval 4 shows the explicit
+    <p>The table compares the evaluation intent and the source-to-circuit transformation across 30 task runs. Eval 4 shows the explicit
       coding-agent interpretation required before the deterministic runtime can execute facts and rules. Eval 5 records both
       coding-agent transformations, promotion, and larger explicitly wired runtime executions without claiming automatic
-      semantic rule discovery. Eval 6–8 add generation followed by independent symbolic verification. Open one row to inspect its files.
+      semantic rule discovery. Eval 6–8 add generation followed by independent symbolic verification. Eval 9–10 exercise
+      automatic mandatory discovery and fixed-point closure over explicit semantic publications. Open one row to inspect its files.
       The <a href="../evaluation.html">testing guide</a> explains how these cases relate to unit suites, while
       <a href="../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a> defines the normative evaluation contract.</p>
   </article></main>

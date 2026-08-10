@@ -1,0 +1,5 @@
+@output request orders firstRawPublication secondRawPublication
+
+@request @orders @first @second task.orders
+@firstRawPublication publish $first "order.raw" "orders.md#OA-1"
+@secondRawPublication publish $second "order.raw" "orders.md#OA-2"

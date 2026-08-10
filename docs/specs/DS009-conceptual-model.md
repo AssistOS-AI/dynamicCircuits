@@ -37,9 +37,10 @@ unit and package with ordered inputs, ordered outputs, local commands, calls, an
 **circuit instance** is one runtime application of that package. Instance identity is internal and never becomes a wire
 namespace visible in source.
 
-A **template circuit** is reusable executable knowledge. A **matcher circuit** returns ordered tuples of wire handles that
-fit a template interface. A **mandatory hook** is a matcher selected by an external assurance profile and evaluated
-systematically. A **problem circuit** is the task root and its task-local packages.
+A **template circuit** is reusable executable knowledge. A **matcher circuit** returns ordered tuples of semantic
+publication handles that fit a target interface. A **mandatory hook** is a reviewed `kb.*` matcher registered for systematic
+evaluation; the current registry loads all such packages, while a future assurance profile may select a trusted subset. A
+**problem circuit** is the task root and its task-local packages.
 
 ### Attempts, goals, profiles, receipts, and epochs
 
@@ -78,6 +79,12 @@ later agent, parser, domain expert, or independent extractor to challenge it wit
 
 Response: Trust depends on the complete dependency slice, verifier lineage, package hashes, source versions, and active
 profile. A local label would permit evidence laundering through aliases.
+
+### Question #3: Is a semantic publication already a verified fact?
+
+Response: No. It is an explicit task interpretation consisting of a canonical value, semantic family, provenance label,
+and handle. Matching can use it deterministically, but verification and acceptance still depend on target logic and later
+assurance policy.
 
 ## Conclusion
 

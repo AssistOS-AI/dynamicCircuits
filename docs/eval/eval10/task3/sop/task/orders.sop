@@ -1,0 +1,39 @@
+@input
+@output order1 order2 request
+
+@load define
+    function run() {
+      return {
+        order1: {
+          id: "OC-1",
+          amount: 9999.50,
+          currency: "gbp",
+          approved: false,
+          source: "orders.md#OC-1",
+        },
+        order2: {
+          id: "OC-2",
+          amount: 10000,
+          currency: "EUR",
+          approved: false,
+          source: "orders.md#OC-2",
+        },
+        request: {
+          publishKey: "order.raw",
+          explicitKbTargetsAllowed: false,
+          expectedMandatoryInstances: 6,
+          expectedClosureStatus: "CLOSED",
+          expectedFindings: [
+            { id: "OC-1", check: "currency", compliant: false },
+            { id: "OC-2", check: "approval", compliant: false, threshold: "exact" },
+          ],
+          source: "orders.md",
+        },
+      }
+    }
+    return { run }
+
+@loaded load
+@order1 get $loaded "order1"
+@order2 get $loaded "order2"
+@request get $loaded "request"

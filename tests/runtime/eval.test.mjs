@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { PackageRegistry, SopRuntime } from "../../src/index.mjs";
+import { executeWithMandatoryClosure, PackageRegistry, SopRuntime } from "../../src/index.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const evalRoot = path.join(repositoryRoot, "docs", "eval");
@@ -13,6 +13,11 @@ async function evalRuntime(caseName, taskRoot = "task") {
     { path: path.join(evalRoot, caseName, taskRoot, "sop"), prefix: "" },
   ]);
   return new SopRuntime(registry);
+}
+
+async function mandatoryEval(caseName, taskRoot = "task") {
+  const runtime = await evalRuntime(caseName, taskRoot);
+  return executeWithMandatoryClosure(runtime, "task.analysis", []);
 }
 
 test("executes eval1 notice-period rule and exception paths", async () => {
@@ -157,5 +162,53 @@ test("executes two additional independent task runs for every evaluation domain"
     const outputs = JSON.stringify(result.outputs);
     for (const pattern of patterns) assert.match(outputs, pattern, `${caseName}/${taskRoot}: ${pattern}`);
     assert.match(result.receipt.receiptHash, /^sha256:[a-f0-9]{64}$/);
+  }
+});
+
+test("eval9 discovers every applicable rule in a ten-matcher registry", async () => {
+  const expectations = [
+    ["task", 4, ["A-01", "A-03", "A-07", "A-10"]],
+    ["task2", 3, ["B-02", "B-05", "B-08"]],
+    ["task3", 4, ["C-04", "C-06", "C-09", "C-10"]],
+  ];
+
+  for (const [taskRoot, expectedCount, caseIds] of expectations) {
+    const result = await mandatoryEval("eval9", taskRoot);
+    assert.equal(result.outcome, "SUCCEEDED", taskRoot);
+    assert.equal(result.receipt.closure.status, "CLOSED", taskRoot);
+    assert.equal(result.receipt.closure.matcherCount, 10, taskRoot);
+    assert.equal(result.receipt.closure.expectedInstances.length, expectedCount, taskRoot);
+    assert.equal(result.receipt.closure.executedInstances.length, expectedCount, taskRoot);
+    assert.deepEqual(result.receipt.closure.missingInstances, [], taskRoot);
+    assert.deepEqual(
+      result.mandatoryResults.map(({ outputs }) => outputs[0].caseId).sort(),
+      [...caseIds].sort(),
+      taskRoot,
+    );
+  }
+});
+
+test("eval10 reaches multi-round mandatory closure from raw orders", async () => {
+  const expectations = [
+    ["task", 6, { approval: [], currency: [] }],
+    ["task2", 3, { approval: ["OB-1"], currency: [] }],
+    ["task3", 6, { approval: ["OC-2"], currency: ["OC-1"] }],
+  ];
+
+  for (const [taskRoot, expectedCount, failures] of expectations) {
+    const result = await mandatoryEval("eval10", taskRoot);
+    assert.equal(result.outcome, "SUCCEEDED", taskRoot);
+    assert.equal(result.receipt.closure.status, "CLOSED", taskRoot);
+    assert.equal(result.receipt.closure.matcherCount, 3, taskRoot);
+    assert.equal(result.receipt.closure.expectedInstances.length, expectedCount, taskRoot);
+    assert.equal(result.receipt.closure.executedInstances.length, expectedCount, taskRoot);
+    assert.deepEqual(result.receipt.closure.missingInstances, [], taskRoot);
+    for (const kind of ["approval", "currency"]) {
+      const observed = result.mandatoryResults
+        .filter(({ target, outputs }) => target === `kb.order.${kind}` && outputs[0].compliant === false)
+        .map(({ outputs }) => outputs[0].id)
+        .sort();
+      assert.deepEqual(observed, failures[kind], `${taskRoot}:${kind}`);
+    }
   }
 });

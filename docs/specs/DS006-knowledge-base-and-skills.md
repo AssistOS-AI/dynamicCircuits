@@ -39,7 +39,7 @@ The three maintained skills consolidate the six historical roles. `author-sop-ci
 constraints plus template/matcher authoring; `circuit-learner` covers source inventory, rule extraction, candidate packaging,
 provenance, tests, ambiguity, and assurance review preparation; `analyze-task` covers problem solving, receipt-guided
 debugging, coverage, task-root construction, and reusable-discovery reporting. Agents must read only the skill needed for their
-task and must distinguish implemented syntax from planned matching, closure, profiles, and proof features.
+task and must distinguish implemented exact-key matching and closure from planned richer discovery, profiles, and proof features.
 
 The executor report must distinguish successful execution from refusal or failure. Agent provenance journals must distinguish
 reused trusted circuits, generated task-local circuits, unexecuted source, and proposed KB candidates without restating a
@@ -48,6 +48,11 @@ semantic result. Learning artifacts must retain input hashes or paths and review
 Candidate packages include a manifest, source provenance, applicability, inputs/outputs, effects/capabilities, assumptions,
 exceptions and priorities, refusal codes, positive/negative/boundary examples, test commands, expected receipts, overlap and
 version notes, and review checklist. Compilation is necessary but never sufficient for semantic promotion.
+
+A candidate mandatory matcher may be promoted only after reviewers approve its exact dotted triggers, apply target,
+interface, exhaustive positive/no-match/multi-record cases, duplicate behavior, and semantic source provenance. The matcher
+contains no local JavaScript and uses only the restricted matching Core. Task analysis may publish values for reviewed
+matchers, but it must never create a task-local mandatory matcher that silently enlarges KB policy.
 
 ### Operational example
 
@@ -69,6 +74,12 @@ Response: Coding-agent extraction can be useful but remains an interpretation. C
 
 Response: Their authority and lifetime are limited to one request. Keeping them in the workdir prevents later analyses from
 mistaking an observation, question, or exceptional case for reviewed reusable knowledge.
+
+### Question #4: Why is mandatory metadata held to a stronger promotion standard?
+
+Response: A false positive forces a rule into every matching run, while a false negative can omit an obligation. Review must
+therefore cover both applicability directions, target binding, registry interaction, and closure behavior rather than only
+whether the target circuit compiles.
 
 ## Conclusion
 

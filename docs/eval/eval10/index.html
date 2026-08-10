@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eval 10: Multi-round mandatory closure — Dynamic Circuits</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page">
+    <p class="breadcrumbs"><a href="../index.html">Evaluation catalog</a> / Eval 10</p>
+    <h1>Eval 10: Multi-round mandatory closure</h1>
+    <p class="lead">Raw-order publications activate normalization; each normalized order publishes a new fact that activates two independent second-round assessments.</p>
+    <h2>What this evaluation proves</h2>
+    <p>This case tests a real fixed point rather than a flat list of calls. The task circuit knows only the current raw orders and publishes them as <code>order.raw</code>. The reviewed normalization matcher discovers those facts. Its target emits normalized values and <code>order.normalized</code> publications, which activate approval and currency matchers in the next productive round.</p>
+    <p>For N valid orders the complete set contains N normalization instances plus 2N assessments. The three tasks therefore expect six, three, and six executed instances. Unsupported currency and missing approval are ordinary non-compliant findings; closure still succeeds when every applicable circuit executes and all expected instance identities appear in the audit.</p>
+    <p>Use the tree to compare human rules with reviewed matchers, generated task SOP, and executor output. The complete mechanism and its present exact-key limitation are described in <a href="../../mandatory-rules.html">Mandatory rules and closure</a>; <a href="../../specsLoader.html?spec=DS016-mandatory-closure.md">DS016</a> defines the fixed-point contract.</p>
+    <div class="eval-browser">
+      <aside class="eval-menu"><h2>Evaluation files</h2><p class="eval-menu__help">Open one branch, then choose a file. Hover over a filename for its complete path.</p><eval-file-tree id="eval-file-tree"></eval-file-tree></aside>
+      <section class="eval-viewer">
+        <div class="eval-case-summary"><h2 id="file-title">File</h2><p id="file-explanation"></p><span id="file-role" class="status"></span></div>
+        <pre class="file-view"><code id="file-content">Loading…</code></pre>
+      </section>
+    </div>
+  </main>
+  <script>window.evalCaseId = "eval10";</script>
+  <script src="../eval-manifests.js"></script><script src="../eval-file-tree.js"></script><script src="../eval-browser.js"></script>
+  <div data-include="partials/footer.html"></div><script src="../../partials-loader.js"></script>
+</body>
+</html>

@@ -26,7 +26,7 @@
       <thead><tr><th>Test</th><th>Needs Codex</th><th>Main evidence</th><th>Useful question answered</th></tr></thead>
       <tbody>
         <tr><td>Unit suite</td><td>No</td><td>Passing test report</td><td>Are implementation contracts intact?</td></tr>
-        <tr><td>Committed eval circuit</td><td>No</td><td>Runtime JSON and receipt</td><td>Can the kernel execute a useful analysis circuit?</td></tr>
+        <tr><td>Committed eval circuit</td><td>No</td><td>Runtime output and receipt</td><td>Can the kernel execute a useful analysis circuit?</td></tr>
         <tr><td>Workspace preparation</td><td>No</td><td>Manifest, folders, skill links</td><td>Will the agent receive the correct filesystem contract?</td></tr>
         <tr><td>Task analysis</td><td>Yes</td><td>Generated SOP and reports</td><td>Can the agent turn source documents into an analysis?</td></tr>
         <tr><td>KB learning</td><td>Yes</td><td>Candidate package and learning report</td><td>Can the agent extract reusable executable knowledge?</td></tr>
@@ -85,19 +85,6 @@ node src/cli.mjs sop run --kb-root ./docs/eval/eval1/kb/circuits \
       returns <code>REFUSED</code> and no public output because <code>unknown</code> is not a finite notice duration. The quoted
       array is only the CLI transport for ordered circuit ports; task and KB source documents remain readable text files.</p>
 
-    <h3>Run the Socrate context example</h3>
-    <p>Eval 4 shows adaptation from a short context after the coding agent has made its interpretation explicit as SOP:</p>
-    <pre><code>node src/cli.mjs sop run \
-  --kb-root ./docs/eval/eval4/kb/circuits \
-  --root ./docs/eval/eval4/task/sop \
-  --prefix eval4 \
-  --package eval4.analysis</code></pre>
-    <p>Expected observation: outcome <code>SUCCEEDED</code>; “Socrate is a man” has direct support; “Socrate is mortal” has
-      derived support through the rule “every man is mortal”; and “Socrate is a philosopher” remains <code>UNKNOWN</code>.
-      The second public output contains the two direct facts and the derived mortal fact. Open
-      <a href="eval/eval4/index.html">Eval 4</a> to compare the English source, generated knowledge circuit, reusable reasoner,
-      and result.</p>
-
     <h3>Run the large 10 × 10 evaluation</h3>
     <p>Eval 5 starts from two source files: one KB document with ten rule chapters and one task document with ten records.
       Codex generated the focused KB circuits during learning, a reviewer promoted them, and a separate Codex run generated
@@ -113,6 +100,26 @@ node src/cli.mjs sop run --kb-root ./docs/eval/eval1/kb/circuits \
       executions and 100 nested rule executions. Use <a href="eval/eval5/index.html">the Eval 5 browser</a> to compare the two
       large source documents, Codex-generated KB candidates, promotion record, task-local SOP layers, and Markdown report.
       Every task run uses an executor-owned Markdown report; no hand-authored JSON result stands in for execution.</p>
+
+    <h3>Run automatic mandatory discovery</h3>
+    <p>Eval 9 has ten reviewed matchers, but Task 1 publishes only four control families. Its task circuit never calls the
+      evaluator target directly. Run the package without a prefix so its fixed root remains <code>task.analysis</code>:</p>
+    <pre><code>node src/cli.mjs sop run \
+  --kb-root ./docs/eval/eval9/kb/circuits \
+  --root ./docs/eval/eval9/task/sop \
+  --package task.analysis</code></pre>
+    <p>Expected observation: root outcome <code>SUCCEEDED</code>; mandatory closure <code>CLOSED</code>; ten registered matchers;
+      four indexed publications; four expected and four executed instances; zero missing. The automatically applied outputs
+      cover A-01, A-03, A-07, and A-10. A-03 has <code>compliant: false</code>, but the target execution itself succeeds.</p>
+
+    <p>Eval 10 demonstrates multiple rounds:</p>
+    <pre><code>node src/cli.mjs sop run \
+  --kb-root ./docs/eval/eval10/kb/circuits \
+  --root ./docs/eval/eval10/task/sop \
+  --package task.analysis</code></pre>
+    <p>Expected observation: six expected and six executed instances across three recorded rounds. Two raw publications cause
+      two normalizations; the two normalized publications then branch into four approval/currency assessments; the final
+      round adds nothing. Compare both runs in <a href="mandatory-rules.html">Mandatory rules and closure</a>.</p>
 
     <h2>2. Prepare a task</h2>
     <p>Reproduce the two workspace roles instead of mixing every Markdown file into one input folder. Seed the KB with the
@@ -154,7 +161,7 @@ node src/cli.mjs prepare \
     <p>After completion, inspect the task in this order:</p>
     <ol>
       <li>Open <code>results/agent-summary.md</code>. It should account for every input, list generated and reused circuits,
-        report execution outcomes, and state limitations.</li>
+        record compile/test attempts, and state limitations without replacing the semantic result.</li>
       <li>Inspect every file under <code>sop/</code>. One package family should represent the current request and facts; a larger
         root should consume those packages and invoke reviewed KB packages rather than copying reusable policy logic.</li>
       <li>Follow the compile and run commands recorded by the agent. Every conclusion supported by a circuit should have a
@@ -164,8 +171,8 @@ node src/cli.mjs prepare \
       <li>Inspect <code>.dynamic-circuits/last-run.json</code> for adapter, mode, working directory, prompt digest, timestamps,
         exit status, and signal.</li>
     </ol>
-    <p>A useful run produces grounded reports plus executable SOP code that can be compiled again. The normal user-facing
-      result is Markdown or text; JSON is generated only when the task explicitly asks for it. A report with no input
+    <p>A useful run produces an executor-owned Markdown result plus executable SOP code that can be compiled again. No
+      hand-authored or agent-authored result object stands in for execution. A run with no input
       coverage, no circuit execution evidence, or hidden source assumptions is incomplete even when the prose sounds plausible.</p>
 
     <h3>Repeat without paying for unchanged work</h3>
@@ -204,12 +211,12 @@ node src/cli.mjs -kbdir ./kb -agent codex</code></pre>
       coding agent can then encode those decisions explicitly instead of guessing them from an underspecified prompt.</p>
 
     <h2>Current limits</h2>
-    <p>The current runtime executes explicit circuit calls, local checks and goals, nested packages, canonical values, and
-      receipts. Semantic registry search, automatic matcher wiring, mandatory closure, assurance profiles, trust evaluation,
-      semantic content-addressed caching across machines, final certificates, and hardened multi-tenant isolation remain
-      planned. The CLI does implement local timestamp-based dependency skipping for one prepared analysis workspace. A useful
-      current test should evaluate workspace preparation, coding-agent transformation, explicit SOP execution, and report grounding; it should
-      not expect the planned Assurance Core to run automatically.</p>
+    <p>The current runtime executes explicit calls, local checks/goals, nested packages, canonical values, exact semantic
+      publications, restricted mandatory matchers, bounded fixed-point closure, and receipts. It does not implement
+      open-ended registry search, ontology reasoning, trust profiles, content-addressed cross-machine caching, final
+      certificates, or hardened multi-tenant isolation. The CLI also implements timestamp-based dependency skipping for one
+      prepared analysis workspace. A useful test should distinguish the implemented registry-relative closure guarantee from
+      the broader planned assurance layers.</p>
 
     <h2>Maintenance checklist</h2>
     <p>When CLI behavior or the underlying theory changes, update this tutorial together with the implementation:</p>

@@ -48,8 +48,10 @@ Verified replay may rerun only validators against stored values; explanatory rep
 fresh execution. Auditors must be able to query which source supported an output, why a template matched, which mandatory
 instances ran or did not run, where a value was produced, what changed between attempts, and whether a cache entry was valid.
 
-The current runtime emits deterministic in-memory receipts for nodes, circuits, dead nodes, checks, invariants, and errors.
-Persistent schemas, closure/final receipts, signing, artifact storage, lineage, and replay commands are planned.
+The current runtime emits deterministic in-memory receipts for nodes, circuits, dead nodes, checks, invariants, errors, and
+mandatory closure. The closure receipt records a registry hash, matcher and publication counts, semantic keys, per-round
+matcher evidence, expected/executed/missing instance sets, failure evidence, and a canonical hash. Persistent schemas,
+profile/final receipts, signing, artifact storage, attempt lineage, and replay commands remain planned.
 
 ### Operational example
 
@@ -67,6 +69,12 @@ Response: Paths vary across machines and can be rebound. Content digests identif
 
 Response: Commitments preserve integrity and selective disclosure can reveal authorized fields, but a verifier that needs
 hidden semantics must report insufficient evidence rather than assume them.
+
+### Question #3: Why are automatically applied outputs rendered in the report?
+
+Response: Instance hashes prove identity but do not show a reader what each mandatory rule concluded. Rendering target
+outputs directly from runtime values keeps the semantic result executor-owned and allows expectation documents to compare
+the actual findings without inventing a separate result object.
 
 ## Conclusion
 

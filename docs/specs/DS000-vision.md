@@ -12,8 +12,8 @@ summary: Defines inferred learning and analysis workspaces, external coding-agen
 
 Dynamic Circuits processes document folders through two components. An external coding agent interprets the documents and
 authors SOP circuits. A deterministic local kernel validates those circuits, executes their dependency graphs, and emits
-outputs and receipts. The current DS set defines both the implemented subset and the planned assurance components; the
-original v1 design remains immutable historical input.
+outputs and receipts. The current DS set defines both the implemented subset—including exact-key semantic publication and
+bounded mandatory closure—and the planned assurance components; the original v1 design remains immutable historical input.
 
 This is the entry specification for the project. It connects the CLI and coding-agent boundary in DS002–DS003, the
 implemented SOP kernel in DS004–DS005, the KB workflow in DS006, and the planned assurance architecture in DS009–DS027.
@@ -36,16 +36,19 @@ The CLI must delegate interpretation and circuit authoring to an external coding
 The source tree includes a dependency-free Node.js reference implementation for the supported SOP Lang subset and tests for
 parser, compiler, runtime, agent invocation, workspace behavior, documentation, eval circuits, and historical integrity.
 The current milestone includes explicit ports, immutable local wires, positional calls, JavaScript command descriptors,
-static graph checks, relevant-slice and nested execution, local checks/invariants, canonical values, and structured receipts.
+static graph checks, relevant-slice and nested execution, local checks/invariants, canonical values, structured receipts,
+exact-key semantic publications, restricted reviewed mandatory matchers, and expected-versus-executed fixed-point closure.
 
 Non-goals for this release are direct LLM API integration, autonomous promotion of learned knowledge, natural-language
-truth guarantees, general-purpose programming syntax, mandatory semantic closure, content-addressed cross-machine caches, formal proofs, trust
-profiles, distributed execution, and production multi-tenant isolation. These are either deliberately external or specified
-as future layers in DS014–DS027.
+truth guarantees, general-purpose programming syntax, open-ended natural-language semantic discovery, content-addressed
+cross-machine caches, formal proofs, trust profiles, distributed execution, and production multi-tenant isolation. The
+implemented closure guarantee covers bindings returned by loaded reviewed exact-key matchers; it does not establish missing
+knowledge, registry trust, or global semantic completeness. Broader layers remain specified in DS014–DS027.
 
 Success has three levels: today, a user can prepare either workspace, invoke a selected coding-agent adapter, compile and
-run supported circuits, inspect receipts, and reproduce serious evals; next, the system can govern and reuse candidates;
-ultimately, it can issue conditional acceptance certificates after exhaustive declared obligations and trust gates.
+run supported circuits, inspect receipts, close all obligations declared by the loaded matcher registry, and reproduce
+serious evals; next, the system can govern and reuse candidates; ultimately, it can add trust profiles and issue conditional
+acceptance certificates.
 
 ### Operational example
 
@@ -66,5 +69,5 @@ Response: External invocation satisfies the present requirement to use coding ag
 ## Conclusion
 
 The implemented release prepares both workspace modes, invokes a selected coding-agent adapter, compiles and executes the
-supported SOP subset, emits receipts, and reproduces the committed evaluation cases. Later DS files define the additional
-components required for mandatory closure and conditional acceptance certificates.
+supported SOP subset, closes loaded exact-key mandatory obligations, emits receipts, and reproduces the committed
+evaluation cases. Later DS files define richer matching, trust policy, and conditional acceptance certificates.

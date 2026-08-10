@@ -21,8 +21,9 @@
     <p>A coding agent can interpret a document in many ways, so Dynamic Circuits stores the calculations and checks that
       support a conclusion as SOP source. The compiler turns that source into a graph with explicit producers and consumers.
       The runtime then evaluates the graph independently of the coding agent. This page explains the implemented language
-      subset and execution path; the <a href="concepts.html">concept model</a> defines its broader vocabulary, and the
-      <a href="assurance.html">assurance page</a> describes planned acceptance checks above the runtime.</p>
+      subset and execution path; the <a href="concepts.html">concept model</a> defines its broader vocabulary,
+      <a href="mandatory-rules.html">the mandatory-rule guide</a> explains implemented closure, and the
+      <a href="assurance.html">assurance page</a> separates it from planned acceptance checks.</p>
 
     <h2>Authoring surface</h2>
     <pre><code>@input left right
@@ -74,9 +75,21 @@
     <pre><code>agent sop compile --root ./sop --package analysis
 agent sop run --root ./sop --package analysis --inputs '["4","7"]'</code></pre>
 
+    <h2>Semantic publications and mandatory closure</h2>
+    <p>A task circuit can expose a current value to reviewed matchers with
+      <code>@publication publish $value "domain.key" "source.md#locator"</code>. The compiler accepts mandatory matchers only
+      when their dotted triggers, exact interface, apply target, selected keys, and restricted Core calls agree. After the
+      root succeeds, the closure engine runs every discovered binding, indexes publications returned by targets, and repeats.
+      The final report shows expected, executed, and missing instance counts plus the actual applied-rule outputs.</p>
+    <p>This mechanism is registry-relative. It covers the loaded reviewed matchers over explicit publications; it does not
+      search arbitrary prose or certify package trust. <a href="eval/eval10/index.html">Eval 10</a> demonstrates a branching
+      multi-round closure.</p>
+
     <h2>Isolation boundary</h2>
     <p>Command code runs in a Node <code>vm</code> context. The context omits process, filesystem, network, module loading, clocks, randomness, and oracle services. String and WebAssembly code generation are disabled, and synchronous execution has a timeout. Production execution of hostile multi-tenant code requires process-level memory, CPU, and operating-system isolation that this runtime does not implement.</p>
-    <div class="callout">Current runtime scope: explicit circuit calls, local checks and invariants, canonical values, and receipts. Planned scope: semantic indexes, mandatory matchers, closure, persistent caches, trust profiles, and mediated effects. See <a href="specsLoader.html?spec=DS005-compiler-runtime.md">DS005</a>.</div>
+    <div class="callout">Current runtime scope: explicit circuit calls, local checks and invariants, canonical values,
+      exact-key semantic publications, reviewed mandatory matchers, bounded closure, and receipts. Planned scope: persistent
+      indexes/caches, richer predicates, trust profiles, and mediated effects. See <a href="specsLoader.html?spec=DS005-compiler-runtime.md">DS005</a>.</div>
     <p>For example, a coding agent may convert a policy paragraph into a command that calculates a deadline from explicit date
       and rule inputs. The command cannot open the policy file itself, read a secret from the environment, or call a web
       service. Required data must enter through circuit inputs or generated SOP source; future effectful operations must use

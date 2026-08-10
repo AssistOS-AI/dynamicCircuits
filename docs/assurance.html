@@ -14,16 +14,18 @@
   <div data-include="partials/header.html"></div>
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="index.html">Documentation</a> / Coverage and acceptance</p>
-    <h1>How the system will check that an analysis is complete</h1>
-    <p class="lead">The current runtime can prove that selected circuits executed. The planned assurance layer additionally checks whether every applicable rule was selected and whether the available evidence is sufficient to publish the result.</p>
+    <h1>Coverage now, trusted acceptance later</h1>
+    <p class="lead">The current executor proves that every instance returned by its loaded reviewed mandatory matcher registry executed to a fixed point. Planned assurance adds trusted registry selection, richer unknown states, goal policy, and final acceptance certificates.</p>
 
-    <h2>The gap in the current release</h2>
+    <h2>The implemented boundary</h2>
     <p>Suppose the KB contains an ordinary 30-day notice rule and a 10-day exception that requires both an expedited request
       and written consent. A coding agent can call both circuits correctly, call only the ordinary rule, or fail to notice the
-      exception. The compiler detects malformed calls, but it cannot currently detect an applicable rule that is never called.
-      A successful receipt therefore means “this explicit graph ran successfully,” not “the KB was searched completely.”</p>
-    <p>The planned assurance layer closes that gap in four concrete stages: publish task facts, enumerate candidate rules,
-      run deterministic applicability checks, and compare all expected rule instances with the instances that executed.</p>
+      exception. Explicit task calls still rely on the author's selection. A reviewed mandatory matcher removes that reliance:
+      task SOP publishes a notice value, the matcher returns its binding, and the executor runs the target automatically.</p>
+    <p>The resulting coverage claim is deliberately scoped. It says the loaded matcher registry was searched completely over
+      explicit semantic publications. It cannot detect a policy that was never encoded as a matcher, prove that Codex
+      interpreted every sentence, or decide that the registry is trusted by an organization. The current and planned stages
+      below keep those different claims separate.</p>
 
     <h2>1. Publish facts</h2>
     <p>The task interpreter publishes facts with source provenance. For case B in Eval 1 those facts would include the case
@@ -38,16 +40,15 @@
       F[/Case B facts/] --> Q{Registry query}
       Q --> B[30-day base rule]
       Q --> E[10-day exception]</pre></figure>
-    <p>The query uses declared metadata such as fact families, domain, version, jurisdiction, and required inputs. Similarity
-      search may help propose candidates, but it cannot decide applicability. In this example the query returns both notice
-      packages because both consume notice-case facts. The receipt records which registry snapshot and shard were searched,
-      so a later audit can identify the candidate population.</p>
+    <p>The current query uses exact dotted semantic keys such as <code>order.raw</code>. It loads all reviewed mandatory
+      <code>kb.*</code> matchers and commits their code plus apply-target hashes to one registry identity. Domain, version,
+      jurisdiction, sharding, and similarity ranking remain planned retrieval layers. Similarity may eventually propose
+      candidates, but it cannot establish a mandatory binding.</p>
 
     <h2>3. Check applicability</h2>
-    <p>Each candidate has a deterministic matcher. The base-rule matcher returns <code>MATCH</code> for every complete notice
-      case. The exception matcher returns <code>MATCH</code> for case B because both required flags are true,
-      <code>NO_MATCH</code> for a case with no expedited request, and <code>UNKNOWN</code> when consent evidence is missing.
-      A match also returns the exact bindings used to instantiate the rule.</p>
+    <p>Each current matcher returns a complete list of publication-handle tuples. Each tuple is a match; an empty list means
+      no current match. A matcher failure produces <code>INCONCLUSIVE</code>, never a silent no-match. The broader tri-state
+      design below remains useful for future predicates that can distinguish proven non-applicability from missing evidence.</p>
     <table>
       <thead><tr><th>Matcher result</th><th>Meaning in this project</th><th>Next action</th></tr></thead>
       <tbody>
@@ -78,7 +79,7 @@
     <h2>5. Compare expected and executed work</h2>
     <p>After closure, an audit compares every expected instance key produced by matchers with every executed instance key.
       If the exception matched case B but no corresponding execution receipt exists, the analysis is incomplete even if the
-      base rule succeeded. This is the planned mechanical check for the omission that the current release cannot detect.</p>
+      base rule succeeded. This expected-versus-executed comparison is implemented in the closure receipt.</p>
 
     <h2>6. Decide whether to publish</h2>
     <p>Publication is a sequence of explicit gates, not one generic boolean:</p>
@@ -97,13 +98,13 @@
       what must change: code, input evidence, a false claim, or a policy decision.</p>
 
     <h2>What can be tested today</h2>
-    <p>The repository currently implements compilation, explicit nested calls, relevant-node execution, local command checks,
-      goals and invariants, classified runtime outcomes, canonical values, and nested receipts. Eval 1 demonstrates those
-      mechanics but commits the coding agent's circuit selection in advance. Semantic registry queries, tri-state matchers,
-      mandatory closure, trust profiles, independent verifier policy, and final acceptance certificates remain planned.</p>
-    <p>During a manual test, inspect whether the agent accounted for every input and whether the generated SOP calls the rules
-      you expect. Treat that review as a temporary human coverage check. The planned mechanism above is intended to turn the
-      same question into receipt-backed executable work. Normative details remain in
+    <p>The repository implements compilation, explicit nested calls, relevant-node execution, local checks/goals/invariants,
+      exact-key publications, restricted reviewed matchers, duplicate-safe fixed-point closure, classified outcomes, and
+      closure receipts. <a href="eval/eval9/index.html">Eval 9</a> selects different subsets from ten mandatory matchers.
+      <a href="eval/eval10/index.html">Eval 10</a> proves that target publications activate later rules.</p>
+    <p>Human review is still required for source interpretation, matcher promotion, and the completeness of the KB itself.
+      Profiles, trust thresholds, explicit unknown applicability records, independent verifier policy, and final acceptance
+      certificates remain planned. Read <a href="mandatory-rules.html">the implemented convention</a> before the normative details in
       <a href="specsLoader.html?spec=DS015-semantic-index-matching-and-wiring.md">DS015</a>,
       <a href="specsLoader.html?spec=DS016-mandatory-closure.md">DS016</a>, and
       <a href="specsLoader.html?spec=DS017-goals-invariants-and-acceptance.md">DS017</a>.</p>

@@ -1,0 +1,30 @@
+@input
+@output order request publication
+
+@sourceOrder define
+    function run() {
+      return {
+        id: "OB-1",
+        amount: 18000,
+        currency: "ron",
+        approved: false,
+        source: "orders.md#OB-1",
+      }
+    }
+    return { run }
+
+@sourceRequest define
+    function run() {
+      return {
+        approvalCompliant: false,
+        normalizationMustSucceed: true,
+        currencyMustSucceed: true,
+        expectedMandatoryInstances: 3,
+        source: "orders.md#current-orders-b",
+      }
+    }
+    return { run }
+
+@order sourceOrder
+@request sourceRequest
+@publication publish $order "order.raw" "orders.md#OB-1"

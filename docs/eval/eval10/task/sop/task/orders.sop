@@ -1,0 +1,42 @@
+@output request orders first second
+
+@load define
+    function run() {
+      return {
+        request: {
+          action: "publish_each_row",
+          semanticKey: "order.raw",
+          explicitAssessmentCalls: false,
+          explicitNormalizationCalls: false,
+          expectedMandatoryInstances: 6,
+          expectedProductiveRounds: [
+            { kind: "normalization", instances: 2 },
+            { kind: "assessment", instances: 4 },
+          ],
+          source: "orders.md",
+        },
+        orders: [
+          {
+            id: "OA-1",
+            amount: 2500,
+            currency: "eur",
+            approved: false,
+            source: "orders.md#OA-1",
+          },
+          {
+            id: "OA-2",
+            amount: 12500,
+            currency: "usd",
+            approved: true,
+            source: "orders.md#OA-2",
+          },
+        ],
+      }
+    }
+    return { run }
+
+@sourceData load
+@request get $sourceData "/request"
+@orders get $sourceData "/orders"
+@first get $orders "/0"
+@second get $orders "/1"

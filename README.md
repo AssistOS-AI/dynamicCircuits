@@ -23,7 +23,8 @@ the workdir contains `input/`, `results/`, `sop/`, `.dynamic-circuits/`, a visib
 `.agents/skills` links for coding-agent discovery. Analysis treats the KB as read-only; learning never promotes candidates
 into trusted circuits. During analysis the coding agent first generates SOP for the current request and facts, then a larger
 root circuit that composes those packages with reviewed KB SOP. After the coding agent exits, the CLI executes the fixed
-`task.analysis` entrypoint and writes `results/runtime-result.md` directly from public outputs and the receipt. Codex may
+`task.analysis` entrypoint, automatically closes every binding from loaded reviewed mandatory matchers, and writes
+`results/runtime-result.md` directly from public outputs and receipts. Codex may
 write a separate provenance journal, but it cannot author or reinterpret the official result. The CLI never creates a JSON
 result artifact.
 
@@ -31,11 +32,13 @@ Analysis runs are incremental. If `results/runtime-result.md` is newer than task
 task SOP, the CLI skips both Codex and the executor. If only SOP is newer, it runs only the executor. Changed task input or
 reviewed KB circuits trigger Codex plus execution. Deleting `runtime-result.md` explicitly forces the complete rerun.
 
-The committed evaluation suite contains eight domain KBs and 24 independent task runs. Each eval page uses one shared file
+The committed evaluation suite contains ten domain KBs and 30 independent task runs. Eval 9 verifies selective discovery
+from ten mandatory matchers; Eval 10 verifies multi-round branching closure. Each eval page uses one shared file
 manifest to keep KB source, reviewed KB SOP, each task's source, each task's generated SOP, executor output, expectation, and
 provenance in separate menu groups.
 
 See [the current capability dashboard](docs/index.html), [the architecture reference](docs/architecture.html),
+[the mandatory-rule convention](docs/mandatory-rules.html),
 [the KB/task directory convention](docs/workspace-conventions.html), [the manual CLI tutorial](docs/tutorial.html), [the evaluation
 catalog](docs/eval/index.html), and [the current specification matrix](docs/specs/matrix.md). The Romanian
 `sop_lang_circuits_design_specs_v1/` package is retained unchanged as the

@@ -31,8 +31,8 @@
       <thead><tr><th>Part</th><th>What it does</th><th>What it does not do</th></tr></thead>
       <tbody>
         <tr><td>User documents</td><td>State policies, evidence, cases, datasets, review rules, and requested output.</td><td>They do not need to contain JSON or SOP syntax.</td></tr>
-        <tr><td>Coding agent</td><td>Reads documents, writes task-value SOP and a larger KB-composing root, runs it, then drafts a report from the output.</td><td>It does not become part of deterministic circuit execution.</td></tr>
-        <tr><td>SOP kernel</td><td>Parses, compiles, and executes explicit circuit calls; returns classified outcomes and receipts.</td><td>It does not reinterpret the original prose or guess a missing rule.</td></tr>
+        <tr><td>Coding agent</td><td>Reads documents and writes task-value SOP plus a larger root that calls optional KB packages or publishes values for mandatory matchers.</td><td>It does not own the official result or become part of deterministic circuit execution.</td></tr>
+        <tr><td>SOP kernel</td><td>Parses, compiles, executes explicit calls, closes loaded mandatory matcher instances, and renders classified outputs plus receipts.</td><td>It does not reinterpret original prose or invent an absent matcher.</td></tr>
         <tr><td>Filesystem contract</td><td>Separates persistent KB knowledge from one task's inputs, generated code, and results.</td><td>It does not automatically promote generated candidates to trusted knowledge.</td></tr>
       </tbody>
     </table>
@@ -56,7 +56,7 @@
     <p>At the first arrow, Codex's interpretation is split by lifetime: reusable policy belongs in reviewed KB SOP, while
       current cases and the requested output become task-value SOP. A larger task root connects the two. At the second arrow,
       the local runtime calls the policy once for each case and returns structured findings. At the third arrow, the result
-      folder preserves a human report and, only when requested, a machine-readable summary. Open <a href="eval/eval1/index.html">Eval 1</a> to inspect the source,
+      folder preserves the executor-owned Markdown result and an optional agent provenance journal. Open <a href="eval/eval1/index.html">Eval 1</a> to inspect the source,
       generated code, and result side by side.</p>
 
     <h2>Two CLI modes</h2>
@@ -74,9 +74,11 @@ node src/cli.mjs -kbdir ./kb -workdir ./work/case-17 -agent codex</code></pre>
     <p>A successful current run proves that the generated SOP was syntactically valid, package and wire references resolved,
       required graph nodes completed, and declared local checks or goals passed. Its receipt identifies the graph execution
       behind the public values. This is already useful for rerunning calculations and exposing agent assumptions as code.</p>
-    <p>It does not yet prove that Codex found every applicable rule in a large KB. Semantic rule discovery, mandatory closure,
-      trust profiles, persistent evidence, and final acceptance certificates remain planned. The documentation labels those
-      features explicitly so a future design is not confused with the current executable release.</p>
+    <p>When task SOP publishes exact semantic keys, the current closure receipt also proves that every binding returned by the
+      loaded reviewed mandatory matcher registry executed. It does not prove that Codex interpreted every source fact, that
+      the KB contains every real-world rule, or that an external trust profile accepts the registry. Richer discovery,
+      persistent evidence, trust profiles, and final certificates remain planned. See
+      <a href="mandatory-rules.html">Mandatory rules and closure</a> for a complete example.</p>
 
     <h2>Choose the next page</h2>
     <table>
@@ -87,6 +89,7 @@ node src/cli.mjs -kbdir ./kb -workdir ./work/case-17 -agent codex</code></pre>
         <tr><td>I need exact folder and option behavior.</td><td><a href="cli.html">CLI and workspaces</a></td></tr>
         <tr><td>I need to decide whether a file belongs to knowledge or the current task.</td><td><a href="workspace-conventions.html">KB and task convention</a></td></tr>
         <tr><td>I want to understand generated <code>.sop</code> files.</td><td><a href="sop-runtime.html">SOP compiler and runtime</a></td></tr>
+        <tr><td>I need every declared mandatory rule to run.</td><td><a href="mandatory-rules.html">Mandatory rules and closure</a></td></tr>
         <tr><td>I want a complete task walkthrough.</td><td><a href="lifecycle.html">One analysis from start to finish</a></td></tr>
         <tr><td>I want to inspect committed examples.</td><td><a href="eval/index.html">Evaluation catalog</a></td></tr>
         <tr><td>I need normative requirements.</td><td><a href="specsLoader.html?spec=matrix.md">DS specification matrix</a></td></tr>

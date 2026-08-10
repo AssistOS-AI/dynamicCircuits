@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { compilePackage, PackageRegistry } from "../../src/index.mjs";
+import { compilePackage, compileRegistry, PackageRegistry } from "../../src/index.mjs";
 
 async function fixture(files) {
   const root = await mkdtemp(path.join(os.tmpdir(), "dc-compiler-"));
@@ -48,4 +48,52 @@ test("marks nodes outside output and assurance slices as dead", async (context) 
   const registry = await PackageRegistry.fromRoots([root]);
   const compiled = compilePackage(registry, "main");
   assert.deepEqual(compiled.nodes.map(({ dead }) => dead), [true, false]);
+});
+
+test("validates mandatory matcher targets, interfaces, triggers, and restricted commands", async (context) => {
+  const validRoot = await fixture({
+    "rule.sop": "@input item\n@output result\n@result alias $item\n",
+    "matcher.sop": `@template mandatory
+@trigger "case.item"
+@apply kb.rule
+@input index delta
+@output matches
+@items select $index "case.item"
+@matches bind $items
+`,
+  });
+  context.after(() => rm(validRoot, { recursive: true, force: true }));
+  const validRegistry = await PackageRegistry.fromRoots([{ path: validRoot, prefix: "kb" }]);
+  assert.doesNotThrow(() => compileRegistry(validRegistry));
+
+  const javascriptRoot = await fixture({
+    "rule.sop": "@input item\n@output result\n@result alias $item\n",
+    "matcher.sop": `@template mandatory
+@trigger "case.item"
+@apply kb.rule
+@input index delta
+@output matches
+@unsafe define index
+    return { run() { return [] } }
+@matches unsafe $index
+`,
+  });
+  context.after(() => rm(javascriptRoot, { recursive: true, force: true }));
+  const javascriptRegistry = await PackageRegistry.fromRoots([{ path: javascriptRoot, prefix: "kb" }]);
+  assert.throws(() => compileRegistry(javascriptRegistry), (error) => error.code === "INVALID_MANDATORY_MATCHER");
+
+  const mismatchRoot = await fixture({
+    "rule.sop": "@input item\n@output result\n@result alias $item\n",
+    "matcher.sop": `@template mandatory
+@trigger "case.declared"
+@apply kb.rule
+@input index delta
+@output matches
+@items select $index "case.selected"
+@matches bind $items
+`,
+  });
+  context.after(() => rm(mismatchRoot, { recursive: true, force: true }));
+  const mismatchRegistry = await PackageRegistry.fromRoots([{ path: mismatchRoot, prefix: "kb" }]);
+  assert.throws(() => compileRegistry(mismatchRegistry), (error) => error.code === "INVALID_MANDATORY_MATCHER");
 });

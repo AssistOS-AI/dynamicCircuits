@@ -1,0 +1,7 @@
+@template mandatory
+@trigger "order.normalized"
+@apply kb.order.currency
+@input index delta
+@output matches
+@entries select $index "order.normalized"
+@matches bind $entries

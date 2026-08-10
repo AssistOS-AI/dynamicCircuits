@@ -1,0 +1,10 @@
+@output review controlR02 controlR05 controlR08 publicationR02 publicationR05 publicationR08
+
+@review task.review
+@controlR02 get $review "/controls/0"
+@controlR05 get $review "/controls/1"
+@controlR08 get $review "/controls/2"
+
+@publicationR02 publish $controlR02 "control.r02" "review.md#B-02"
+@publicationR05 publish $controlR05 "control.r05" "review.md#B-05"
+@publicationR08 publish $controlR08 "control.r08" "review.md#B-08"

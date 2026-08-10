@@ -1,0 +1,19 @@
+@input order
+@output normalized publication
+
+@normalize define order
+    function run({ order }, ctx) {
+      if (!order || typeof order !== "object" || typeof order.id !== "string") {
+        return ctx.reject("order_identity_required")
+      }
+      const amount = Number(order.amount)
+      if (!Number.isFinite(amount)) return ctx.reject("finite_amount_required", { id: order.id })
+      if (typeof order.currency !== "string" || typeof order.approved !== "boolean") {
+        return ctx.reject("currency_and_approval_required", { id: order.id })
+      }
+      return { id: order.id, amount, currency: order.currency.toUpperCase(), approved: order.approved, source: order.source }
+    }
+    return { run }
+
+@normalized normalize $order
+@publication publish $normalized "order.normalized" "kb.order.normalize"

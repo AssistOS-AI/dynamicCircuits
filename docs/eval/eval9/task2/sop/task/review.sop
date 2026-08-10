@@ -1,0 +1,46 @@
+@output review
+
+@loadReview define
+    function run() {
+      return {
+        sourceFile: "review.md",
+        request: {
+          publishWithoutDirectKbRuleCalls: true,
+          expectedMandatoryInstances: 3,
+          retainNoncompliantFindingAsSuccessfulOutput: true,
+        },
+        controls: [
+          {
+            caseId: "B-02",
+            controlId: "R02",
+            required: true,
+            observed: false,
+            source: "review.md#B-02",
+          },
+          {
+            caseId: "B-05",
+            controlId: "R05",
+            required: true,
+            observed: true,
+            source: "review.md#B-05",
+          },
+          {
+            caseId: "B-08",
+            controlId: "R08",
+            required: true,
+            observed: true,
+            source: "review.md#B-08",
+          },
+        ],
+      }
+    }
+    function check(inputs, output) {
+      return Object.keys(inputs).length === 0
+        && output.sourceFile === "review.md"
+        && output.request.expectedMandatoryInstances === 3
+        && output.controls.length === 3
+        && output.controls.every((control) => typeof control.source === "string")
+    }
+    return { run, check }
+
+@review loadReview

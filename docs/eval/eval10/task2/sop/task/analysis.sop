@@ -1,0 +1,4 @@
+@input
+@output order request rawPublication
+
+@order @request @rawPublication task.orders

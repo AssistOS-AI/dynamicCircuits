@@ -54,7 +54,7 @@ and accessible label expose the complete relative path. Selecting a leaf display
 in the right pane. The central `docs/eval/index.html` is a scalable catalog of evaluation folders; it must not merge every
 case's file tree into one menu.
 
-The current suite has eight non-trivial domains and three real task runs per domain. Eval 1 applies an ordinary legal notice period and an evidenced expedited
+The current suite has ten non-trivial domains and three real task runs per domain. Eval 1 applies an ordinary legal notice period and an evidenced expedited
 exception across compliant and violating cases. Eval 2 tests a universal scientific claim, finds a concrete counterexample,
 and separately computes descriptive statistics. Eval 3 reconciles timelines and terminology across three documents and
 retains rather than hides two conflicts. Eval 4 converts a short English context into direct facts, one unary implication,
@@ -66,7 +66,9 @@ a larger root that uses the promoted KB family, and a Markdown report derived fr
 decisions and preserves per-rule and per-record attribution. Eval 6 generates and independently verifies a constrained
 literary vignette. Eval 7 generates and independently verifies an operational incident-handoff SOP. Eval 8 generates and
 independently verifies a fact-bounded contractual notice. The three text-generation cases publish both generated Markdown
-and complete verifier findings. Additional runs exercise compliant, violating, boundary, conflict, unknown, explicit
+and complete verifier findings. Eval 9 exercises selective automatic discovery against ten reviewed mandatory matchers.
+Eval 10 exercises multi-round closure: raw-order normalization publishes facts that independently activate approval and
+currency assessments. Additional runs exercise compliant, violating, boundary, conflict, unknown, explicit
 supersession, generation, and independent-verification paths. Eval 5 includes a deliberate runtime refusal for an unsupported
 task vocabulary value; the refusal report is retained instead of being rewritten as an agent conclusion. Unit tests execute every
 committed circuit against its source data and compare exact outcomes; the HTML index exposes all inputs, circuits, results,
@@ -110,11 +112,11 @@ Response: An evaluation should test the same authority boundary used by a real a
 cross-root package resolution; each nested task proves that current data, generated adaptation, and results remain local to
 one run. Keeping all task runs below `evalN/` makes the complete reproduction statically browsable without merging their roles.
 
-### Question #4: Why is the large-KB evaluation wired explicitly?
+### Question #4: Why does Eval 5 remain explicitly wired while Eval 9 is automatic?
 
-Response: The implemented runtime resolves package calls and executes graphs but does not yet perform semantic registry
-search or mandatory applicability closure. Explicitly calling all ten rule packages gives a defensible 100-decision scale
-test while keeping automatic discovery correctly assigned to the planned assurance contracts.
+Response: Eval 5 preserves the earlier large-source experiment and its explicit 100-decision composition. Eval 9 isolates
+the newer mandatory-registry feature: task SOP contains publications but no direct apply-target calls, and the closure receipt
+proves the exact selected subset. Keeping both shows the behavioral change without rewriting historical evaluation evidence.
 
 ### Question #5: Who generated Eval 5's SOP and report artifacts?
 
@@ -127,7 +129,7 @@ generated circuits directly; no JSON result file or agent-authored semantic repo
 
 Response: Multiple inputs reveal boundaries, refusals, and conflicts that one happy-path fixture cannot. Separate workspaces
 prove that generated task SOP and results do not leak across runs. One shared manifest keeps the role taxonomy identical in
-all eight pages, while one Web Component gives them identical tree interaction without copied markup or rendering logic.
+all ten pages, while one Web Component gives them identical tree interaction without copied markup or rendering logic.
 The hierarchy communicates ownership before selection: KB and task branches cannot visually collapse into one flat list.
 
 ## Conclusion

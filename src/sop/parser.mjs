@@ -1,4 +1,5 @@
 import { fail } from "./errors.mjs";
+import { isSemanticKey } from "./semantic-index.mjs";
 
 const IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
 const QUALIFIED = /^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$/;
@@ -194,6 +195,12 @@ export function parseSop(source, options = {}) {
           fail("PARSE_ERROR", "@trigger requires one or more string literals", location(filePath, lineNumber));
         }
         result.trigger = topTokens.slice(1).map((token) => token.value);
+        if (result.trigger.some((key) => !isSemanticKey(key))) {
+          fail("PARSE_ERROR", "@trigger values must be dotted semantic keys", location(filePath, lineNumber));
+        }
+        if (new Set(result.trigger).size !== result.trigger.length) {
+          fail("PARSE_ERROR", "@trigger cannot repeat a semantic key", location(filePath, lineNumber));
+        }
       } else if (directive === "apply") {
         if (topTokens.length !== 2 || topTokens[1].kind !== "word" || !QUALIFIED.test(topTokens[1].value)) {
           fail("PARSE_ERROR", "@apply requires one qualified package name", location(filePath, lineNumber));

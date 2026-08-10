@@ -32,10 +32,11 @@ goals, trust, conflicts, capabilities, and profile gates. **H. Repair:** if refu
 diagnose from receipts and create an immutable child attempt with the smallest semantic change. **I. Publish:** on acceptance,
 emit reports, artifacts, and a final receipt/certificate; otherwise publish the classified failure without pretending success.
 
-The present version automates workspace preparation, external coding-agent invocation, explicit circuit compilation and
-execution, local checks/invariants, runtime receipts, and executor-owned Markdown report rendering. Agents currently perform
-document interpretation and task-circuit assembly, and may write a provenance-only journal. Registry discovery, automatic
-wiring, closure, profiles, attempts, and certificates remain planned.
+The present version automates workspace preparation, external coding-agent invocation, circuit compilation and execution,
+local checks/invariants, exact-key semantic publication, reviewed mandatory matcher discovery, automatic target wiring,
+bounded closure, runtime receipts, and executor-owned Markdown report rendering. Agents perform document interpretation and
+task-circuit assembly, and may write a provenance-only journal. Broader registry search, profile selection, persistent
+attempts, trust gates, and certificates remain planned.
 
 ### Reference flows
 
@@ -60,14 +61,16 @@ into focused candidate SOP packages, reviewed packages are promoted into the KB,
 by a separate analysis-agent run into task-data SOP plus a larger composition circuit. Three additional domains generate
 literary, operational, and contractual documents and pass each generated value to an independent verifier circuit.
 
-These eight domains contain 24 task runs under `docs/eval/`. For every run, Codex authors task SOP and exits; the CLI then
+These ten domains contain 30 task runs under `docs/eval/`. For every run, Codex authors task SOP and exits; the CLI then
 executes the fixed root and renders the Markdown runtime report. A fresh report skips unchanged agent and executor work,
-while deleting it forces the complete path. Stronger future assurance gates remain labeled as such.
+while deleting it forces the complete path. Eval 9 tests exhaustive selection from ten mandatory matchers; Eval 10 tests
+multi-round closure in which normalization activates two later assessments. Stronger future assurance gates remain labeled as such.
 
 Operational example: Eval 3 starts with three Markdown chapters. The committed interpreter circuit extracts each chapter's
 launch date and term definition, the synthesis circuit compares those values, and the result reports both conflicts with
 source labels. Current execution proves that this explicit comparison graph ran. A future strict run must additionally prove
-that every chapter in the epoch and every mandatory consistency matcher was covered before issuing acceptance.
+that every chapter in the epoch was interpreted. The current closure engine can prove coverage of loaded declared matchers,
+but a future strict profile must also establish registry trust and all remaining acceptance gates.
 
 ## Decisions & Questions
 

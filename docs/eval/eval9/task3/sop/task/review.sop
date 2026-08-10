@@ -1,0 +1,48 @@
+@output r04 r06 r09 r10
+
+@loadReview define
+    function run() {
+      return {
+        r04: {
+          caseId: "C-04",
+          controlId: "R04",
+          required: false,
+          observed: true,
+          source: "review.md#C-04",
+        },
+        r06: {
+          caseId: "C-06",
+          controlId: "R06",
+          required: true,
+          observed: true,
+          source: "review.md#C-06",
+        },
+        r09: {
+          caseId: "C-09",
+          controlId: "R09",
+          required: true,
+          observed: false,
+          source: "review.md#C-09",
+        },
+        r10: {
+          caseId: "C-10",
+          controlId: "R10",
+          required: false,
+          observed: false,
+          source: "review.md#C-10",
+        },
+      }
+    }
+    function check(_inputs, output) {
+      return output.r04.caseId === "C-04"
+        && output.r06.caseId === "C-06"
+        && output.r09.caseId === "C-09"
+        && output.r10.caseId === "C-10"
+    }
+    return { run, check }
+
+@review loadReview
+@r04 get $review "r04"
+@r06 get $review "r06"
+@r09 get $review "r09"
+@r10 get $review "r10"

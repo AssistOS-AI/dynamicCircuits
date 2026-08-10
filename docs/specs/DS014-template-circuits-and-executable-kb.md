@@ -47,8 +47,10 @@ aggregation, comparison, temporal reasoning, unit conversion, evidence grading, 
 refuse when prerequisites are absent rather than fabricate defaults. Broad applicability descriptions are candidate
 generation aids; assurance depends on explicit matchers and closure as specified by DS015 and DS016.
 
-The current runtime discovers and calls `.sop` packages from a filesystem KB and supports nested circuits. Rich template
-metadata, version solving, promotion, and automatic instantiation remain planned.
+The current runtime discovers and calls `.sop` packages from a filesystem KB, supports nested circuits, and automatically
+registers reviewed `kb.*` packages with complete `mandatory` matcher metadata. It instantiates the target named by `@apply`
+for every validated handle tuple. Rich domain metadata, version solving, autonomous promotion, optional candidate ranking,
+and profile-selected registries remain planned.
 
 ### Operational example
 
@@ -67,6 +69,11 @@ candidate boundary makes review, testing, provenance, and promotion visible.
 
 Response: Value binding preserves SSA, type and arity checks, effects, provenance, and independent compilation; textual
 expansion would obscure all five.
+
+### Question #3: Where is the mandatory property declared?
+
+Response: On a separate reviewed matcher package. The target remains a reusable transformation; the matcher states the
+semantic keys and bindings that make that target obligatory in the loaded registry.
 
 ## Conclusion
 

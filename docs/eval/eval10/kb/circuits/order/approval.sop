@@ -1,0 +1,18 @@
+@input order
+@output finding
+
+@assess define order
+    function run({ order }) {
+      const approvalRequired = order.amount >= 10000
+      return {
+        id: order.id,
+        check: "approval",
+        compliant: !approvalRequired || order.approved,
+        approvalRequired,
+        approved: order.approved,
+        source: order.source,
+      }
+    }
+    return { run }
+
+@finding assess $order

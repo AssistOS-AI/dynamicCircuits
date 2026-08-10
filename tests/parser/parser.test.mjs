@@ -53,3 +53,14 @@ test("rejects duplicate ports and literal coverage wire names", () => {
     (error) => error.code === "PARSE_ERROR",
   );
 });
+
+test("requires unique dotted semantic keys for matcher triggers", () => {
+  assert.throws(
+    () => parseSop("@template mandatory\n@trigger \"notice\"\n@apply kb.rule\n@input index delta\n@output matches\n@matches emptyList\n"),
+    (error) => error.code === "PARSE_ERROR",
+  );
+  assert.throws(
+    () => parseSop("@template mandatory\n@trigger \"case.notice\" \"case.notice\"\n@apply kb.rule\n@input index delta\n@output matches\n@matches emptyList\n"),
+    (error) => error.code === "PARSE_ERROR",
+  );
+});

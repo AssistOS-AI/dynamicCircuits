@@ -38,12 +38,13 @@ the agent working directory but authorizes generated knowledge only under `candi
 read but not edit `circuits/`. The explicit `--learn` option is obsolete and rejected with migration guidance. Agent
 completion state is recorded in the active workspace's `.dynamic-circuits/last-run.json`.
 
-An analysis run uses three visible stages. First, the coding agent translates the task documents into task-local packages
+An analysis run uses four visible stages. First, the coding agent translates the task documents into task-local packages
 under `sop/task/` without copying reusable KB policy. Second, it authors the no-input root `task.analysis` at
-`sop/task/analysis.sop`; this root obtains current values from task packages, invokes reviewed `kb.*` packages, and exposes
-the complete analysis through public outputs. Third, after the coding-agent process exits successfully, the CLI compiles and
-executes that fixed root and writes `results/runtime-result.md` directly from the returned values and receipt. The CLI does
-not create a JSON result artifact.
+`sop/task/analysis.sop`; this root obtains current values from task packages, explicitly invokes applicable optional or
+legacy `kb.*` packages, and publishes current values under exact trigger keys for applicable reviewed mandatory matchers.
+Third, after the coding-agent process exits, the CLI compiles the complete registry, executes the root, and automatically
+closes mandatory matcher instances to a fixed point. Fourth, it writes `results/runtime-result.md` directly from root
+values, automatically applied target outputs, and receipts. The CLI does not create a JSON result artifact.
 
 `runtime-result.md` is the authoritative result. A coding agent may write `results/agent-summary.md` only as a provenance
 journal covering input coverage, generated packages, compile/test attempts, assumptions, limitations, and reusable
@@ -120,6 +121,12 @@ Response: Editing generated SOP does not require another natural-language interp
 reviewed KB circuit can change that interpretation. Separate dependency sets avoid an expensive agent call when a direct
 SOP correction only needs deterministic re-execution. The report timestamp remains the visible cache boundary, and deleting
 the report intentionally requests a complete rerun.
+
+### Question #8: Must the coding agent call every mandatory KB rule?
+
+Response: No. It publishes task values under reviewed semantic keys. The executor, not agent memory, enumerates the loaded
+mandatory matcher registry, validates every returned binding, executes each apply target, and audits expected versus
+executed instances.
 
 ## Conclusion
 

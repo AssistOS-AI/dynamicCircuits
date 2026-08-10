@@ -25,7 +25,8 @@ SOP files must be UTF-8 text. Simple identifiers must match `[A-Za-z_][A-Za-z0-9
 Wires must be local and single-assignment. Inputs are the only external wire values. Multiple output wires before a qualified package name bind a nested circuit's ordered outputs. `@invariant` and `@goal` may declare `covers`; the compiler must verify actual dependency reachability.
 
 The implemented core commands are `value`, `absent`, `alias`, `get`, `hash`, `equal`, `compare`, `parseNumber`,
-`assertInvariant`, `emptyList`, `append`, and `concat`. Their exact contracts are in DS022. Package names derive from `.sop`
+`assertInvariant`, `emptyList`, `append`, `concat`, `publish`, `select`, `bind`, `join`, and `distinct`. Their exact contracts
+are in DS022. Package names derive from `.sop`
 paths, with `index.sop` collapsing to its containing directory. Multiple roots may use explicit prefixes, and duplicate
 package names fail.
 
@@ -40,7 +41,10 @@ dep...` name an already produced boolean-like wire and optional dependencies who
 Local command definitions use `@name define formal...`; names and formals are unique. The JavaScript body evaluates to a
 descriptor with `run(ctx)` and optional `check(output, ctx)` according to DS011.
 
-Template metadata directives are parsed as an atomic `@template`, `@trigger`, and `@apply` set, but mandatory matching and closure are not executed in this milestone.
+Template metadata directives form an atomic `@template`, one or more `@trigger`, and `@apply` set. Mandatory matchers use
+mode `mandatory`, the exact interface `@input index delta` and `@output matches`, dotted trigger keys, and an existing apply
+target. They cannot define local JavaScript and may call only the restricted matching Core. The compiler verifies that their
+literal `select` keys equal their declared triggers before the closure engine can register them.
 
 Reserved future syntax includes richer literals, types, named arguments, explicit imports/versions, effects, capabilities,
 profiles, proof declarations, and structured template metadata. Implementations must reject rather than guess unknown
@@ -59,9 +63,11 @@ accepted JSON string literal.
 
 Response: Positional calls, quoted literals, bare command formals, explicit ordered ports, local wires, multi-output circuit binding, and path-derived package namespaces are preserved.
 
-### Question #2: Why are template directives parsed before matching exists?
+### Question #2: Why is mandatory applicability expressed in a separate matcher?
 
-Response: Parsing preserves forward-compatible source validation and package metadata while the runtime clearly reports that matching and closure remain unsupported.
+Response: The same reusable rule may be mandatory for one semantic context and optional for another. A separate reviewed
+matcher makes that policy visible, restricts its implementation, and lets the executor audit applicability independently
+of target execution.
 
 ## Conclusion
 

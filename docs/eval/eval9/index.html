@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eval 9: Mandatory registry coverage — Dynamic Circuits</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page">
+    <p class="breadcrumbs"><a href="../index.html">Evaluation catalog</a> / Eval 9</p>
+    <h1>Eval 9: Mandatory registry coverage</h1>
+    <p class="lead">Ten reviewed matchers share one evaluator. Each task publishes only its current control records; the executor discovers and runs every matching obligation without direct KB calls in task SOP.</p>
+    <h2>What this evaluation proves</h2>
+    <p>The three tasks activate different subsets of a ten-rule registry: four, three, and four instances. This separates applicability from execution. A dotted semantic key identifies a current fact family, a reviewed mandatory matcher converts every publication in that family into a binding, and <code>@apply</code> names the reusable rule that must run.</p>
+    <p>Open a task's generated <code>analysis.sop</code> and compare it with its executor report. The task circuit publishes facts but does not call <code>kb.mandatory_controls.evaluate</code>. The report's closure table records the registry size, expected instances, executed instances, and missing instances. A finding with <code>compliant: false</code> remains a successful rule result; it is not confused with runtime failure.</p>
+    <p>The file tree keeps KB source, reviewed KB circuits, task input, generated task SOP, executor-owned output, and evaluator evidence in separate branches. The convention is explained in <a href="../../mandatory-rules.html">Mandatory rules and closure</a>; the normative contracts are <a href="../../specsLoader.html?spec=DS015-semantic-index-matching-and-wiring.md">DS015</a> and <a href="../../specsLoader.html?spec=DS016-mandatory-closure.md">DS016</a>.</p>
+    <div class="eval-browser">
+      <aside class="eval-menu"><h2>Evaluation files</h2><p class="eval-menu__help">Open one branch, then choose a file. Hover over a filename for its complete path.</p><eval-file-tree id="eval-file-tree"></eval-file-tree></aside>
+      <section class="eval-viewer">
+        <div class="eval-case-summary"><h2 id="file-title">File</h2><p id="file-explanation"></p><span id="file-role" class="status"></span></div>
+        <pre class="file-view"><code id="file-content">Loading…</code></pre>
+      </section>
+    </div>
+  </main>
+  <script>window.evalCaseId = "eval9";</script>
+  <script src="../eval-manifests.js"></script><script src="../eval-file-tree.js"></script><script src="../eval-browser.js"></script>
+  <div data-include="partials/footer.html"></div><script src="../../partials-loader.js"></script>
+</body>
+</html>

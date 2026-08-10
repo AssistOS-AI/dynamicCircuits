@@ -22,10 +22,12 @@ finite number, comparing two values, building a list, and reporting a failed inv
 ### Implemented Core
 
 The reference runtime currently provides `value`, `absent`, `alias`, `get`, `hash`, `equal`, `compare`, `parseNumber`,
-`assertInvariant`, `emptyList`, `append`, and `concat`. They cover literal/wire forwarding, explicit absence, JSON Pointer or
-dot-path lookup, canonical hashing/equality, six comparison operators, strict finite-number parsing, invariant result
-construction, and immutable list construction. Invalid paths, comparison operators, numbers, or list operands return
-structured refusal values. User commands cannot shadow these names.
+`assertInvariant`, `emptyList`, `append`, `concat`, `publish`, `select`, `bind`, `join`, and `distinct`. The first family
+covers literal/wire forwarding, explicit absence, JSON Pointer or dot-path lookup, canonical hashing/equality, six
+comparison operators, strict finite-number parsing, invariant result construction, and immutable lists. The matching family
+creates semantic publication records, selects index entries by exact dotted key, converts entries to handle tuples, joins
+two entry sets by equal JSON-pointer values, and removes duplicate tuples. Invalid operands return structured refusals.
+User commands cannot shadow Core names.
 
 Core contracts require deterministic behavior, no ambient I/O, explicit refusal for unmet preconditions, finite canonical
 numbers, prototype-safe object handling, stable error classifications, and conformance vectors. Object and array values
@@ -38,10 +40,11 @@ reduce, sorting and grouping, set operations, string and regex operations with l
 decimal arithmetic, comparison with tolerance, hashing, provenance attachment, and deterministic report assembly. Unsafe
 filesystem, network, process, clock, randomness, and environment access are never ordinary Core commands.
 
-### Planned Assurance Core
+### Implemented matching substrate and planned Assurance Core
 
-Assurance commands manage semantic fact publication and query, candidate retrieval, matcher evaluation, instance
-registration, mandatory closure, goal and invariant verification, trust lookup, conflict adjudication, receipt finalization,
+Semantic publication, exact query, binding, equality join, instance registration, and mandatory closure are implemented by
+the matching Core plus the closure engine. Broader Assurance commands manage candidate retrieval, richer matcher evaluation,
+goal and invariant verification, trust lookup, conflict adjudication, receipt finalization,
 signature or certificate verification, cache validation, artifact commitments, and acceptance decisions. Their inputs always
 include or inherit the immutable epoch and profile; their outputs are evidence records, not unqualified booleans.
 
@@ -65,5 +68,5 @@ Response: Shadowing would make source meaning resolution-order dependent and cou
 
 ## Conclusion
 
-Core is the portable deterministic substrate; Assurance Core is the planned policy substrate that turns executions into
-qualified acceptance evidence.
+Core is the portable deterministic substrate. Its implemented matching primitives support registry-relative mandatory
+closure; planned Assurance Core adds the policy and trust gates needed for qualified acceptance evidence.

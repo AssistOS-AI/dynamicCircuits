@@ -26,8 +26,10 @@ topological execution, refusal/error/block propagation, nested circuits, checks 
 workspace safety, agent adapter construction, and CLI mode inference. Historical-source integrity and documentation links
 are repository conformance requirements.
 
-Future Assurance Core conformance adds matcher tri-state behavior, deterministic ranking, duplicate suppression, closure
-fixed points, expected-versus-executed audits, goals, profiles, trust/revocation, conflicts, cache invalidation, epoch replay,
+Current matching conformance covers dotted-key validation, metadata completeness, restricted matcher commands, trigger/select
+agreement, duplicate suppression, multi-record enumeration, equality joins, no-match behavior, multi-round fixed points,
+target failure, closure budgets, and expected-versus-executed audits. Future Assurance Core conformance adds explicit
+matcher tri-state behavior, deterministic ranking, goals, profiles, trust/revocation, conflicts, cache invalidation, epoch replay,
 capability enforcement, signed artifacts, budget-driven inconclusive outcomes, and final certificates.
 
 Test methods include example vectors, parser and canonicalization fuzzing, property tests over graph transformations,

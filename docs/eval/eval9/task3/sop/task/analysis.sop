@@ -1,0 +1,8 @@
+@output r04 r06 r09 r10 publicationR04 publicationR06 publicationR09 publicationR10
+
+@r04 @r06 @r09 @r10 task.review
+
+@publicationR04 publish $r04 "control.r04" "review.md#C-04"
+@publicationR06 publish $r06 "control.r06" "review.md#C-06"
+@publicationR09 publish $r09 "control.r09" "review.md#C-09"
+@publicationR10 publish $r10 "control.r10" "review.md#C-10"

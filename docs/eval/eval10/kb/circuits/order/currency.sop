@@ -1,0 +1,11 @@
+@input order
+@output finding
+
+@assess define order
+    function run({ order }) {
+      const supported = ["EUR", "USD", "RON"].includes(order.currency)
+      return { id: order.id, check: "currency", compliant: supported, currency: order.currency, source: order.source }
+    }
+    return { run }
+
+@finding assess $order

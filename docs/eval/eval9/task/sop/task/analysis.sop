@@ -1,0 +1,8 @@
+@output inputCoverage expectedAutomaticInstances inactiveSemanticKeys publishedR01 publishedR03 publishedR07 publishedR10
+
+@controlR01 @controlR03 @controlR07 @controlR10 @expectedAutomaticInstances @inactiveSemanticKeys @inputCoverage task.review
+
+@publishedR01 publish $controlR01 "control.r01" "review.md#A-01"
+@publishedR03 publish $controlR03 "control.r03" "review.md#A-03"
+@publishedR07 publish $controlR07 "control.r07" "review.md#A-07"
+@publishedR10 publish $controlR10 "control.r10" "review.md#A-10"

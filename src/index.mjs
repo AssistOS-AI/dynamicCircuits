@@ -2,6 +2,14 @@ export { parseSop } from "./sop/parser.mjs";
 export { PackageRegistry, packageNameFor } from "./sop/registry.mjs";
 export { compilePackage, compileRegistry } from "./sop/compiler.mjs";
 export { SopRuntime } from "./sop/runtime.mjs";
+export { executeWithMandatoryClosure } from "./sop/mandatory-closure.mjs";
+export {
+  collectPublications,
+  createPublication,
+  isPublication,
+  isSemanticKey,
+  SemanticIndex,
+} from "./sop/semantic-index.mjs";
 export { SopError } from "./sop/errors.mjs";
 export { canonicalize, hashText, hashValue, normalizeCanonical } from "./sop/canonical.mjs";
 export {

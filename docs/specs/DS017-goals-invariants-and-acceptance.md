@@ -47,8 +47,8 @@ success is `ACCEPTED`.
 
 ### Current subset
 
-The current runtime supports local node checks, circuit invariants, typed result categories, and receipts. It does not yet
-implement first-class profiles, goal verifier packages, closure, trust policy, or final acceptance certificates. Eval cases
+The current runtime supports local node checks, circuit invariants, typed result categories, receipts, and registry-relative
+mandatory closure. It does not yet implement first-class profiles, goal verifier packages, trust policy, or final acceptance certificates. Eval cases
 therefore report both technical runtime outcome and their explicit semantic verdict instead of overstating assurance.
 
 ### Operational example

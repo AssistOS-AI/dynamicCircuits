@@ -1,0 +1,69 @@
+@output controlR01 controlR03 controlR07 controlR10 expectedAutomaticInstances inactiveSemanticKeys inputCoverage
+
+@reviewData define
+    function run() {
+      return {
+        controls: {
+          r01: {
+            caseId: "A-01",
+            controlId: "R01",
+            required: true,
+            observed: true,
+            source: "review.md#A-01",
+          },
+          r03: {
+            caseId: "A-03",
+            controlId: "R03",
+            required: true,
+            observed: false,
+            source: "review.md#A-03",
+          },
+          r07: {
+            caseId: "A-07",
+            controlId: "R07",
+            required: false,
+            observed: false,
+            source: "review.md#A-07",
+          },
+          r10: {
+            caseId: "A-10",
+            controlId: "R10",
+            required: true,
+            observed: true,
+            source: "review.md#A-10",
+          },
+        },
+        expectedAutomaticInstances: 4,
+        inactiveSemanticKeys: [
+          "control.r02",
+          "control.r04",
+          "control.r05",
+          "control.r06",
+          "control.r08",
+          "control.r09",
+        ],
+        inputCoverage: {
+          manifestEntries: 1,
+          processedEntries: 1,
+          path: "review.md",
+          bytes: 712,
+          sha256: "5b7ebd90bee50ebab33817082812e163ba47856eba53cfe4c4bbfcfeecc43b99",
+        },
+      }
+    }
+    function check(inputs, output) {
+      return output.expectedAutomaticInstances === 4
+        && Object.keys(output.controls).length === 4
+        && output.inactiveSemanticKeys.length === 6
+        && output.inputCoverage.manifestEntries === output.inputCoverage.processedEntries
+    }
+    return { run, check }
+
+@review reviewData
+@controlR01 get $review "/controls/r01"
+@controlR03 get $review "/controls/r03"
+@controlR07 get $review "/controls/r07"
+@controlR10 get $review "/controls/r10"
+@expectedAutomaticInstances get $review "/expectedAutomaticInstances"
+@inactiveSemanticKeys get $review "/inactiveSemanticKeys"
+@inputCoverage get $review "/inputCoverage"

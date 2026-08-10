@@ -21,8 +21,8 @@ acceptance gates in DS017 and the final provenance hierarchy in DS019.
 
 ### Closure algorithm
 
-The Assurance Core snapshots the active profile, package registry, template versions, matcher set, and source epoch. It
-indexes initial facts, enumerates every mandatory matcher applicable to the changed fact families, evaluates them, creates
+The closure engine snapshots the compiled mandatory matcher registry and hashes each matcher plus its apply target. It
+indexes initial semantic publications, enumerates every mandatory matcher applicable to present trigger keys, evaluates them, creates
 all new instance keys for `MATCH` outcomes, executes their relevant slices, indexes their outputs, and repeats until a round
 adds neither facts nor instances.
 
@@ -45,10 +45,14 @@ the profile explicitly upgrades them.
 
 Closure may be incremental by dependency keys, but strict acceptance must be equivalent to exhaustive evaluation for the
 same snapshot. Parallel rounds are valid only when deterministic merge and duplicate suppression preserve that result.
-Receipts commit to registry and profile hashes so later changes cannot retroactively alter what “all mandatory rules” meant.
+The implemented receipt commits to a registry hash, matcher count, semantic keys, publication count, rounds, expected and
+executed instance identities, missing identities, failure evidence, and a closure hash. A future assurance profile will add
+its own hash so later policy changes cannot alter what “all mandatory rules” meant.
 
-The current runtime executes an explicit finite graph and has no matcher registry or closure engine. This document is the
-normative target for the planned Assurance Core, not a claim about current implementation.
+The current runtime implements this algorithm for additive exact-key publications, reviewed filesystem `kb.*` matchers,
+one-key bindings, two-key equality joins, deterministic deduplication, and configurable round and instance limits. It does
+not implement persistent epochs, retraction, explicit unknown matcher outcomes, profile-selected registries, trust gates,
+parallel closure, or final acceptance certificates.
 
 ### Operational example
 
@@ -66,6 +70,12 @@ completeness independently checkable.
 ### Question #2: Can closure accept after reaching a configured limit?
 
 Response: No. A limit is operational evidence of incomplete computation and therefore produces `INCONCLUSIVE`.
+
+### Question #3: Does a non-compliant finding fail closure?
+
+Response: No. Closure checks whether every mandatory circuit instance executed successfully, not whether its domain finding
+is positive. A target that successfully returns `compliant: false` is executed evidence; refusal, rejection, error, or a
+missing instance blocks closure.
 
 ## Conclusion
 

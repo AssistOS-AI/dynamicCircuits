@@ -1,0 +1,30 @@
+@input control
+@output finding
+
+@evaluate define control
+    function run({ control }, ctx) {
+      if (!control || typeof control !== "object" || Array.isArray(control)) {
+        return ctx.reject("control_object_required")
+      }
+      if (typeof control.caseId !== "string" || typeof control.controlId !== "string") {
+        return ctx.reject("control_identity_required")
+      }
+      if (typeof control.required !== "boolean" || typeof control.observed !== "boolean") {
+        return ctx.reject("control_boolean_values_required", { caseId: control.caseId, controlId: control.controlId })
+      }
+      return {
+        caseId: control.caseId,
+        controlId: control.controlId,
+        compliant: control.observed === control.required,
+        required: control.required,
+        observed: control.observed,
+        source: control.source ?? null,
+      }
+    }
+    function check({ control }, output) {
+      return output.caseId === control.caseId && output.controlId === control.controlId
+        && output.compliant === (control.observed === control.required)
+    }
+    return { run, check }
+
+@finding evaluate $control
