@@ -18,10 +18,10 @@
     <p class="lead">The CLI keeps reusable knowledge separate from the current analysis. It prepares the directory contract before any coding-agent process starts.</p>
 
     <h2>Prepare and analyze</h2>
-    <pre><code>dc-agent prepare -kbdir ./kb -workdir /path/to/task
-dc-agent -kbdir ./kb -workdir /path/to/task -agent codex
-dc-agent run --kbdir ./kb --workdir /path/to/task --agent codex --learn</code></pre>
-    <p>Both single-dash and conventional double-dash forms are accepted for KB, workdir, and agent options. Preparation creates missing directories, inventories inputs, and links the project skill catalog. It refuses overlapping KB/work roots and conflicting skill-link paths.</p>
+    <pre><code>agent prepare -kbdir ./kb -workdir /path/to/task
+agent -kbdir ./kb -workdir /path/to/task -agent codex
+agent run --kbdir ./kb --workdir /path/to/task --agent codex --learn</code></pre>
+    <p>Both single-dash and conventional double-dash forms are accepted for KB, workdir, and agent options. Preparation creates missing directories, inventories inputs, and links the project skill catalog at <code>circuitSkills</code> and <code>.agents/skills</code>. It refuses overlapping KB/work roots and conflicting skill-link paths.</p>
 
     <pre class="mermaid">flowchart TD
       K[KB root] --> KC[circuits: trusted]
@@ -34,7 +34,7 @@ dc-agent run --kbdir ./kb --workdir /path/to/task --agent codex --learn</code></
 
     <h2>Agent authority</h2>
     <p>Normal analysis treats the KB as read-only. Learning mode lets the Codex sandbox write under the KB root, while the generated instructions restrict reusable output to <code>candidates/</code>. This restriction is currently instructional rather than a host-mediated filesystem capability; <a href="specsLoader.html?spec=DS008-security-and-trust.md">DS008</a> records the limitation.</p>
-    <p><code>--prepare-only</code> stops before adapter construction. <code>--dry-run</code> prints the command, arguments, working directory, and prompt without launching a process. The <code>generic</code> adapter accepts a program through <code>--agent-command</code> and sends the prompt through standard input.</p>
+    <p><code>--prepare-only</code> stops before adapter construction. <code>--dry-run</code> prints the command, arguments, working directory, and prompt without launching a process. The <code>generic</code> adapter accepts a program through <code>--agent-command</code> and sends the prompt through standard input. Installed compatibility aliases are <code>dc-agent</code> and <code>dynamic-circuits</code>.</p>
 
     <h2>Workspace skill catalog</h2>
     <p><code>analyze-task</code> enforces complete input coverage and grounded results. <code>author-sop-circuit</code> supplies the implemented syntax and verification loop. <code>circuit-learner</code> separates reusable candidates from task-specific facts. The CLI links the catalog as one directory so the same instructions govern normal tasks and evaluation cases.</p>

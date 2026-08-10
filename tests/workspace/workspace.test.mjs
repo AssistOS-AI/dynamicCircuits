@@ -18,6 +18,7 @@ test("prepares isolated KB/work directories and inventories every regular input 
   const workspace = await prepareWorkspace({ kbDir, workDir, skillsDir });
   assert.deepEqual(workspace.inputManifest.files.map(({ path: file }) => file), ["a.txt", "nested/b.txt"]);
   assert.equal((await lstat(path.join(workDir, "circuitSkills"))).isSymbolicLink(), true);
+  assert.equal((await lstat(path.join(workDir, ".agents", "skills"))).isSymbolicLink(), true);
   assert.match(await readFile(path.join(workDir, "AGENTS.md"), "utf8"), /Treat the knowledge base as read-only/);
 });
 
@@ -45,4 +46,17 @@ test("rejects overlapping KB and work roots", async (context) => {
     }),
     (error) => error.code === "INVALID_WORKSPACE_LAYOUT",
   );
+});
+
+test("adds project skill links to an existing discovery directory", async (context) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "dc-workspace-"));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  const workDir = path.join(root, "work");
+  const skillsDir = path.join(root, "project-skills");
+  await mkdir(path.join(workDir, ".agents", "skills"), { recursive: true });
+  await mkdir(path.join(skillsDir, "one-skill"), { recursive: true });
+  await writeFile(path.join(workDir, ".agents", "skills", "user-skill.txt"), "preserve");
+  await prepareWorkspace({ kbDir: path.join(root, "kb"), workDir, skillsDir });
+  assert.equal(await readFile(path.join(workDir, ".agents", "skills", "user-skill.txt"), "utf8"), "preserve");
+  assert.equal((await lstat(path.join(workDir, ".agents", "skills", "one-skill"))).isSymbolicLink(), true);
 });

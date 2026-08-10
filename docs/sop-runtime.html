@@ -40,8 +40,8 @@
       V -->|invalid| D[Structured diagnostic]
       E --> X[Structured receipt]</pre>
     <p>The compiler resolves core, local, qualified, and nested circuit calls. It marks dead nodes outside output and assurance slices. The executor distinguishes success, refusal, rejection, and error; failed child circuits do not leak partial public outputs.</p>
-    <pre><code>dc-agent sop compile --root ./sop --package analysis
-dc-agent sop run --root ./sop --package analysis --inputs '["4","7"]'</code></pre>
+    <pre><code>agent sop compile --root ./sop --package analysis
+agent sop run --root ./sop --package analysis --inputs '["4","7"]'</code></pre>
 
     <h2>Isolation boundary</h2>
     <p>Command code runs in a Node <code>vm</code> context without process, filesystem, network, module loading, clocks, randomness, or oracle services. String and WebAssembly code generation are disabled and synchronous execution has a timeout. This is a development guard for reviewable code, not a production sandbox for hostile multi-tenant programs.</p>

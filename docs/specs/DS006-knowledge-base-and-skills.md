@@ -18,7 +18,7 @@ Trusted reusable `.sop` packages must live under `KB/circuits/`. New learning ou
 
 The project must ship `circuitSkills/analyze-task`, `circuitSkills/author-sop-circuit`, and `circuitSkills/circuit-learner`. Each skill must contain valid concise frontmatter, imperative workflows, and only resources required for its task. `author-sop-circuit` must document the implemented subset and must warn agents not to claim future runtime capabilities.
 
-Workspace preparation must link the entire `circuitSkills` directory rather than copy it. This keeps one maintained skill version across normal workspaces and `eval/evalN` cases. Imported repository-maintenance skills under `.agents/` are read-only guidance and are not runtime circuit skills.
+Workspace preparation must link the entire `circuitSkills` directory rather than copy it. The visible `circuitSkills` link and `.agents/skills` discovery links must resolve to that same catalog; an existing local discovery directory receives project skill links without losing unrelated skills. This keeps one maintained skill version across normal workspaces and `eval/evalN` cases. Imported repository-maintenance skills under the repository root `.agents/` are read-only guidance and are not runtime circuit skills.
 
 Analysis reports must distinguish reused trusted circuits, generated task-local circuits, unexecuted source, successful execution, and proposed KB candidates. Learning artifacts must retain input hashes or paths and review-relevant source spans without copying unnecessary document bodies.
 

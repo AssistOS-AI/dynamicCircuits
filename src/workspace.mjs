@@ -30,6 +30,29 @@ async function ensureSymlink(linkPath, targetPath) {
   }
 }
 
+async function ensureAgentSkillDiscovery(workDir, skillsDir) {
+  const agentDir = path.join(workDir, ".agents");
+  const agentDirEntry = await lstat(agentDir).catch(() => null);
+  if (!agentDirEntry) await mkdir(agentDir);
+  else if (!agentDirEntry.isDirectory() || agentDirEntry.isSymbolicLink()) {
+    throw new SopError("WORKSPACE_CONFLICT", `${agentDir} must be a local directory`);
+  }
+
+  const discoveryPath = path.join(agentDir, "skills");
+  const discoveryEntry = await lstat(discoveryPath).catch(() => null);
+  if (!discoveryEntry || discoveryEntry.isSymbolicLink()) {
+    await ensureSymlink(discoveryPath, skillsDir);
+    return;
+  }
+  if (!discoveryEntry.isDirectory()) {
+    throw new SopError("WORKSPACE_CONFLICT", `${discoveryPath} must be a directory or symbolic link`);
+  }
+  const skills = await readdir(skillsDir, { withFileTypes: true });
+  for (const skill of skills.filter((entry) => entry.isDirectory())) {
+    await ensureSymlink(path.join(discoveryPath, skill.name), path.join(skillsDir, skill.name));
+  }
+}
+
 async function walkInput(directory, root, files) {
   const entries = await readdir(directory, { withFileTypes: true });
   entries.sort((left, right) => left.name.localeCompare(right.name));
@@ -85,7 +108,9 @@ export async function prepareWorkspace(options) {
   for (const directory of ["input", "results", "sop", ".dynamic-circuits"]) {
     await mkdir(path.join(workDir, directory), { recursive: true });
   }
-  await ensureSymlink(path.join(workDir, "circuitSkills"), await realpath(skillsDir));
+  const canonicalSkillsDir = await realpath(skillsDir);
+  await ensureSymlink(path.join(workDir, "circuitSkills"), canonicalSkillsDir);
+  await ensureAgentSkillDiscovery(workDir, canonicalSkillsDir);
 
   const agentsPath = path.join(workDir, "AGENTS.md");
   const existingInstructions = await readFile(agentsPath, "utf8").catch(() => null);
@@ -102,7 +127,13 @@ export async function prepareWorkspace(options) {
     kbDir,
     workDir,
     mode: options.learn ? "learn" : "analyze",
-    paths: { input: "input", results: "results", sop: "sop", skills: "circuitSkills" },
+    paths: {
+      input: "input",
+      results: "results",
+      sop: "sop",
+      skills: "circuitSkills",
+      agentSkillDiscovery: ".agents/skills",
+    },
   };
   await writeFile(path.join(workDir, ".dynamic-circuits", "workspace.json"), `${JSON.stringify(workspaceManifest, null, 2)}\n`, "utf8");
   return { kbDir, workDir, skillsDir, inputManifest, workspaceManifest };
@@ -110,5 +141,13 @@ export async function prepareWorkspace(options) {
 
 export function buildAnalysisPrompt(workspace) {
   const count = workspace.inputManifest.files.length;
-  return `Use the linked circuitSkills to analyze this workspace. Read AGENTS.md and, when present, .dynamic-circuits/AGENT_INSTRUCTIONS.md. Process all ${count} files in .dynamic-circuits/input-manifest.json, inspect relevant reusable circuits in ${workspace.kbDir}/circuits, author task-local SOP Lang in sop/, execute relevant circuits, and write grounded reports to results/. Finish with results/agent-summary.md containing coverage, generated circuits, execution outcomes, limitations, and any KB candidates. Do not use direct LLM API integrations.`;
+  return [
+    "Use the linked circuitSkills to analyze this workspace.",
+    "Read AGENTS.md and, when present, .dynamic-circuits/AGENT_INSTRUCTIONS.md.",
+    `Process all ${count} files in .dynamic-circuits/input-manifest.json.`,
+    `Inspect relevant reusable circuits in ${workspace.kbDir}/circuits.`,
+    "Author task-local SOP Lang in sop/, execute relevant circuits, and write grounded reports to results/.",
+    "Finish with results/agent-summary.md containing coverage, generated circuits, execution outcomes,",
+    "limitations, and any KB candidates. Do not use direct LLM API integrations.",
+  ].join(" ");
 }

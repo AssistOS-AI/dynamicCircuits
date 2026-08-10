@@ -14,13 +14,13 @@ Dynamic Circuits separates deterministic implementation tests from end-to-end co
 
 ## Core Content
 
-`npm test` must execute modular unit suites for parser syntax, compiler graph validation, runtime outcomes and nesting, workspace preparation and non-destructive behavior, coding-agent invocation construction, and the public CLI argument form. Tests must cover successful and failing paths, including bare arguments, free wires, arity mismatch, dead nodes, refusal, failed checks, exceptions, false invariants, symlink creation, user-owned guidance, and generic adapter extension.
+`npm test` must execute modular unit suites for parser syntax, compiler graph validation, runtime outcomes and nesting, workspace preparation and non-destructive behavior, coding-agent invocation construction, the public CLI argument form, and historical-package integrity. Tests must cover successful and failing paths, including bare arguments, free wires, arity mismatch, dead nodes, refusal, failed checks, exceptions, false invariants, symlink creation, user-owned guidance, and generic adapter extension.
 
 Every evaluation case must live under a contiguous `eval/evalN/` directory and contain `input/`, `results/`, and `sop/` plus the same `circuitSkills` link created for production workspaces. Eval inputs and circuits must be committed; generated result reports may remain empty until a coding-agent evaluation is executed. Each case must state its purpose and reproducible compile or run command.
 
 Documentation verification must regenerate `docs/specs/matrix.md`, require contiguous DS numbers, validate local links, and check Mermaid availability on every HTML page. `npm run check` must combine unit tests and documentation checks. Skill folders must pass the skill-creator validator.
 
-The complete hash of files under `sop_lang_circuits_design_specs_v1/` must remain unchanged across initialization work. Future CI should persist the expected aggregate hash as an integrity assertion.
+The complete hash of files under `sop_lang_circuits_design_specs_v1/` must remain unchanged across initialization work. The integrity suite must compare the deterministic aggregate against the captured initial hash on every test run.
 
 ## Decisions & Questions
 

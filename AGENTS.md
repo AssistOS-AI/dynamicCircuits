@@ -24,15 +24,25 @@ Update this catalog whenever a project skill folder is added or removed. Update 
 
 ## Repository Rules
 
-All documentation, specifications, source comments, diagnostics, and durable generated guidance must be written in English. DS numbering must remain contiguous. Ordinary DS files must contain `Introduction`, `Core Content`, `Decisions & Questions`, and `Conclusion`; questions must be consecutive numbered subchapters and use `Response:` or `Options:`. Architectural rationale belongs in the affected DS file, not a separate decision log.
+All documentation, specifications, source comments, diagnostics, and durable generated guidance must be written in English.
+DS numbering must remain contiguous. Ordinary DS files must contain `Introduction`, `Core Content`,
+`Decisions & Questions`, and `Conclusion`; questions must be consecutive numbered subchapters and use `Response:`
+or `Options:`. Architectural rationale belongs in the affected DS file, not a separate decision log.
 
 Keep imported-skill DS files and standalone imported-skill pages out of this downstream project's `docs/`. Preserve the historical v1 package byte-for-byte. Use `apply_patch` for source edits and keep generated work products out of `input/`.
 
-AchillesAgentLib is authorized for future orchestrated runtime integration. It is not a current dependency. If in-process LLM access is added later, all such interactions must go through AchillesAgentLib's `LLMAgent`, runtime configuration must support explicit code-level overrides in addition to environment defaults, and routing-sensitive work must carry task metadata tags. The current release invokes external coding-agent CLIs and must not call LLM APIs directly.
+AchillesAgentLib is authorized for future orchestrated runtime integration. It is not a current dependency. If
+in-process LLM access is added later, all such interactions must go through AchillesAgentLib's `LLMAgent`, runtime
+configuration must support explicit code-level overrides in addition to environment defaults, and routing-sensitive
+work must carry task metadata tags. The current release invokes external coding-agent CLIs and must not call LLM APIs
+directly.
 
 ## Runtime Defaults
 
-The default coding-agent adapter is `codex`. Workspace preparation is non-destructive toward user-owned `AGENTS.md` files, KB trusted circuits are read-only during normal analysis, and learning writes only reviewable candidates. SOP commands execute without filesystem, process, network, clock, random, or oracle capabilities. Node.js 20 or newer is required and production code has no external package dependency.
+The default coding-agent adapter is `codex`. Workspace preparation is non-destructive toward user-owned `AGENTS.md`
+files, KB trusted circuits are read-only during normal analysis, and learning writes only reviewable candidates. SOP
+commands execute without filesystem, process, network, clock, random, or oracle capabilities. Node.js 20 or newer is
+required and production code has no external package dependency.
 
 ## Key Paths
 

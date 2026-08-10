@@ -14,14 +14,15 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 
 function usage() {
   return `Usage:
-  dc-agent [-kbdir PATH] [-workdir PATH] [-agent codex] [--learn] [--prepare-only]
-  dc-agent run --kbdir PATH --workdir PATH [--agent codex|generic]
-  dc-agent prepare --kbdir PATH --workdir PATH
-  dc-agent sop compile --root PATH --package NAME [--prefix NAME] [--kb-root PATH]
-  dc-agent sop run --root PATH --package NAME [--inputs JSON] [--prefix NAME] [--kb-root PATH]
+  agent [-kbdir PATH] [-workdir PATH] [-agent codex] [--learn] [--prepare-only]
+  agent run --kbdir PATH --workdir PATH [--agent codex|generic]
+  agent prepare --kbdir PATH --workdir PATH
+  agent sop compile --root PATH --package NAME [--prefix NAME] [--kb-root PATH]
+  agent sop run --root PATH --package NAME [--inputs JSON] [--prefix NAME] [--kb-root PATH]
 
 Options accept both the requested single-dash form (-kbdir) and conventional long form (--kbdir).
-The generic adapter also requires --agent-command PATH.`;
+The generic adapter also requires --agent-command PATH. Installed aliases are agent, dc-agent,
+and dynamic-circuits.`;
 }
 
 function parseArgs(argv) {

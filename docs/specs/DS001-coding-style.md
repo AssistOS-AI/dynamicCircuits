@@ -18,7 +18,7 @@ Production code must use Node.js ECMAScript modules under `src/` and must suppor
 
 Functions should remain deterministic unless their boundary explicitly represents an effect. Errors crossing module or CLI boundaries must use stable codes and structured details. Canonical data must not contain non-finite numbers, functions, or unstable object identities. Code must not use hidden globals to transfer runtime values.
 
-Tests must use `node:test` and mirror responsibility under `tests/parser/`, `tests/compiler/`, `tests/runtime/`, `tests/workspace/`, `tests/agents/`, and `tests/cli/`. Every defect fix must add or strengthen a focused test. Temporary test data must be created outside repository fixtures and cleaned after the test. Evaluation cases under `eval/` are reproducible workspace examples and do not replace unit tests.
+Tests must use `node:test` and mirror responsibility under `tests/parser/`, `tests/compiler/`, `tests/runtime/`, `tests/workspace/`, `tests/agents/`, `tests/cli/`, and `tests/integrity/`. Every defect fix must add or strengthen a focused test. Temporary test data must be created outside repository fixtures and cleaned after the test. Evaluation cases under `eval/` are reproducible workspace examples and do not replace unit tests.
 
 Source files should remain reviewable in one sitting. Run `fileSizesCheck.sh` after substantial changes; a file exceeding its configured limits should be split by responsibility unless cohesion provides a documented reason. Prefer lines that remain readable without horizontal scrolling, generally below 120 characters, while preserving commands and machine-readable fixtures when wrapping would reduce clarity.
 

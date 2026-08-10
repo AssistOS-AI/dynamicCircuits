@@ -16,7 +16,7 @@ The CLI translates two user-controlled paths into a predictable analysis environ
 
 The primary invocation must accept both `-kbdir PATH -workdir PATH` and conventional double-dash forms. The KB and work directories must be distinct and must not contain one another. Preparation must create `KB/circuits/`, `KB/candidates/`, `WORK/input/`, `WORK/results/`, `WORK/sop/`, and `WORK/.dynamic-circuits/` as needed.
 
-The work directory must contain a `circuitSkills` symbolic link targeting the project-owned skill catalog. An existing link is accepted only when it resolves to the expected directory; a conflicting file, directory, or link must produce a structured failure.
+The work directory must contain a `circuitSkills` symbolic link targeting the project-owned skill catalog. It must also expose the same catalog through `.agents/skills` for native coding-agent discovery. When `.agents/skills` is an existing local directory, preparation must add one safe link per project skill and preserve unrelated entries. Existing links are accepted only when they resolve to expected targets; conflicting files or links must produce a structured failure.
 
 Preparation must recursively inventory every regular input file without following symbolic links. `.dynamic-circuits/input-manifest.json` must record normalized relative paths, byte sizes, and SHA-256 hashes. `.dynamic-circuits/workspace.json` must record the path contract and analysis mode.
 
