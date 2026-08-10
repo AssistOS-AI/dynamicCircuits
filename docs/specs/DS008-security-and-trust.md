@@ -14,6 +14,9 @@ Dynamic Circuits executes agent-authored JavaScript and launches external coding
 defines each writable directory, the capabilities absent from command contexts, the limits of Node `vm`, and the additional
 isolation required for hostile code.
 
+This specification applies across workspace preparation in DS003, coding-agent invocation in DS002, command execution in
+DS011, trust policy in DS018, receipts in DS019, and future capability brokers described by DS021.
+
 ## Core Content
 
 Workspace preparation must reject overlapping KB and work roots, must not follow input or package symbolic links during inventory and discovery, and must refuse a pre-existing `circuitSkills` path unless it is the expected link. User-owned `AGENTS.md` content must not be overwritten.
@@ -42,6 +45,12 @@ Threat tests include traversal and symlink escape, malicious package names, prot
 prompt injection inside source documents, secret exfiltration, dependency confusion, cache poisoning, receipt forgery,
 oversized artifacts/logs, catastrophic regexes, infinite loops, recursion, closure explosion, and oracle replay. Failure must
 default to refusal, error, or inconclusive—not relaxed policy.
+
+### Operational example
+
+A task input may contain text instructing the agent to overwrite the KB. The agent guidance treats that text as document
+data, analysis mode supplies no writable KB root, and trusted circuit promotion remains outside agent authority. A command
+that tries to access `process` receives no such global in its VM context.
 
 ## Decisions & Questions
 

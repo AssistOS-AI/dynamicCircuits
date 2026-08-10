@@ -14,6 +14,9 @@ Dynamic Circuits represents a document analysis as source artifacts, interpreted
 reusable templates, task attempts, assurance obligations, and receipts. Separate terms identify what the source states,
 what a circuit derives, what a verifier checks, and what an assurance profile accepts.
 
+This vocabulary is shared by DS010–DS020. It prevents the parser, agent, matcher, assurance engine, and auditor from using
+one term such as “result” for source text, derived data, verification evidence, and final acceptance.
+
 ## Core Content
 
 ### Sources, interpretations, and values
@@ -52,6 +55,12 @@ profile, runtime/compiler versions, and relevant environment. A semantic change 
 A command is not a circuit; package namespaces resolve components, not values; a local checker is not an assurance profile;
 a matcher establishes applicability while a planner only proposes work. Refusal is not boolean false, an exception is not
 refusal, unknown is not negation, and contradiction is not a technical error.
+
+### Operational example
+
+A document sentence is a source assertion. An interpretation circuit may publish it as a claim with a source span. A rule
+circuit derives a value from that claim. A verifier checks a goal over the value. An assurance profile decides whether that
+verifier and evidence are sufficient for an accepted outcome.
 
 Trust must remain derived from receipts and policy. The model distinguishes unchecked, self-checked, independently checked,
 certificate-checked, and externally attested outputs. Support for a proposition, support for its negation, conflict,

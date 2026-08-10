@@ -13,6 +13,9 @@ summary: Defines KB circuits, candidates, and the analyze-task, author-sop-circu
 Reviewed reusable circuits persist in the knowledge base. Task-specific circuits and reports remain in one workdir. The
 runtime skill catalog gives coding agents separate workflows for analysis, SOP authoring, and KB candidate extraction.
 
+This specification connects inferred learning mode from DS003 to reviewed templates in DS014 and to the three runtime
+skills linked into every prepared KB, workdir, and evaluation workspace.
+
 ## Core Content
 
 Trusted reusable `.sop` packages must live under `KB/circuits/`. New learning output must begin under `KB/candidates/` with its contract, provenance, examples, and tests. A coding agent must not promote candidates or overwrite trusted circuits. Task-specific circuits must remain under `WORK/sop/`.
@@ -36,6 +39,12 @@ Analysis reports must distinguish reused trusted circuits, generated task-local 
 Candidate packages include a manifest, source provenance, applicability, inputs/outputs, effects/capabilities, assumptions,
 exceptions and priorities, refusal codes, positive/negative/boundary examples, test commands, expected receipts, overlap and
 version notes, and review checklist. Compilation is necessary but never sufficient for semantic promotion.
+
+### Operational example
+
+A policy learner extracts a notice-period rule into `candidates/legal-notice/`, records the source paragraph and policy
+assumptions, adds ordinary, exception, and missing-consent cases, and compiles the package. The reviewed `circuits/` tree
+remains unchanged until a separate promotion decision.
 
 ## Decisions & Questions
 

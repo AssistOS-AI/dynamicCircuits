@@ -13,6 +13,9 @@ summary: Defines the implemented syntax, positional interfaces, command ABI, cor
 This specification defines the SOP syntax accepted by the current parser and compiler. Planned syntax and runtime features
 from the historical v1 design are identified separately in the relevant later specifications.
 
+The parser applies this contract before DS012 resolves package names and builds IR. DS011 defines the JavaScript command
+ABI, DS010 defines wire semantics, and DS005 defines execution of the compiled result.
+
 ## Core Content
 
 SOP files must be UTF-8 text. Simple identifiers must match `[A-Za-z_][A-Za-z0-9_]*`; package names must be dot-qualified simple identifiers. Comments begin with `#` outside JSON strings. Calls accept only `$wire` references and double-quoted JSON string literals.
@@ -43,6 +46,12 @@ Reserved future syntax includes richer literals, types, named arguments, explici
 profiles, proof declarations, and structured template metadata. Implementations must reject rather than guess unknown
 directives, malformed bare literals, empty definitions, duplicate ports or commands, partial matcher metadata, free wires,
 and illegal redefinition.
+
+### Operational example
+
+`@total add $left $right` declares output wire `total`, calls local command `add`, and supplies two existing wires in
+positional order. `add $left 2` fails parsing because bare numeric literals are outside the supported surface; `"2"` is an
+accepted JSON string literal.
 
 ## Decisions & Questions
 

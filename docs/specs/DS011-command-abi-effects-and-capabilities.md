@@ -13,6 +13,9 @@ summary: Defines positional JavaScript commands, run/check/refusal behavior, eff
 Commands provide open-ended computation while the ABI keeps inputs explicit, failures classified, and effects subject to
 policy. Flexibility does not imply trust.
 
+This specification connects JavaScript bodies parsed under DS004 to value semantics in DS010, runtime invocation in DS005,
+security policy in DS008, and the future capability brokers and receipts in DS019–DS021.
+
 ## Core Content
 
 ### Declaration and descriptor
@@ -56,6 +59,12 @@ Static helpers may be provided only through a sandbox module registry and their 
 present `vm` boundary disables string and WebAssembly code generation and bounds synchronous work; production execution of
 untrusted commands requires worker, process, container, or WASM isolation with CPU, wall-time, memory, output, and log
 budgets.
+
+### Operational example
+
+A `parsePolicy` command receives `{policyJson}` through its declared formal, returns a canonical object, and calls
+`ctx.reject("invalid_json")` for malformed input. A thrown parser exception is recorded as `ERROR`; returning false is an
+ordinary domain value and remains distinct from both outcomes.
 
 ## Decisions & Questions
 

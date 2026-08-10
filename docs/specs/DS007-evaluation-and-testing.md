@@ -13,6 +13,9 @@ summary: Defines modular unit suites, reproducible eval workspaces, verification
 Deterministic unit tests verify parser, compiler, runtime, CLI, workspace, adapter, documentation, and integrity contracts.
 Committed evaluation workspaces exercise complete SOP tasks with source documents, circuits, checked results, and reports.
 
+This specification verifies the CLI, skills, and runtime contracts defined by DS001–DS006 and provides executable reference
+flows for the larger lifecycle in DS027. DS023 defines future conformance and scale coverage beyond the current suite.
+
 ## Core Content
 
 `npm test` must execute modular unit suites for parser syntax, compiler graph validation, runtime outcomes and nesting, workspace preparation and non-destructive behavior, coding-agent invocation construction, the public CLI argument form, and historical-package integrity. Tests must cover successful and failing paths, including bare arguments, free wires, arity mismatch, dead nodes, refusal, failed checks, exceptions, false invariants, symlink creation, user-owned guidance, and generic adapter extension.
@@ -34,6 +37,11 @@ checks Mermaid availability on every HTML page. Matrix links must remain relativ
 `npm run check` combines unit tests and documentation checks. Skill folders must pass the skill-creator validator.
 
 The complete hash of files under `sop_lang_circuits_design_specs_v1/` must remain unchanged across initialization work. The integrity suite must compare the deterministic aggregate against the captured initial hash on every test run.
+
+### Operational example
+
+Eval 2 loads eight observations, runs a counterexample circuit, and compares the public outputs with the committed JSON
+summary. The expected runtime outcome is `SUCCEEDED`; the semantic verdict is `REFUTED` because `-2` is a grounded witness.
 
 ## Decisions & Questions
 

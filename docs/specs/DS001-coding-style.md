@@ -12,6 +12,9 @@ summary: Establishes the source layout, deterministic JavaScript conventions, fi
 
 This specification is the coding-style authority for Dynamic Circuits. It applies to production source, tests, scripts, skills, and durable documentation.
 
+It connects repository structure to verification: module boundaries determine test placement, and documentation rules keep
+the HTML pages and DS contracts synchronized with observable implementation behavior.
+
 ## Core Content
 
 Production code must use Node.js ECMAScript modules under `src/` and must support Node.js 20 or newer. Runtime code must avoid external package dependencies. Modules must have explicit responsibilities: `src/sop/` contains language mechanics, `src/agents/` contains coding-agent adapters, `src/workspace.mjs` owns workspace preparation, and `src/cli.mjs` owns argument handling and process orchestration.
@@ -32,6 +35,11 @@ explained. Slogans, rhetorical contrasts, and claims framed mainly as what the s
 operational descriptions.
 
 AchillesAgentLib is authorized but is not installed for the current external-agent architecture. A future in-process integration must route every LLM interaction through `LLMAgent`, use runtime configuration and environment variables, permit explicit code-level configuration overrides, and attach metadata tags for documentation, specification, orchestration, bootstrap, and testing work.
+
+### Operational example
+
+A change to cross-realm canonicalization belongs in `src/sop/canonical.mjs`, receives a focused runtime regression test,
+updates DS005 and the runtime HTML page, and passes `npm run check` plus `fileSizesCheck.sh` before completion.
 
 ## Decisions & Questions
 

@@ -12,6 +12,9 @@ summary: Specifies compilation phases, graph validation, sandboxed command execu
 
 The reference kernel converts SOP packages into an explicit graph and executes only the dependency slices required by public outputs and assurance declarations.
 
+This specification consumes the syntax, wire, command, and package contracts from DS004 and DS010–DS012. Its outputs feed
+runtime receipts in DS019 and the higher-level acceptance process in DS017.
+
 ## Core Content
 
 The registry must discover `.sop` files deterministically, skip symbolic links, derive package names, parse sources, and reject collisions. Compilation must resolve local commands, core commands, qualified commands, and circuit packages. It must validate single assignment, free wires, command and circuit arity, declared outputs, coverage reachability, and graph acyclicity.
@@ -41,6 +44,12 @@ their receipt is embedded or hash-linked. Resolution never depends on discovery 
 compiler's topological order, so independent-node source reordering cannot change pure results or receipt semantics.
 
 The `vm` boundary is a reference-development guard, not a production security sandbox. Asynchronous resource limits, worker isolation, persistent caching, effects, semantic indexes, mandatory closure, and trust-profile enforcement remain unsupported.
+
+### Operational example
+
+If output `report` depends on nodes `parse`, `applyRule`, and `format`, those nodes execute in topological order. An unrelated
+debug node is marked `DEAD`. If `applyRule` refuses, `format` does not run, no public report is returned, and the receipt
+preserves the refusal and completed predecessor evidence.
 
 ## Decisions & Questions
 

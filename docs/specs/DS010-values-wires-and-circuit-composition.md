@@ -13,6 +13,9 @@ summary: Specifies canonical values, registered handles, immutable local wires, 
 The executable graph uses static single assignment (SSA) to make dependencies complete, scheduling deterministic, and
 provenance traversable across nested circuit instances.
 
+This specification connects surface calls from DS004 to compiler dependency analysis in DS012 and runtime scheduling in
+DS013. Canonical values also provide the identity inputs used by receipts and caches in DS019–DS020.
+
 ## Core Content
 
 ### Wire production and scope
@@ -59,6 +62,12 @@ renamed with `alias` when distinct provenance is useful.
 Child refusal, rejection, or error must block public child outputs. Receipts may retain internal diagnostics but callers
 must never consume a partial failed result. Direct and mutual recursion are unsupported unless a future explicit fixpoint
 backend defines their semantics.
+
+### Operational example
+
+A parent circuit passes wire `policy` into two child instances. Each child uses its own local wire names and returns only its
+declared outputs. Reassigning `policy` or reading a child's internal `deadline` wire is invalid; the parent must receive the
+deadline through an ordered child output.
 
 ## Decisions & Questions
 

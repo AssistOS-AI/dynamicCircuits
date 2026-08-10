@@ -13,6 +13,9 @@ summary: Specifies path-derived packages, multiple roots, identity, resolution, 
 Packages name executable components, while the intermediate representation fixes resolved dependencies before execution.
 Namespaces never expose runtime values.
 
+This specification turns DS004 source and DS010 wires into the resolved graph executed by DS005 and DS013. Package hashes
+and normalized node identities later become receipt and cache dependencies under DS019–DS020.
+
 ## Core Content
 
 ### Path mapping and roots
@@ -56,6 +59,12 @@ message when the information exists.
 Static policy checks are planned for permitted hashes, capabilities, mandatory matcher restrictions, trusted blocking
 verifiers, and write effects. Incremental compilation may cache parse and IR by package hash; interface or code changes must
 invalidate callers or execution caches according to dependency.
+
+### Operational example
+
+Under root prefix `kb`, file `legal/notice/index.sop` resolves to package `kb.legal.notice`. A task call to that name binds
+the package's exact ordered inputs and outputs. A second root producing the same qualified name causes a package-collision
+diagnostic before any circuit runs.
 
 ## Decisions & Questions
 

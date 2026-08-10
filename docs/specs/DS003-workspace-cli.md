@@ -13,6 +13,9 @@ summary: Specifies inferred KB learning and workdir analysis modes, input discov
 The CLI prepares a persistent knowledge-base directory and, when supplied, a separate directory for one analysis task. Each
 directory has explicit read/write locations, manifests, coding-agent instructions, and skill-discovery links.
 
+This specification is the filesystem boundary between user inputs, the external coding agent in DS002, the reusable KB in
+DS006, and the circuit compiler/runtime in DS005. DS008 defines the security limits of that boundary.
+
 ## Core Content
 
 The primary invocation accepts requested single-dash and conventional double-dash options. `agent -kbdir ./kb` infers
@@ -38,6 +41,11 @@ completion state is recorded in the active workspace's `.dynamic-circuits/last-r
 Codex is the default adapter. A generic command adapter proves extensibility and the registry is the boundary for future
 OpenCode, Claude Code, and other coding agents. `--dry-run` prints an argument-vector invocation and generated prompt. It
 must not use a shell command string or direct model API.
+
+### Operational example
+
+With `-kbdir ./kb -workdir ./work/case-a`, the CLI hashes files under `./work/case-a/input`, prepares `sop/` and `results/`,
+links `circuitSkills`, records mode `analyze`, and starts the selected agent with `./work/case-a` as its current directory.
 
 ## Decisions & Questions
 

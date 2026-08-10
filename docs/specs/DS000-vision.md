@@ -15,6 +15,9 @@ authors SOP circuits. A deterministic local kernel validates those circuits, exe
 outputs and receipts. The current DS set defines both the implemented subset and the planned assurance components; the
 original v1 design remains immutable historical input.
 
+This is the entry specification for the project. It connects the CLI and coding-agent boundary in DS002–DS003, the
+implemented SOP kernel in DS004–DS005, the KB workflow in DS006, and the planned assurance architecture in DS009–DS027.
+
 ## Core Content
 
 Document analysis combines source files, interpreted facts, reusable rules, exceptions, priorities, intermediate values,
@@ -43,6 +46,12 @@ as future layers in DS014–DS027.
 Success has three levels: today, a user can prepare either workspace, invoke a selected coding-agent adapter, compile and
 run supported circuits, inspect receipts, and reproduce serious evals; next, the system can govern and reuse candidates;
 ultimately, it can issue conditional acceptance certificates after exhaustive declared obligations and trust gates.
+
+### Operational example
+
+Given policy documents under `./work/task-001/input`, the CLI prepares the workdir, Codex authors a task circuit under
+`sop/`, the runtime executes it against explicit values, and the agent writes a report under `results/` that cites the
+runtime outcome and source files.
 
 ## Decisions & Questions
 

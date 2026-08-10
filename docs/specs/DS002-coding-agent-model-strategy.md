@@ -13,6 +13,9 @@ summary: Defines external coding-agent selection, Codex defaults, future adapter
 An external coding-agent process performs document interpretation and circuit authoring. The SOP runtime receives circuit
 files and input values and therefore remains independent from model APIs and model credentials.
 
+This specification connects CLI adapter selection to the workspace authority defined by DS003 and DS008. The coding agent
+may author files inside its prepared workspace; deterministic SOP execution remains the responsibility of DS005.
+
 ## Core Content
 
 The CLI must expose an `--agent` parameter. `codex` is the built-in default and must be invoked non-interactively in the work directory with workspace-write sandboxing, no interactive approvals, an ephemeral session, and the prompt supplied through standard input. `--model` may forward an explicit model choice without embedding a repository-wide model name.
@@ -25,6 +28,11 @@ writes to `results/`. That candidate-only restriction is instructional in the cu
 security limitation; trusted circuit promotion remains outside agent authority.
 
 No runtime command, workspace module, or adapter may call an LLM HTTP API directly in this release. If a future embedded model path is approved, AchillesAgentLib and `LLMAgent` become mandatory, with environment defaults, manual runtime overrides, and tagged routing metadata.
+
+### Operational example
+
+`agent -kbdir ./kb -workdir ./work/task-001 -agent codex` builds a Codex argument vector and sends the analysis prompt on
+standard input. Selecting `generic` changes only adapter construction; the workspace and SOP contracts remain identical.
 
 ## Decisions & Questions
 

@@ -14,6 +14,9 @@ Execution evaluates the required slice of a compiled graph and returns a classif
 semantic acceptance separately. Immutable attempts record repairs, while budgets bound time, resources, instances, and
 external work.
 
+This specification receives compiled dependency graphs from DS012 and supplies classified evidence to acceptance in DS017,
+receipts in DS019, cache epochs in DS020, and repair operations in the agent lifecycle under DS026–DS027.
+
 ## Core Content
 
 ### Root set and scheduling
@@ -52,6 +55,12 @@ Long tasks should checkpoint completed receipts, semantic index, closure queue, 
 one epoch. Retry must be explicit: transient broker failures may retry with receipts; deterministic exceptions, refusals,
 and assurance failures require a new attempt; a larger budget creates a new epoch. Cancellation must preserve safe pure
 receipts and handle effectful work transactionally.
+
+### Operational example
+
+Attempt 1 refuses because written consent is missing. Supplying a newly discovered consent artifact creates attempt 2 with
+attempt 1 as parent and a new source digest. Increasing only the wall-time budget also creates a new epoch so the resulting
+receipt records the changed execution policy.
 
 ## Decisions & Questions
 
