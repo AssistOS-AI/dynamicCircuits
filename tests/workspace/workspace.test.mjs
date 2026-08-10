@@ -3,7 +3,7 @@ import { lstat, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { prepareWorkspace } from "../../src/index.mjs";
+import { prepareKnowledgeBase, prepareWorkspace } from "../../src/index.mjs";
 
 test("prepares isolated KB/work directories and inventories every regular input file", async (context) => {
   const root = await mkdtemp(path.join(os.tmpdir(), "dc-workspace-"));
@@ -32,7 +32,7 @@ test("does not overwrite a user-owned AGENTS.md", async (context) => {
   await writeFile(path.join(workDir, "AGENTS.md"), "user rules\n");
   await prepareWorkspace({ kbDir: path.join(root, "kb"), workDir, skillsDir });
   assert.equal(await readFile(path.join(workDir, "AGENTS.md"), "utf8"), "user rules\n");
-  assert.match(await readFile(path.join(workDir, ".dynamic-circuits", "AGENT_INSTRUCTIONS.md"), "utf8"), /Dynamic Circuits Workspace/);
+  assert.match(await readFile(path.join(workDir, ".dynamic-circuits", "AGENT_INSTRUCTIONS.md"), "utf8"), /Dynamic Circuits Analysis Workspace/);
 });
 
 test("rejects overlapping KB and work roots", async (context) => {
@@ -59,4 +59,20 @@ test("adds project skill links to an existing discovery directory", async (conte
   await prepareWorkspace({ kbDir: path.join(root, "kb"), workDir, skillsDir });
   assert.equal(await readFile(path.join(workDir, ".agents", "skills", "user-skill.txt"), "utf8"), "preserve");
   assert.equal((await lstat(path.join(workDir, ".agents", "skills", "one-skill"))).isSymbolicLink(), true);
+});
+
+test("prepares inferred KB learning without a task workdir", async (context) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "dc-learning-"));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  const kbDir = path.join(root, "kb");
+  const skillsDir = path.join(root, "skills");
+  await mkdir(path.join(kbDir, "input"), { recursive: true });
+  await mkdir(skillsDir);
+  await writeFile(path.join(kbDir, "input", "rules.txt"), "A reusable rule");
+  const workspace = await prepareKnowledgeBase({ kbDir, skillsDir });
+  assert.equal(workspace.mode, "learn");
+  assert.equal(workspace.workDir, null);
+  assert.equal(workspace.agentWorkDir, kbDir);
+  assert.deepEqual(workspace.inputManifest.files.map(({ path: file }) => file), ["rules.txt"]);
+  assert.match(await readFile(path.join(kbDir, "AGENTS.md"), "utf8"), /only under `candidates\/`/);
 });

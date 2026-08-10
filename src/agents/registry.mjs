@@ -6,7 +6,6 @@ export const supportedAgents = Object.freeze(["codex", "generic"]);
 export function buildAgentInvocation(options) {
   const agent = options.agent ?? "codex";
   const workDir = path.resolve(options.workDir);
-  const kbDir = path.resolve(options.kbDir);
   if (agent === "codex") {
     const args = [
       "exec",
@@ -16,7 +15,6 @@ export function buildAgentInvocation(options) {
       "--ask-for-approval", "never",
       "--cd", workDir,
     ];
-    if (options.learn) args.push("--add-dir", kbDir);
     if (options.model) args.push("--model", options.model);
     args.push("-");
     return { command: options.agentCommand ?? "codex", args, cwd: workDir, promptViaStdin: true };

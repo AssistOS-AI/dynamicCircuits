@@ -1,0 +1,17 @@
+@input chapterOne chapterTwo chapterThree
+@output report
+@goal conflictsReported covers report
+
+@first eval3.interpretation $chapterOne "chapter-01"
+@second eval3.interpretation $chapterTwo "chapter-02"
+@third eval3.interpretation $chapterThree "chapter-03"
+@report eval3.consistency $first $second $third
+
+@verify define report
+    function run({ report }) {
+      return report.timelineConflict === true && report.terminologyConflict === true
+    }
+    return { run }
+
+@bothConflictClasses verify $report
+@conflictsReported assertInvariant $bothConflictClasses "eval3.conflicts-reported"

@@ -8,19 +8,26 @@ import { compilePackage } from "./sop/compiler.mjs";
 import { SopError } from "./sop/errors.mjs";
 import { PackageRegistry } from "./sop/registry.mjs";
 import { SopRuntime } from "./sop/runtime.mjs";
-import { buildAnalysisPrompt, prepareWorkspace } from "./workspace.mjs";
+import {
+  buildAnalysisPrompt,
+  buildLearningPrompt,
+  prepareKnowledgeBase,
+  prepareWorkspace,
+} from "./workspace.mjs";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function usage() {
   return `Usage:
-  agent [-kbdir PATH] [-workdir PATH] [-agent codex] [--learn] [--prepare-only]
-  agent run --kbdir PATH --workdir PATH [--agent codex|generic]
-  agent prepare --kbdir PATH --workdir PATH
+  agent -kbdir PATH [-agent codex|generic]
+  agent -kbdir PATH -workdir PATH [-agent codex|generic]
+  agent prepare -kbdir PATH [-workdir PATH]
   agent sop compile --root PATH --package NAME [--prefix NAME] [--kb-root PATH]
   agent sop run --root PATH --package NAME [--inputs JSON] [--prefix NAME] [--kb-root PATH]
 
 Options accept both the requested single-dash form (-kbdir) and conventional long form (--kbdir).
+Without --workdir the agent learns candidate circuits from KB/input. With --workdir it analyzes
+WORK/input and writes WORK/sop and WORK/results while treating the KB as read-only.
 The generic adapter also requires --agent-command PATH. Installed aliases are agent, dc-agent,
 and dynamic-circuits.`;
 }
@@ -61,12 +68,19 @@ async function runChild(invocation, prompt) {
 }
 
 async function handleWorkspace(command, options) {
-  const workspace = await prepareWorkspace({
+  if (options.learn) {
+    throw new SopError(
+      "CLI_ARGUMENT",
+      "--learn was removed: omit --workdir for KB learning, or provide --workdir for task analysis",
+    );
+  }
+  const common = {
     kbDir: requireOption(options, "kbdir"),
-    workDir: requireOption(options, "workdir"),
     skillsDir: path.join(projectRoot, "circuitSkills"),
-    learn: options.learn === true,
-  });
+  };
+  const workspace = options.workdir
+    ? await prepareWorkspace({ ...common, workDir: options.workdir })
+    : await prepareKnowledgeBase(common);
   if (command === "prepare" || options["prepare-only"]) {
     process.stdout.write(`${JSON.stringify(workspace.workspaceManifest, null, 2)}\n`);
     return;
@@ -74,18 +88,18 @@ async function handleWorkspace(command, options) {
   const invocation = buildAgentInvocation({
     agent: options.agent ?? "codex",
     agentCommand: options["agent-command"],
-    kbDir: workspace.kbDir,
-    workDir: workspace.workDir,
-    learn: options.learn === true,
+    workDir: workspace.agentWorkDir,
     model: options.model,
   });
-  const prompt = buildAnalysisPrompt(workspace);
+  const prompt = workspace.mode === "learn"
+    ? buildLearningPrompt(workspace)
+    : buildAnalysisPrompt(workspace);
   if (options["dry-run"]) {
     process.stdout.write(`${JSON.stringify({ ...invocation, prompt }, null, 2)}\n`);
     return;
   }
   const result = await runChild(invocation, prompt);
-  await writeFile(path.join(workspace.workDir, ".dynamic-circuits", "last-run.json"), `${JSON.stringify({
+  await writeFile(path.join(workspace.agentWorkDir, ".dynamic-circuits", "last-run.json"), `${JSON.stringify({
     schemaVersion: 1,
     agent: options.agent ?? "codex",
     command: invocation.command,

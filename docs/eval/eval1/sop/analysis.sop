@@ -1,0 +1,14 @@
+@input policyJson casesJson
+@output findings stats
+@goal complete covers findings stats
+
+@findings @stats eval1.policy $policyJson $casesJson
+
+@verifyComplete define findings stats
+    function run({ findings, stats }) {
+      return Array.isArray(findings) && findings.length === stats.total
+    }
+    return { run }
+
+@allClassified verifyComplete $findings $stats
+@complete assertInvariant $allClassified "eval1.all-cases-classified"

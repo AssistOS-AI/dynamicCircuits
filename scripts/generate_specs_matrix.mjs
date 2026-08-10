@@ -104,7 +104,7 @@ function renderMatrix(specs) {
   const rows = specs
     .map(
       (spec) =>
-        `| [${spec.id}](/specsLoader.html?spec=${spec.fileName}) | ${spec.title} | [[status:${spec.status}]] | ${spec.owner} | ${spec.summary.replace(/\|/g, '\\|')} |`
+        `| [${spec.id}](specsLoader.html?spec=${spec.fileName}) | ${spec.title} | [[status:${spec.status}]] | ${spec.owner} | ${spec.summary.replace(/\|/g, '\\|')} |`
     )
     .join('\n');
 

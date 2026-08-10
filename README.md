@@ -4,10 +4,10 @@ Dynamic Circuits is a Node.js CLI that prepares document-analysis workspaces for
 
 ```bash
 npm test
-agent prepare -kbdir ./kb -workdir /path/to/dynamic-task
-agent -kbdir ./kb -workdir /path/to/dynamic-task -agent codex --dry-run
-node src/cli.mjs sop compile --kb-root ./kb/circuits --root ./eval/eval1/sop --prefix eval --package eval.analysis
-node src/cli.mjs sop run --kb-root ./kb/circuits --root ./eval/eval1/sop --prefix eval --package eval.analysis --inputs '["4","7"]'
+agent prepare -kbdir ./kb -workdir ./work/task-001
+agent -kbdir ./kb -workdir ./work/task-001 -agent codex --dry-run
+node src/cli.mjs sop compile --kb-root ./kb/circuits --root ./docs/eval/eval1/sop --prefix eval --package eval.analysis
+node src/cli.mjs sop run --kb-root ./kb/circuits --root ./docs/eval/eval1/sop --prefix eval --package eval.analysis --inputs '["4","7"]'
 ```
 
 The package also installs `dc-agent` and `dynamic-circuits` aliases. During repository development, replace `agent`

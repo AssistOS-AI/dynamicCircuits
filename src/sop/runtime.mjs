@@ -1,7 +1,7 @@
 import vm from "node:vm";
 import { compileRegistry } from "./compiler.mjs";
 import { coreCommands } from "./core-commands.mjs";
-import { deepFreeze, hashValue } from "./canonical.mjs";
+import { deepFreeze, hashValue, normalizeCanonical } from "./canonical.mjs";
 import { SopError, fail } from "./errors.mjs";
 
 function isRefusal(value) {
@@ -68,7 +68,7 @@ export class SopRuntime {
         }
         return isRefusal(output)
           ? { status: "REFUSED", refusal: { code: output.code, details: output.details ?? {} } }
-          : { status: "SUCCEEDED", output: deepFreeze(output) };
+          : { status: "SUCCEEDED", output: deepFreeze(normalizeCanonical(output)) };
       } catch (error) {
         return { status: "ERROR", error: sanitizedError(error) };
       }
@@ -105,7 +105,7 @@ export class SopRuntime {
         const ok = check === true || (check && check.ok === true);
         if (!ok) return { status: "CHECK_FAILED", check, notes };
       }
-      return { status: "SUCCEEDED", output: deepFreeze(output), notes };
+      return { status: "SUCCEEDED", output: deepFreeze(normalizeCanonical(output)), notes };
     } catch (error) {
       return { status: "ERROR", error: sanitizedError(error), notes };
     } finally {

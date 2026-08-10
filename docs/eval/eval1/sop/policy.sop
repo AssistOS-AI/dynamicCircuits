@@ -1,0 +1,41 @@
+@input policyJson casesJson
+@output findings stats
+
+@review define policyJson casesJson
+    function run({ policyJson, casesJson }, ctx) {
+      let policy
+      let cases
+      try {
+        policy = JSON.parse(policyJson)
+        cases = JSON.parse(casesJson)
+      } catch {
+        return ctx.reject("invalid_json")
+      }
+      if (!Array.isArray(cases)) return ctx.reject("cases_must_be_array")
+      const findings = cases.map((item) => {
+        const exceptionUsed = item.expedited === true && item.writtenConsent === true
+        const applicableMinimum = exceptionUsed ? policy.expeditedDays : policy.minimumDays
+        const compliant = Number(item.noticeDays) >= Number(applicableMinimum)
+        return {
+          id: item.id,
+          noticeDays: item.noticeDays,
+          applicableMinimum,
+          exceptionUsed,
+          compliant,
+          reason: compliant ? "applicable_minimum_met" : "notice_below_applicable_minimum"
+        }
+      })
+      return {
+        findings,
+        stats: {
+          total: findings.length,
+          compliant: findings.filter((item) => item.compliant).length,
+          violations: findings.filter((item) => !item.compliant).length
+        }
+      }
+    }
+    return { run }
+
+@bundle review $policyJson $casesJson
+@findings get $bundle "/findings"
+@stats get $bundle "/stats"

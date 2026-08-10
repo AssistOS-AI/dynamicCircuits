@@ -1,0 +1,10 @@
+{
+  "outcome": "SUCCEEDED",
+  "findings": [
+    {"id": "A", "noticeDays": 10, "applicableMinimum": 30, "exceptionUsed": false, "compliant": false, "reason": "notice_below_applicable_minimum"},
+    {"id": "B", "noticeDays": 10, "applicableMinimum": 10, "exceptionUsed": true, "compliant": true, "reason": "applicable_minimum_met"},
+    {"id": "C", "noticeDays": 30, "applicableMinimum": 30, "exceptionUsed": false, "compliant": true, "reason": "applicable_minimum_met"}
+  ],
+  "stats": {"total": 3, "compliant": 2, "violations": 1},
+  "goal": {"code": "eval1.all-cases-classified", "ok": true}
+}

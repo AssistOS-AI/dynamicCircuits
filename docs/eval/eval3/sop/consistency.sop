@@ -1,0 +1,23 @@
+@input first second third
+@output report
+
+@compareInterpretations define first second third
+    function run({ first, second, third }) {
+      const items = [first, second, third]
+      const dateClaims = items.flatMap((item) => item.dates.map((value) => ({value, source: item.sourceLabel})))
+      const definitionClaims = items
+        .filter((item) => item.definition !== null)
+        .map((item) => ({value: item.definition, source: item.sourceLabel}))
+      const dates = [...new Set(dateClaims.map((item) => item.value))]
+      const definitions = [...new Set(definitionClaims.map((item) => item.value))]
+      return {
+        timelineConflict: dates.length > 1,
+        terminologyConflict: definitions.length > 1,
+        dateClaims,
+        definitionClaims,
+        unresolved: dates.length > 1 || definitions.length > 1
+      }
+    }
+    return { run }
+
+@report compareInterpretations $first $second $third

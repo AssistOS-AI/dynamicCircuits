@@ -1,0 +1,14 @@
+@input sourceText sourceLabel
+@output interpretation
+
+@extract define sourceText sourceLabel
+    function run({ sourceText, sourceLabel }, ctx) {
+      if (typeof sourceText !== "string") return ctx.reject("source_text_required")
+      const dates = [...sourceText.matchAll(/launch date(?: is)?\s+(\d{4}-\d{2}-\d{2})/gi)]
+        .map((match) => match[1])
+      const definition = sourceText.match(/Node means ([^.]+)\./i)?.[1] ?? null
+      return { sourceLabel, dates, definition }
+    }
+    return { run }
+
+@interpretation extract $sourceText $sourceLabel

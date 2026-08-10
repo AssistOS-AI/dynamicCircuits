@@ -1,0 +1,20 @@
+[
+  {
+    "id": "A",
+    "noticeDays": 10,
+    "expedited": false,
+    "writtenConsent": false
+  },
+  {
+    "id": "B",
+    "noticeDays": 10,
+    "expedited": true,
+    "writtenConsent": true
+  },
+  {
+    "id": "C",
+    "noticeDays": 30,
+    "expedited": false,
+    "writtenConsent": false
+  }
+]

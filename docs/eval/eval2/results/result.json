@@ -1,0 +1,7 @@
+{
+  "outcome": "SUCCEEDED",
+  "verdict": "REFUTED",
+  "witness": -2,
+  "mean": 5.25,
+  "goal": {"code": "eval2.counterexample-grounded", "ok": true}
+}

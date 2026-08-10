@@ -10,7 +10,9 @@ export function canonicalize(value) {
     return Object.is(value, -0) ? "0" : JSON.stringify(value);
   }
   if (Array.isArray(value)) return `[${value.map(canonicalize).join(",")}]`;
-  if (Object.getPrototypeOf(value) === Object.prototype) {
+  const prototype = Object.getPrototypeOf(value);
+  const isPlainObject = prototype === null || prototype === Object.prototype || prototype?.constructor?.name === "Object";
+  if (isPlainObject) {
     const fields = Object.keys(value)
       .sort()
       .map((key) => `${JSON.stringify(key)}:${canonicalize(value[key])}`);
@@ -25,6 +27,23 @@ export function hashValue(value) {
 
 export function hashText(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
+}
+
+export function normalizeCanonical(value) {
+  if (value === undefined || value === null || typeof value === "boolean" || typeof value === "string") return value;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) throw new TypeError("Only finite numbers are canonical");
+    return Object.is(value, -0) ? 0 : value;
+  }
+  if (Array.isArray(value)) return Array.from(value, normalizeCanonical);
+  if (typeof value === "object") {
+    const prototype = Object.getPrototypeOf(value);
+    const isPlainObject = prototype === null || prototype === Object.prototype || prototype?.constructor?.name === "Object";
+    if (isPlainObject) {
+      return Object.fromEntries(Object.keys(value).map((key) => [key, normalizeCanonical(value[key])]));
+    }
+  }
+  throw new TypeError("Value is not canonically serializable");
 }
 
 export function deepFreeze(value, seen = new WeakSet()) {
