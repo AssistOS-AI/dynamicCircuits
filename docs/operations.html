@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Evidence, Scale, and Security — Dynamic Circuits</title><link rel="stylesheet" href="styles.css">
+<title>Evidence and reuse — Dynamic Circuits</title><link rel="stylesheet" href="styles.css">
 <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
 <body><div data-include="partials/header.html"></div><main class="page"><article class="page__panel">
 <p class="breadcrumbs"><a href="index.html">Documentation</a> / Design / Operations</p>
-<h1>Receipts, cache, scale, and security</h1>
+<h1>Evidence, reuse, and large inputs</h1>
 <p class="lead">Receipts bind results to inputs, code, policy, and dependencies. Epochs and semantic cache keys control reuse. Registry layers organize large knowledge bases, and capability brokers mediate external effects.</p>
 
-<h2>Purpose and relationship to the system</h2>
+<h2>Why this page exists</h2>
 <p>This page explains how Dynamic Circuits stores execution evidence and how that evidence remains valid when work is cached,
 split across large documents, or performed through external capabilities. It follows the runtime and assurance layers: the
 runtime creates node and circuit evidence, assurance adds closure and policy evidence, and operations persists, reuses, and
@@ -15,24 +15,43 @@ protects those records.</p>
 <p>The current runtime implements deterministic in-memory node and circuit receipts. Persistent receipts, semantic caches,
 epochs, large-document registries, capability brokers, and signatures are planned components defined by the linked DS files.</p>
 
+<h2>Five terms used below</h2>
+<p>A new reader needs five definitions before following the storage design. A <strong>receipt</strong> is the structured record
+of one execution. A <strong>digest</strong> is a content hash used to identify exact bytes or canonical values. An
+<strong>epoch</strong> names one stable snapshot of sources, packages, registry, and policy. A <strong>cache key</strong>
+identifies the complete conditions under which an old computation may be reused. A <strong>capability</strong> is an explicit,
+limited permission to perform an external operation such as reading one artifact or calling one allowlisted service.</p>
+<p>Only the first two are substantially visible in the current runtime. Epochs, persistent semantic cache, registry-wide
+evidence, and mediated effect capabilities describe later milestones. The page keeps them together because they determine
+whether a stored result still means the same thing after inputs, code, policy, or external state changes.</p>
+
 <h2>Receipt hierarchy</h2>
+<figure class="diagram">
+<figcaption><strong>Receipt levels</strong>Detailed command evidence is aggregated into the final task record</figcaption>
 <pre class="mermaid">flowchart LR
-  N[Node receipts] --> C[Circuit receipt]
-  C --> L[Closure receipt]
-  L --> F[Final receipt]</pre>
+  N[(Command receipts)] --> C[Circuit receipt]
+  H[(Child-circuit receipts)] --> C
+  C --> F([Final task receipt])
+  L[Future closure evidence] --> F</pre></figure>
 <p>The hierarchy diagram shows aggregation. A node receipt describes one command or child-circuit call. A circuit receipt
 binds the ordered interface, required node receipts, checks, and outputs. A closure receipt adds matcher coverage and fixed-
 point rounds. The final receipt adds task sources, attempt lineage, goals, trust decisions, conflicts, budgets, and
 publication status.</p>
+<figure class="diagram">
+<figcaption><strong>Final receipt inputs</strong>Evidence identity changes when source, policy, or required goals change</figcaption>
 <pre class="mermaid">flowchart LR
-  S[Sources and artifacts] --> F[Final receipt]
+  S[/Sources and artifacts/] --> F[(Final receipt identity)]
   P[Profile and epoch] --> F
-  G[Goals and trust] --> F</pre>
+  G[Goals and trust] --> F</pre></figure>
 <p>The evidence-input diagram shows why the final receipt is more than an execution log. Source and artifact commitments
 identify the evidence bytes. Profile and epoch identify the rules, registry snapshot, and resource policy. Goals and trust
 identify which propositions were checked and which implementations were accepted. Changing any of these inputs creates a
 different final identity.</p>
 <p>Node receipts bind code, canonical inputs and outputs, checks, effects, capabilities, artifacts, oracle calls, state, and dependencies. Circuit receipts add interface bindings, relevant slice, invariants, child instances, and public outputs. Closure receipts bind registry coverage and every fixed-point round. Final receipts bind sources, attempts, goals, trust decisions, conflicts, budgets, and acceptance gates. Canonical serialization, content hashes, signatures, selective disclosure, replay modes, and audit queries are specified in <a href="specsLoader.html?spec=DS019-receipts-provenance-and-audit.md">DS019</a>.</p>
+<p>In the current Eval 1 run, the root receipt contains the <code>eval1.analysis</code> execution and three child receipts for
+<code>kb.policy</code>. Each child records hashed inputs, the local node outcome, and its returned finding. The committed
+<code>results/result.json</code> is a short expected-output fixture; it is not a replacement for the full runtime receipt.
+Run the command in the <a href="tutorial.html">manual tutorial</a> to print and inspect that receipt directly.</p>
 
 <h2>Cache and epochs</h2>
 <p>A cache key includes command/code/package digests, canonical inputs, dependency lock, declared environment, profile-sensitive semantics, runtime version, and epoch-bound external state. A hit revalidates the old receipt and emits a new reuse receipt; it never upgrades trust. Epochs snapshot sources, registry, matchers, templates, profile, and external versions. Incremental invalidation follows semantic dependencies and must converge to the same strict fixed point as a full run. See <a href="specsLoader.html?spec=DS020-cache-incremental-execution-and-epochs.md">DS020</a>.</p>
@@ -46,6 +65,10 @@ presenting the value as a fresh execution.</p>
 <p>For a book-sized source, each chapter can publish dates, definitions, claims, and citations with stable section locators.
 Cross-section circuits consume those structured outputs to find inconsistent terminology or timelines. This preserves the
 source span behind every global conclusion while avoiding repeated processing of unchanged raw chapters.</p>
+<p>Current behavior is simpler: the CLI hashes every regular input file, and Codex decides how to inspect it with locally
+available tools. There is no automatic chapter segmenter or persistent artifact store yet. For a current manual test, split
+large text at meaningful headings, keep stable source labels, and require the report to list unsupported files. The
+<a href="input-guide.html">input guide</a> gives concrete preparation rules.</p>
 
 <h2>Effects and threat boundary</h2>
 <p>The full architecture declares effects and supplies least-authority capabilities through host brokers: opaque artifact handles, allowlisted network requests, injected time/randomness, secret references, and receipt-bearing oracles. Resource budgets cover time, memory, output, logs, regexes, recursion, closure growth, calls, bytes, and cost. Package locks, signatures, SBOMs, revocation, redaction, and tenant isolation complete the operational boundary.</p>
@@ -53,4 +76,7 @@ source span behind every global conclusion while avoiding repeated processing of
 <p>Example: a future network-enabled command would receive an allowlisted broker capability, not the ambient Node network
 API. The broker would validate the destination and request size, enforce budgets, materialize the response as an artifact,
 and add the request and response commitments to the receipt.</p>
+<p>Read <a href="sop-runtime.html">SOP runtime</a> first for the receipt fields produced today, then
+<a href="assurance.html">coverage and acceptance</a> for the planned evidence added above a successful graph. The normative
+storage, cache, and scalability contracts are DS019, DS020, and DS021.</p>
 </article></main><div data-include="partials/footer.html"></div><script src="partials-loader.js"></script></body></html>

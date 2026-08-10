@@ -1,0 +1,5 @@
+@input
+@output markdown verification
+
+@brief task.brief
+@markdown @verification kb.analysis $brief

@@ -1,0 +1,35 @@
+@output brief
+
+@buildBrief define
+    function run() {
+      return {
+        title: "Orchard Signal",
+        protagonist: "Lea",
+        setting: "an empty orchard after harvest",
+        object: "a cracked field radio",
+        immediateGoal: "send one final weather warning",
+        obstacle: "the battery can power either the radio or the frost lamps",
+        choice: "Lea turns off the lamps and transmits the warning",
+        consequence: "distant farms answer while her own trees darken",
+        closingImage: "one green frequency bar above the black branches",
+        motifs: ["copper leaf", "static rain", "borrowed fire"],
+        request: "Generate the Markdown vignette and return the complete independent verification.",
+        source: {
+          path: "input/brief.md",
+          sha256: "6b148ea3a7a802c47f6393eaa388b9e84a31f22bb17808b2e237ba77cfb73c6c",
+        },
+      }
+    }
+
+    function check(inputs, output) {
+      return inputs !== null
+        && typeof inputs === "object"
+        && output !== null
+        && typeof output === "object"
+        && output.source.path === "input/brief.md"
+        && output.source.sha256 === "6b148ea3a7a802c47f6393eaa388b9e84a31f22bb17808b2e237ba77cfb73c6c"
+    }
+
+    return { run, check }
+
+@brief buildBrief

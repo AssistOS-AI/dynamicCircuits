@@ -1,0 +1,140 @@
+[
+  {
+    "id": "direct-supported",
+    "category": "positive",
+    "inputs": [
+      { "facts": [{ "kind": "fact", "subject": "A", "predicate": "p", "polarity": "POSITIVE", "locator": "case:direct" }], "rules": [] },
+      { "kind": "proposition", "subject": "A", "predicate": "p", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "SUCCEEDED", "status": "SUPPORTED", "queryMode": "DIRECT" }
+  },
+  {
+    "id": "multi-step-derived",
+    "category": "positive",
+    "inputs": [
+      {
+        "facts": [{ "kind": "fact", "subject": "A", "predicate": "p", "polarity": "POSITIVE", "locator": "case:seed" }],
+        "rules": [
+          { "kind": "implication", "antecedent": { "predicate": "q", "polarity": "POSITIVE" }, "consequent": { "predicate": "r", "polarity": "POSITIVE" }, "locator": "case:r2" },
+          { "kind": "implication", "antecedent": { "predicate": "p", "polarity": "POSITIVE" }, "consequent": { "predicate": "q", "polarity": "POSITIVE" }, "locator": "case:r1" }
+        ]
+      },
+      { "kind": "proposition", "subject": "A", "predicate": "r", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "SUCCEEDED", "status": "SUPPORTED", "queryMode": "DERIVED", "minimumDepth": 2 }
+  },
+  {
+    "id": "explicit-contradiction",
+    "category": "negative",
+    "inputs": [
+      { "facts": [{ "kind": "fact", "subject": "A", "predicate": "p", "polarity": "NEGATIVE", "locator": "case:negative" }], "rules": [] },
+      { "kind": "proposition", "subject": "A", "predicate": "p", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "SUCCEEDED", "status": "CONTRADICTED", "oppositeMode": "DIRECT" }
+  },
+  {
+    "id": "open-world-unknown",
+    "category": "negative",
+    "inputs": [
+      { "facts": [{ "kind": "fact", "subject": "B", "predicate": "p", "polarity": "POSITIVE", "locator": "case:other-subject" }], "rules": [] },
+      { "kind": "proposition", "subject": "A", "predicate": "p", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "SUCCEEDED", "status": "UNKNOWN", "closureCount": 0 }
+  },
+  {
+    "id": "conflict-direct-and-derived",
+    "category": "exception",
+    "inputs": [
+      {
+        "facts": [
+          { "kind": "fact", "subject": "A", "predicate": "p", "polarity": "POSITIVE", "locator": "case:positive" },
+          { "kind": "fact", "subject": "A", "predicate": "q", "polarity": "POSITIVE", "locator": "case:q" }
+        ],
+        "rules": [{ "kind": "implication", "antecedent": { "predicate": "q", "polarity": "POSITIVE" }, "consequent": { "predicate": "p", "polarity": "NEGATIVE" }, "locator": "case:negative-rule" }]
+      },
+      { "kind": "proposition", "subject": "A", "predicate": "p", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "SUCCEEDED", "status": "CONFLICT", "queryMode": "DIRECT", "oppositeMode": "DERIVED" }
+  },
+  {
+    "id": "cyclic-rules-terminate",
+    "category": "boundary",
+    "inputs": [
+      {
+        "facts": [{ "kind": "fact", "subject": "A", "predicate": "p", "polarity": "POSITIVE", "locator": "case:cycle-seed" }],
+        "rules": [
+          { "kind": "implication", "antecedent": { "predicate": "p", "polarity": "POSITIVE" }, "consequent": { "predicate": "q", "polarity": "POSITIVE" }, "locator": "case:p-q" },
+          { "kind": "implication", "antecedent": { "predicate": "q", "polarity": "POSITIVE" }, "consequent": { "predicate": "p", "polarity": "POSITIVE" }, "locator": "case:q-p" }
+        ]
+      },
+      { "kind": "proposition", "subject": "A", "predicate": "q", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "SUCCEEDED", "status": "SUPPORTED", "closureCount": 2 }
+  },
+  {
+    "id": "duplicate-derivations-suppressed",
+    "category": "boundary",
+    "inputs": [
+      {
+        "facts": [
+          { "kind": "fact", "subject": "A", "predicate": "p", "polarity": "POSITIVE", "locator": "case:duplicate-fact" },
+          { "kind": "fact", "subject": "A", "predicate": "p", "polarity": "POSITIVE", "locator": "case:duplicate-fact" }
+        ],
+        "rules": [
+          { "kind": "implication", "antecedent": { "predicate": "p", "polarity": "POSITIVE" }, "consequent": { "predicate": "q", "polarity": "POSITIVE" }, "locator": "case:duplicate-rule" },
+          { "kind": "implication", "antecedent": { "predicate": "p", "polarity": "POSITIVE" }, "consequent": { "predicate": "q", "polarity": "POSITIVE" }, "locator": "case:duplicate-rule" }
+        ]
+      },
+      { "kind": "proposition", "subject": "A", "predicate": "q", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "SUCCEEDED", "status": "SUPPORTED", "duplicateEvidenceSuppressed": 2 }
+  },
+  {
+    "id": "empty-context",
+    "category": "boundary",
+    "inputs": [
+      { "facts": [], "rules": [] },
+      { "kind": "proposition", "subject": "A", "predicate": "p", "polarity": "NEGATIVE" }
+    ],
+    "expected": { "outcome": "SUCCEEDED", "status": "UNKNOWN", "closureCount": 0 }
+  },
+  {
+    "id": "malformed-facts-container",
+    "category": "malformed",
+    "inputs": [
+      { "facts": {}, "rules": [] },
+      { "kind": "proposition", "subject": "A", "predicate": "p", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "REFUSED", "code": "facts_must_be_an_array" }
+  },
+  {
+    "id": "missing-source-locator",
+    "category": "malformed",
+    "inputs": [
+      { "facts": [{ "kind": "fact", "subject": "A", "predicate": "p", "polarity": "POSITIVE", "locator": "" }], "rules": [] },
+      { "kind": "proposition", "subject": "A", "predicate": "p", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "REFUSED", "code": "source_locator_required" }
+  },
+  {
+    "id": "unsupported-conjunction",
+    "category": "refusal",
+    "inputs": [
+      {
+        "facts": [],
+        "rules": [{ "kind": "implication", "antecedent": { "all": [{ "predicate": "p", "polarity": "POSITIVE" }, { "predicate": "q", "polarity": "POSITIVE" }] }, "consequent": { "predicate": "r", "polarity": "POSITIVE" }, "locator": "case:conjunction" }]
+      },
+      { "kind": "proposition", "subject": "A", "predicate": "r", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "REFUSED", "code": "unsupported_logical_form" }
+  },
+  {
+    "id": "unsupported-binary-fact",
+    "category": "refusal",
+    "inputs": [
+      { "facts": [{ "kind": "binary_fact", "subject": "A", "object": "B", "predicate": "knows", "polarity": "POSITIVE", "locator": "case:binary" }], "rules": [] },
+      { "kind": "proposition", "subject": "A", "predicate": "knows", "polarity": "POSITIVE" }
+    ],
+    "expected": { "outcome": "REFUSED", "code": "unsupported_logical_form" }
+  }
+]

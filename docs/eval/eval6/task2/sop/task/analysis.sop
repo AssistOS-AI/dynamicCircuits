@@ -1,0 +1,25 @@
+@input
+@output markdown verification
+@invariant requestedDeliverablesPresent covers request markdown verification
+
+@validateRequestedDeliverables define request markdown verification
+    function run({ request, markdown, verification }) {
+      return request !== null
+        && typeof request === "object"
+        && Array.isArray(request.deliverables)
+        && request.deliverables.length === 2
+        && request.deliverables[0] === "markdown-vignette"
+        && request.deliverables[1] === "complete-independent-verification"
+        && typeof markdown === "string"
+        && verification !== null
+        && typeof verification === "object"
+        && typeof verification.ok === "boolean"
+        && Array.isArray(verification.checks)
+    }
+
+    return { run }
+
+@brief task.brief
+@request task.request
+@markdown @verification kb.literary.composition $brief
+@requestedDeliverablesPresent validateRequestedDeliverables $request $markdown $verification

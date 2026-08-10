@@ -12,3 +12,5 @@ export {
   prepareWorkspace,
 } from "./workspace.mjs";
 export { buildAgentInvocation, supportedAgents } from "./agents/registry.mjs";
+export { executeWorkspaceCircuit, renderRuntimeReport, TASK_ENTRYPOINT } from "./runtime-report.mjs";
+export { planAnalysisRun } from "./incremental.mjs";

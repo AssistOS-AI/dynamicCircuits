@@ -1,0 +1,193 @@
+@output report analysis
+@goal analysisAccepted covers report analysis request records rel01 rel02 rel03 rel04 rel05 rel06 rel07 rel08 rel09 rel10
+
+@request task.request
+@records task.records
+
+@rel01Record get $records "0"
+@rel02Record get $records "1"
+@rel03Record get $records "2"
+@rel04Record get $records "3"
+@rel05Record get $records "4"
+@rel06Record get $records "5"
+@rel07Record get $records "6"
+@rel08Record get $records "7"
+@rel09Record get $records "8"
+@rel10Record get $records "9"
+
+@rel01 kb.data_release_governance.review $rel01Record
+@rel02 kb.data_release_governance.review $rel02Record
+@rel03 kb.data_release_governance.review $rel03Record
+@rel04 kb.data_release_governance.review $rel04Record
+@rel05 kb.data_release_governance.review $rel05Record
+@rel06 kb.data_release_governance.review $rel06Record
+@rel07 kb.data_release_governance.review $rel07Record
+@rel08 kb.data_release_governance.review $rel08Record
+@rel09 kb.data_release_governance.review $rel09Record
+@rel10 kb.data_release_governance.review $rel10Record
+
+@aggregate define request records rel01 rel02 rel03 rel04 rel05 rel06 rel07 rel08 rel09 rel10
+    function run({ request, records, rel01, rel02, rel03, rel04, rel05, rel06, rel07, rel08, rel09, rel10 }, ctx) {
+      const reviews = [rel01, rel02, rel03, rel04, rel05, rel06, rel07, rel08, rel09, rel10]
+      if (records.length !== request.expectedRecordCount || reviews.length !== request.expectedRecordCount) {
+        return ctx.reject("record_coverage_mismatch", {
+          expected: request.expectedRecordCount,
+          records: records.length,
+          reviews: reviews.length
+        })
+      }
+
+      const releases = reviews.map((review, index) => {
+        const record = records[index]
+        const failedFindings = review.findings.filter((finding) => finding.status === "FAIL")
+        return {
+          releaseIdentifier: review.releaseIdentifier,
+          sourceLocator: record.sourceLocator,
+          findings: review.findings,
+          failedRuleIdentifiers: review.failedRuleIdentifiers,
+          failureReasons: failedFindings.map((finding) => ({
+            ruleId: finding.ruleId,
+            reason: finding.reason,
+            ruleSourceLocator: finding.sourceLocator
+          })),
+          passCount: review.passCount,
+          failCount: review.failCount,
+          compliant: review.compliant
+        }
+      })
+
+      const passCount = releases.reduce((sum, release) => sum + release.passCount, 0)
+      const failCount = releases.reduce((sum, release) => sum + release.failCount, 0)
+      const compliantRecordCount = releases.filter((release) => release.compliant).length
+      const totalFindingCount = releases.reduce((sum, release) => sum + release.findings.length, 0)
+      const reusedCircuits = [
+        "kb.data_release_governance.review",
+        "kb.data_release_governance.r01",
+        "kb.data_release_governance.r02",
+        "kb.data_release_governance.r03",
+        "kb.data_release_governance.r04",
+        "kb.data_release_governance.r05",
+        "kb.data_release_governance.r06",
+        "kb.data_release_governance.r07",
+        "kb.data_release_governance.r08",
+        "kb.data_release_governance.r09",
+        "kb.data_release_governance.r10"
+      ]
+      const limitations = [
+        "The SOP runtime evaluates canonical values encoded from input/task.md; it does not parse unrestricted Markdown at runtime.",
+        "The reviewed KB circuits evaluate supplied values only and do not verify external evidence or access files, processes, or networks.",
+        "Coverage is limited to the ten supplied release records and reviewed rules R01 through R10.",
+        "Source values written as missing are preserved verbatim and are not replaced with favorable defaults."
+      ]
+
+      const lines = [
+        "# Data Release Governance Review",
+        "",
+        "## Execution outcome",
+        "",
+        "SUCCEEDED — task.analysis completed and produced all public outputs.",
+        "",
+        "## Input coverage",
+        "",
+        `- Manifest files processed: ${request.expectedInputFileCount}/${request.expectedInputFileCount} (input/task.md)`,
+        `- Release records reviewed: ${releases.length}/${request.expectedRecordCount}`,
+        `- Rules retained per release: ${request.expectedRuleIdentifiers.length}`,
+        `- Total rule findings retained: ${totalFindingCount}/${request.expectedFindingCount}`,
+        "",
+        "## Aggregate counts",
+        "",
+        `- Passed rule findings: ${passCount}`,
+        `- Failed rule findings: ${failCount}`,
+        `- Compliant records: ${compliantRecordCount}`,
+        `- Non-compliant records: ${releases.length - compliantRecordCount}`,
+        "",
+        "## Per-release findings",
+        ""
+      ]
+
+      for (const release of releases) {
+        lines.push(`### ${release.releaseIdentifier}`)
+        lines.push("")
+        lines.push(`- Source: ${release.sourceLocator}`)
+        lines.push(`- Record outcome: ${release.compliant ? "COMPLIANT" : "NON-COMPLIANT"}`)
+        lines.push(`- Failed rule IDs: ${release.failedRuleIdentifiers.length ? release.failedRuleIdentifiers.join(", ") : "None"}`)
+        lines.push(`- Rule counts: ${release.passCount} pass, ${release.failCount} fail`)
+        lines.push("")
+        lines.push("| Rule | Status | Reason | Path |")
+        lines.push("|---|---|---|---|")
+        for (const finding of release.findings) {
+          lines.push(`| ${finding.ruleId} | ${finding.status} | ${finding.reason === null ? "—" : finding.reason} | ${finding.path} |`)
+        }
+        lines.push("")
+      }
+
+      lines.push("## Reused reviewed circuits")
+      lines.push("")
+      for (const circuit of reusedCircuits) lines.push(`- ${circuit}`)
+      lines.push("")
+      lines.push("## Limitations")
+      lines.push("")
+      for (const limitation of limitations) lines.push(`- ${limitation}`)
+
+      return {
+        executionOutcome: "SUCCEEDED",
+        inputCoverage: {
+          manifestFilesExpected: request.expectedInputFileCount,
+          manifestFilesProcessed: 1,
+          processedInputs: [
+            {
+              path: "input/task.md",
+              sha256: "92565b8c65c071560b6be7bb3a5f5490e3d7bc690ea135d546cdc85eac4b216a",
+              status: "PROCESSED"
+            }
+          ],
+          expectedRecordCount: request.expectedRecordCount,
+          reviewedRecordCount: releases.length,
+          expectedRuleCountPerRecord: request.expectedRuleIdentifiers.length,
+          retainedFindingCount: totalFindingCount,
+          expectedFindingCount: request.expectedFindingCount
+        },
+        aggregateCounts: {
+          passCount,
+          failCount,
+          compliantRecordCount,
+          nonCompliantRecordCount: releases.length - compliantRecordCount
+        },
+        releases,
+        reusedCircuits,
+        limitations,
+        humanReadableReport: lines.join("\n")
+      }
+    }
+    function check(inputs, output) {
+      const releases = output.releases
+      const allRuleIdsStable = releases.every((release) =>
+        release.findings.map((finding) => finding.ruleId).join(",") === "R01,R02,R03,R04,R05,R06,R07,R08,R09,R10"
+      )
+      return output.executionOutcome === "SUCCEEDED"
+        && releases.length === inputs.request.expectedRecordCount
+        && output.inputCoverage.retainedFindingCount === inputs.request.expectedFindingCount
+        && output.aggregateCounts.passCount + output.aggregateCounts.failCount === inputs.request.expectedFindingCount
+        && output.aggregateCounts.compliantRecordCount + output.aggregateCounts.nonCompliantRecordCount === inputs.request.expectedRecordCount
+        && allRuleIdsStable
+        && output.humanReadableReport.includes("## Per-release findings")
+    }
+    return { run, check }
+
+@analysis aggregate $request $records $rel01 $rel02 $rel03 $rel04 $rel05 $rel06 $rel07 $rel08 $rel09 $rel10
+@report get $analysis "humanReadableReport"
+
+@validateAnalysis define request records analysis report
+    function run({ request, records, analysis, report }) {
+      return records.length === request.expectedRecordCount
+        && analysis.releases.length === request.expectedRecordCount
+        && analysis.releases.every((release) => release.findings.length === request.expectedRuleIdentifiers.length)
+        && analysis.inputCoverage.retainedFindingCount === request.expectedFindingCount
+        && analysis.inputCoverage.manifestFilesProcessed === request.expectedInputFileCount
+        && typeof report === "string"
+        && report.length > 0
+    }
+    return { run }
+
+@analysisValid validateAnalysis $request $records $analysis $report
+@analysisAccepted assertInvariant $analysisValid "analysis must preserve complete input, record, and rule coverage"

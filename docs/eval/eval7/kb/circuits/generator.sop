@@ -1,0 +1,108 @@
+@input brief
+@output markdown
+
+@render define brief
+    function validText(value) {
+      return typeof value === "string" && value.trim().length > 0 && !/[\r\n]/.test(value)
+    }
+
+    function validateBrief(brief) {
+      if (brief === null || typeof brief !== "object" || Array.isArray(brief)) return "brief_not_object"
+      const textFields = [
+        "documentTitle",
+        "service",
+        "severity",
+        "incidentCommanderRole",
+        "outgoingRole",
+        "incomingRole",
+        "communicationChannel",
+        "prohibitedAction",
+        "approvalRole",
+      ]
+      for (const field of textFields) {
+        if (!validText(brief[field])) return `missing_or_malformed_${field}`
+      }
+      if (!Array.isArray(brief.evidenceLocations) || brief.evidenceLocations.length === 0 || !brief.evidenceLocations.every(validText)) {
+        return "missing_or_malformed_evidenceLocations"
+      }
+      if (typeof brief.acknowledgementMinutes !== "number" || !Number.isFinite(brief.acknowledgementMinutes) || brief.acknowledgementMinutes <= 0) {
+        return "non_positive_or_malformed_acknowledgementMinutes"
+      }
+      if (typeof brief.escalationMinutes !== "number" || !Number.isFinite(brief.escalationMinutes) || brief.escalationMinutes <= 0) {
+        return "non_positive_or_malformed_escalationMinutes"
+      }
+      if (brief.escalationMinutes <= brief.acknowledgementMinutes) return "deadline_order_invalid"
+      return null
+    }
+
+    function procedureSteps(brief) {
+      return [
+        `1. Declare handoff: ${brief.outgoingRole} declares the handoff to ${brief.incomingRole} in ${brief.communicationChannel}.`,
+        `2. Freeze the timeline snapshot: ${brief.outgoingRole} freezes the current incident timeline.`,
+        `3. Identify open risks: ${brief.outgoingRole} identifies all open risks for ${brief.incomingRole}.`,
+        `4. Transfer evidence links: ${brief.outgoingRole} transfers every evidence location to ${brief.incomingRole}.`,
+        `5. Incoming acknowledgement: ${brief.incomingRole} acknowledges the handoff within ${brief.acknowledgementMinutes} minutes.`,
+        `6. Commander confirmation: ${brief.incidentCommanderRole} confirms the transfer before the ${brief.escalationMinutes} minutes escalation deadline.`,
+        `7. Completion record: ${brief.incomingRole} records completion with all required sign-offs and the UTC timestamp.`,
+      ]
+    }
+
+    function buildMarkdown(brief) {
+      const evidence = brief.evidenceLocations.map((location) => `  - ${location}`)
+      return [
+        `# ${brief.documentTitle}`,
+        "",
+        "## Scope",
+        `Service: ${brief.service}`,
+        `Severity: ${brief.severity}`,
+        "This generated SOP is a document only; generating it performs no operational action.",
+        "",
+        "## Roles",
+        `- Incident commander: ${brief.incidentCommanderRole}`,
+        `- Outgoing role: ${brief.outgoingRole}`,
+        `- Incoming role: ${brief.incomingRole}`,
+        `- Approval role: ${brief.approvalRole}`,
+        "",
+        "## Preconditions",
+        `- Communication channel: ${brief.communicationChannel}`,
+        "- Evidence locations:",
+        ...evidence,
+        "",
+        "## Handoff Procedure",
+        ...procedureSteps(brief),
+        "",
+        "## Verification",
+        `- Confirm ${brief.incomingRole} acknowledged within ${brief.acknowledgementMinutes} minutes.`,
+        `- Confirm ${brief.incidentCommanderRole} approved completion.`,
+        `- Confirm all evidence locations were transferred in ${brief.communicationChannel}.`,
+        "",
+        "## Escalation",
+        `If acknowledgement is not received within ${brief.acknowledgementMinutes} minutes, escalate in ${brief.communicationChannel} no later than ${brief.escalationMinutes} minutes to ${brief.incidentCommanderRole}.`,
+        "",
+        "## Prohibited Actions",
+        `- MUST NOT ${brief.prohibitedAction}`,
+        `- Only ${brief.approvalRole} may approve an override to this MUST NOT rule.`,
+        "",
+        "## Record of Completion",
+        "- [ ] Incident ID",
+        "- [ ] Outgoing sign-off",
+        "- [ ] Incoming sign-off",
+        "- [ ] Commander sign-off",
+        "- [ ] UTC timestamp",
+        "",
+      ].join("\n")
+    }
+
+    async function run({ brief }, ctx) {
+      const refusal = validateBrief(brief)
+      if (refusal) return ctx.reject(refusal)
+      return buildMarkdown(brief)
+    }
+
+    async function check({ brief }, output) {
+      return validateBrief(brief) === null && typeof output === "string" && output === buildMarkdown(brief)
+    }
+
+    return { run, check }
+
+@markdown render $brief

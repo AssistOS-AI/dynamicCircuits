@@ -1,0 +1,60 @@
+@input
+@output observations request
+
+# Encodes only the task-local study facts, request, completeness statement, and source locators.
+@loadStudy define
+    function expectedStudy() {
+      const sourcePath = "input/study.md"
+      return {
+        observations: [
+          {
+            id: "P1",
+            value: 1,
+            source: { path: sourcePath, locator: "All-positive study table; Value row; P1 column" },
+          },
+          {
+            id: "P2",
+            value: 2,
+            source: { path: sourcePath, locator: "All-positive study table; Value row; P2 column" },
+          },
+          {
+            id: "P3",
+            value: 3,
+            source: { path: sourcePath, locator: "All-positive study table; Value row; P3 column" },
+          },
+          {
+            id: "P4",
+            value: 4,
+            source: { path: sourcePath, locator: "All-positive study table; Value row; P4 column" },
+          },
+        ],
+        request: {
+          claim: "all_observations_are_strictly_positive",
+          requirements: [
+            "evaluate_universal_claim",
+            "keep_mean_separate_from_universal_proof",
+            "preserve_source_order",
+            "return_grounded_counterexample_only_if_one_exists",
+          ],
+          datasetCompleteness: "four_finite_observations_are_the_complete_dataset",
+          source: {
+            path: sourcePath,
+            locator: "Entire document, including request paragraph, observation table, and completeness statement",
+          },
+        },
+      }
+    }
+
+    async function run() {
+      return expectedStudy()
+    }
+
+    async function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(expectedStudy())
+    }
+
+    return { run, check }
+
+@study loadStudy
+@observations get $study "observations"
+@request get $study "request"

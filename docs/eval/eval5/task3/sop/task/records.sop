@@ -1,0 +1,90 @@
+@input
+@output edge01 edge02 edge03
+@invariant recordsComplete covers edge01 edge02 edge03 recordSet
+
+@loadRecords define
+    function run() {
+      return {
+        edge01: {
+          identifier: "EDGE-01",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "internal",
+          encryptionAtRest: true,
+          retentionDays: 1,
+          deletionOwner: "Archive Owner",
+          accessLogging: true,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Response Owner",
+          license: "ODC-BY-1.0",
+          sourceLocator: "input/task.md:6-23"
+        },
+        edge02: {
+          identifier: "EDGE-02",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "internal",
+          encryptionAtRest: true,
+          retentionDays: 365,
+          deletionOwner: "Archive Owner",
+          accessLogging: true,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Response Owner",
+          license: "CC0-1.0",
+          sourceLocator: "input/task.md:25-42"
+        },
+        edge03: {
+          identifier: "EDGE-03",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "internal",
+          encryptionAtRest: true,
+          retentionDays: 366,
+          deletionOwner: "Archive Owner",
+          accessLogging: true,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Response Owner",
+          license: "CC-BY-4.0",
+          sourceLocator: "input/task.md:44-61"
+        }
+      }
+    }
+    function check(inputs, output) {
+      return output.edge01.identifier === "EDGE-01"
+        && output.edge02.identifier === "EDGE-02"
+        && output.edge03.identifier === "EDGE-03"
+        && output.edge01.sourceLocator === "input/task.md:6-23"
+        && output.edge02.sourceLocator === "input/task.md:25-42"
+        && output.edge03.sourceLocator === "input/task.md:44-61"
+    }
+    return { run, check }
+
+@recordSet loadRecords
+@edge01 get $recordSet "edge01"
+@edge02 get $recordSet "edge02"
+@edge03 get $recordSet "edge03"
+
+@validateRecords define edge01 edge02 edge03
+    function run({ edge01, edge02, edge03 }) {
+      const records = [edge01, edge02, edge03]
+      return records.length === 3
+        && records.map((record) => record.identifier).join(",") === "EDGE-01,EDGE-02,EDGE-03"
+        && records.every((record) => typeof record.containsPersonalData === "boolean")
+        && records.every((record) => Number.isInteger(record.retentionDays))
+    }
+    return { run }
+
+@recordsValid validateRecords $edge01 $edge02 $edge03
+@recordsComplete assertInvariant $recordsValid "all three source records must be present with canonical task facts"

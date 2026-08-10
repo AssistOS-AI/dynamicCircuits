@@ -1,0 +1,168 @@
+@input brief notice
+@output report
+@invariant reportContractValid covers reportContractValid report validatedBrief brief notice
+
+@validatedBrief breach_notice.brief $brief
+@report verifyNotice $validatedBrief $notice
+@reportContractValid validateReport $report $validatedBrief $notice
+
+@verifyNotice define brief notice
+    const EXPECTED_HEADINGS = [
+      "## Parties and Agreement",
+      "## Notice Purpose",
+      "## Supplied Facts",
+      "## Contract Reference",
+      "## Requested Cure",
+      "## Delivery",
+      "## Reservation of Rights",
+      "## Exhibits",
+      "## Limitations"
+    ]
+    const LIMITATIONS = "This generated document is not legal advice and does not independently determine breach, liability, damages, or enforceability."
+    const CLAUSE_CAUTION = "This notice cites, but does not independently interpret, the supplied clause."
+    const REQUIRED_VALUE_FIELDS = [
+      "sender",
+      "recipient",
+      "agreementTitle",
+      "agreementDate",
+      "noticeDate",
+      "contractClause",
+      "eventStatement",
+      "cureAction",
+      "cureDeadlineDate",
+      "permittedDeliveryMethod",
+      "reservationText",
+      "governingLawStatement"
+    ]
+
+    function occurrences(text, value) {
+      let count = 0
+      let cursor = 0
+      while (true) {
+        const found = text.indexOf(value, cursor)
+        if (found === -1) return count
+        count += 1
+        cursor = found + value.length
+      }
+    }
+
+    function sectionBody(lines, heading) {
+      const start = lines.indexOf(heading)
+      if (start === -1) return ""
+      let end = lines.length
+      for (let index = start + 1; index < lines.length; index += 1) {
+        if (/^#{1,6} /.test(lines[index])) {
+          end = index
+          break
+        }
+      }
+      return lines.slice(start + 1, end).join("\n").trim()
+    }
+
+    async function run({ brief, notice }, ctx) {
+      if (typeof notice !== "string") {
+        return ctx.reject("INVALID_NOTICE_TYPE", { expected: "string", actual: notice === null ? "null" : typeof notice })
+      }
+
+      const normalized = notice.replace(/\r\n?/g, "\n")
+      const lines = normalized.split("\n")
+      const allHeadings = lines.filter((line) => /^#{1,6} /.test(line))
+      const titleLines = allHeadings.filter((line) => /^# /.test(line))
+      const sectionHeadings = allHeadings.filter((line) => /^## /.test(line))
+      const parties = sectionBody(lines, "## Parties and Agreement")
+      const exhibits = sectionBody(lines, "## Exhibits")
+      const limitations = sectionBody(lines, "## Limitations")
+
+      const expectedExhibitLines = brief.factualExhibits.map((value, index) => `${index + 1}. ${value}`)
+      const actualExhibitLines = exhibits.length === 0 ? [] : exhibits.split("\n")
+      const briefValues = [...REQUIRED_VALUE_FIELDS.map((field) => brief[field]), ...brief.factualExhibits]
+      const briefText = briefValues.join("\n")
+      const currencySymbols = [...new Set(normalized.match(/\p{Sc}/gu) || [])].sort()
+      const unsupportedCurrencySymbols = currencySymbols.filter((symbol) => !briefText.includes(symbol))
+      const penaltyPhrase = "statutory penalty"
+      const unsupportedPenalty = normalized.includes(penaltyPhrase) && !briefText.includes(penaltyPhrase)
+
+      const checks = {
+        oneTitle: titleLines.length === 1,
+        exactHeadingOrder: allHeadings.length === EXPECTED_HEADINGS.length + 1
+          && /^# /.test(allHeadings[0] || "")
+          && JSON.stringify(allHeadings.slice(1)) === JSON.stringify(EXPECTED_HEADINGS),
+        allSuppliedValuesPresent: briefValues.every((value) => normalized.includes(value)),
+        orderedExhibits: JSON.stringify(actualExhibitLines) === JSON.stringify(expectedExhibitLines),
+        factualLabelPresent: normalized.includes(`Supplied factual statement: ${brief.eventStatement}`),
+        clauseCautionPresent: normalized.includes(CLAUSE_CAUTION),
+        deadlineUnchanged: normalized.includes(`Supplied cure deadline (not calculated): ${brief.cureDeadlineDate}`),
+        deliveryMethodPresent: normalized.includes(`Permitted delivery method: ${brief.permittedDeliveryMethod}`),
+        reservationTextPresent: normalized.includes(brief.reservationText),
+        governingLawStatementPresent: normalized.includes(`Governing-law statement: ${brief.governingLawStatement}`),
+        exactLimitations: limitations === LIMITATIONS,
+        noUnsupportedCurrency: unsupportedCurrencySymbols.length === 0,
+        noUnsupportedPenaltyLanguage: !unsupportedPenalty,
+        senderOnceInParties: occurrences(parties, brief.sender) === 1,
+        recipientOnceInParties: occurrences(parties, brief.recipient) === 1
+      }
+
+      const missingItems = Object.keys(checks).filter((name) => !checks[name]
+        && name !== "noUnsupportedCurrency"
+        && name !== "noUnsupportedPenaltyLanguage")
+      const prohibitedAdditions = [
+        ...unsupportedCurrencySymbols.map((symbol) => `currency_symbol:${symbol}`),
+        ...(unsupportedPenalty ? ["phrase:statutory penalty"] : [])
+      ]
+      const ok = Object.values(checks).every((value) => value === true)
+
+      return {
+        ok,
+        checks,
+        missingItems,
+        prohibitedAdditions,
+        measuredCounts: {
+          titleCount: titleLines.length,
+          sectionHeadingCount: sectionHeadings.length,
+          allHeadingCount: allHeadings.length,
+          expectedHeadingCount: EXPECTED_HEADINGS.length + 1,
+          suppliedValueCount: briefValues.length,
+          exhibitCount: actualExhibitLines.length,
+          expectedExhibitCount: brief.factualExhibits.length,
+          senderPartiesOccurrences: occurrences(parties, brief.sender),
+          recipientPartiesOccurrences: occurrences(parties, brief.recipient),
+          unsupportedCurrencyCount: unsupportedCurrencySymbols.length,
+          unsupportedPenaltyCount: unsupportedPenalty ? 1 : 0
+        }
+      }
+    }
+
+    async function check(inputs, output) {
+      return output !== null
+        && typeof output === "object"
+        && typeof output.ok === "boolean"
+        && output.checks !== null
+        && typeof output.checks === "object"
+        && Array.isArray(output.missingItems)
+        && Array.isArray(output.prohibitedAdditions)
+        && output.measuredCounts !== null
+        && typeof output.measuredCounts === "object"
+    }
+
+    return { run, check }
+
+@validateReport define report brief notice
+    async function run({ report, brief, notice }) {
+      const checkNames = Object.keys(report.checks)
+      return {
+        ok: typeof notice === "string"
+          && brief !== null
+          && typeof brief === "object"
+          && typeof report.ok === "boolean"
+          && checkNames.length === 15
+          && checkNames.every((name) => typeof report.checks[name] === "boolean")
+          && Array.isArray(report.missingItems)
+          && Array.isArray(report.prohibitedAdditions)
+      }
+    }
+
+    async function check(inputs, output) {
+      return output.ok === true
+    }
+
+    return { run, check }

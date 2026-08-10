@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "context.md",
+      "bytes": 201,
+      "sha256": "b28b07b935babc2ef2595ef52e7d749c50b4ae98cd6c7c6a963dd02a140dd9ac"
+    },
+    {
+      "path": "task.md",
+      "bytes": 376,
+      "sha256": "d888d139dba3fa0160150e367fa9e82f015baafccfc6a97d3a594ee0245df6fb"
+    }
+  ]
+}

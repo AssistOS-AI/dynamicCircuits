@@ -21,26 +21,49 @@ flows for the larger lifecycle in DS027. DS023 defines future conformance and sc
 `npm test` must execute modular unit suites for parser syntax, compiler graph validation, runtime outcomes and nesting, workspace preparation and non-destructive behavior, coding-agent invocation construction, the public CLI argument form, and historical-package integrity. Tests must cover successful and failing paths, including bare arguments, free wires, arity mismatch, dead nodes, refusal, failed checks, exceptions, false invariants, symlink creation, user-owned guidance, and generic adapter extension.
 
 Every evaluation case lives under a contiguous `docs/eval/evalN/` directory so all artifacts are statically browsable using
-relative URLs. It contains `input/`, `results/`, `sop/`, a detailed `README.md`, an `index.html`, and the same skill links as
-a production workspace. Inputs, governing rules, circuits, expected semantic verdicts, and deterministic results are
-committed and linked; the README states exactly what was evaluated, complexity, commands, observed outcome, limitations,
-and the distinction between runtime success and semantic success.
+relative URLs. It contains a detailed `README.md`, one `index.html`, and two explicit workspace trees. `kb/input/` contains
+reusable rules or reference knowledge and `kb/circuits/` contains reviewed packages with the `kb.*` namespace.
+`task/input/` contains the current dataset and request, `task/sop/task/` contains generated packages rooted at
+`task.analysis`, and `task/results/runtime-result.md` contains the executor-owned output. Both `kb/` and `task/` expose the same project-owned skill catalog used
+by production workspaces.
 
-Files under an eval `input/` directory must be human-readable source documents for the coding agent, not pre-interpreted JSON
-records. The generated SOP packages must contain the executable interpretation used by the deterministic test. JSON may be
-used under `results/` to serialize checked machine outputs. SOP eval code must not hide source interpretation behind JSON
-parsing when the evaluated workflow requires the coding agent to translate source documents into circuits.
+Files under evaluation `kb/input/` and `task/input/` directories must be human-readable source documents for the coding
+agent, not pre-interpreted JSON records. Reusable behavior must not be placed in task SOP merely to avoid loading the KB root,
+and current observations or questions must not be placed in KB circuits. The generated SOP packages must contain the
+executable interpretation used by the deterministic test. No `result.json` or `results.json` fixture is permitted under
+task results. SOP eval code must not hide source interpretation behind JSON parsing when the evaluated workflow requires
+the coding agent to translate source documents into circuits.
 
-Each evaluation folder owns one `index.html`. That page must present the evaluation question and method, group files by
-contract, source material, generated SOP code, and observed results, and display a selected file with a file-specific
+Each eval may contain a separate root-level `expected.md`. It is evaluation material, never KB/task input, and records the
+source-derived expectation plus an explicit comparison with `runtime-result.md`. If an expectation is adjusted because the
+executor exposes an error in it, the document must retain the original expectation and explain the correction rather than
+silently moving the target.
+
+The README must state exactly what was evaluated, complexity, commands, observed outcome, limitations, and the distinction
+between runtime success and semantic success. Deterministic reproduction commands and tests must register both
+`kb/circuits/` with prefix `kb` and `task/sop/` with the case prefix before compiling or running the task root.
+
+Each evaluation folder owns one `index.html`. That page must present the evaluation question and method, keep KB source
+texts, reviewed KB SOP, task input texts, generated task SOP, executor results, and expectations in distinct menu groups,
+and display a selected file with a file-specific
 explanation in a two-pane browser. The central `docs/eval/index.html` is a scalable catalog of evaluation folders; it must
 not merge every case's file tree into one menu.
 
-The current suite has three non-trivial cases. Eval 1 applies an ordinary legal notice period and an evidenced expedited
+The current suite has eight non-trivial cases. Eval 1 applies an ordinary legal notice period and an evidenced expedited
 exception across compliant and violating cases. Eval 2 tests a universal scientific claim, finds a concrete counterexample,
 and separately computes descriptive statistics. Eval 3 reconciles timelines and terminology across three documents and
-retains rather than hides two conflicts. Unit tests execute every committed circuit against its source data and compare exact
-outcomes; the HTML index exposes all inputs, circuits, results, and READMEs.
+retains rather than hides two conflicts. Eval 4 converts a short English context into direct facts, one unary implication,
+and symbolic questions, then verifies direct support, derived support, and open-world unknown behavior. Eval 5 gives the
+learning agent one large KB source document containing ten rule chapters and gives the analysis agent one large task
+document containing ten current records. The real Codex learning run generates ten focused candidate rules plus a review
+composer; a recorded review promotes them into `kb/circuits/`. A separate real Codex analysis run generates task-input SOP,
+a larger root that uses the promoted KB family, and a Markdown report derived from the root execution. The root verifies 100
+decisions and preserves per-rule and per-record attribution. Eval 6 generates and independently verifies a constrained
+literary vignette. Eval 7 generates and independently verifies an operational incident-handoff SOP. Eval 8 generates and
+independently verifies a fact-bounded contractual notice. The three text-generation cases publish both generated Markdown
+and complete verifier findings. Unit tests execute every
+committed circuit against its source data and compare exact outcomes; the HTML index exposes all inputs, circuits, results,
+and READMEs.
 
 Documentation verification regenerates `docs/specs/matrix.md`, requires contiguous DS numbers, validates local links, and
 checks Mermaid availability on every HTML page. Matrix links must remain relative to preserve arbitrary static mount prefixes.
@@ -54,6 +77,15 @@ Eval 2 supplies a Markdown observation table to the coding-agent workflow. The g
 interpretation, the counterexample circuit scans the resulting values, and the test compares public outputs with the
 committed result summary. Runtime outcome is `SUCCEEDED`; semantic verdict is `REFUTED` because `-2` is a grounded witness.
 
+Eval 4 demonstrates the natural-language boundary: a coding agent converts `Socrate is a man` and `Every man is mortal` into
+`knowledge.sop`; the reusable reasoner derives `mortal(Socrate)`. The runtime does not claim to parse unrestricted English.
+
+Eval 5 demonstrates both coding-agent transformations and deterministic scale without semantic-discovery overclaiming. One
+KB document becomes `kb.data_release_governance.r01` through `.r10` plus `.review`. One task document becomes task-local data
+packages and a root package that calls `.review` once for each record. The root goal checks the complete 10 × 10 product. The
+fixture proves agent-authored source interpretation, reviewed promotion, explicit cross-root composition, and runtime
+coverage; it does not claim automatic selection of applicable packages from prose.
+
 ## Decisions & Questions
 
 ### Question #1: Why do eval cases not replace unit tests?
@@ -64,6 +96,25 @@ Response: Coding-agent outputs may depend on agent versions and user configurati
 
 Response: No. It proves the explicit circuit executed successfully. Each eval separately states the semantic verdict and the
 rules and evidence under which that verdict is valid; future Assurance Core would enforce the stronger acceptance gates.
+
+### Question #3: Why does each evaluation contain both `kb/` and `task/`?
+
+Response: An evaluation should test the same authority boundary used by a real analysis. The nested KB proves reuse and
+cross-root package resolution; the nested task proves that current data, generated adaptation, and results remain local to
+one run. Keeping both below `evalN/` makes the complete reproduction statically browsable without merging their roles.
+
+### Question #4: Why is the large-KB evaluation wired explicitly?
+
+Response: The implemented runtime resolves package calls and executes graphs but does not yet perform semantic registry
+search or mandatory applicability closure. Explicitly calling all ten rule packages gives a defensible 100-decision scale
+test while keeping automatic discovery correctly assigned to the planned assurance contracts.
+
+### Question #5: Who generated Eval 5's SOP and report artifacts?
+
+Response: Codex generated the candidate KB SOP family from the single KB source during a recorded learning invocation. After
+review and a namespace-only promotion adjustment, a second recorded Codex invocation generated the task-local SOP family,
+the larger composition circuit, and the Markdown report. The repository tests rerun the generated circuits directly; no JSON
+result file or manually authored expected-output artifact stands in for that execution.
 
 ## Conclusion
 

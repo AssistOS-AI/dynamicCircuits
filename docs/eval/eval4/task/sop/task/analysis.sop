@@ -1,0 +1,67 @@
+@output analysis
+@goal completeAnalysis covers analysis
+
+@context task.context
+@request @manQuery @mortalQuery @philosopherQuery task.request
+
+@manResult kb.unary_entailment.evaluate $context $manQuery
+@mortalResult kb.unary_entailment.evaluate $context $mortalQuery
+@philosopherResult kb.unary_entailment.evaluate $context $philosopherQuery
+
+@assemble define request manResult mortalResult philosopherResult
+    async function run({ request, manResult, mortalResult, philosopherResult }) {
+      const results = [manResult, mortalResult, philosopherResult]
+      return {
+        schemaVersion: 1,
+        sourceConstraint: request.sourceConstraint,
+        sourceConstraintLocator: request.sourceConstraintLocator,
+        contextCompletenessLocator: request.contextCompletenessLocator,
+        openWorld: request.openWorld,
+        requestedLabels: request.requestedLabels,
+        includeEvidenceForSupported: request.includeEvidenceForSupported,
+        requirementsLocator: request.requirementsLocator,
+        answers: request.questions.map((question, index) => ({
+          questionId: question.id,
+          questionLocator: question.locator,
+          result: results[index],
+        })),
+      }
+    }
+
+    async function check(inputs, output) {
+      if (output === null || typeof output !== "object" || !Array.isArray(output.answers)) return false
+      if (output.answers.length !== inputs.request.questions.length) return false
+      return output.answers.every((answer, index) => {
+        const expectedQuestion = inputs.request.questions[index]
+        return answer.questionId === expectedQuestion.id
+          && answer.questionLocator === expectedQuestion.locator
+          && answer.result.query.subject === expectedQuestion.query.subject
+          && answer.result.query.predicate === expectedQuestion.query.predicate
+          && answer.result.query.polarity === expectedQuestion.query.polarity
+      })
+    }
+
+    return { run, check }
+
+@analysis assemble $request $manResult $mortalResult $philosopherResult
+
+@verifyAnalysis define analysis
+    async function run({ analysis }) {
+      return analysis.schemaVersion === 1
+        && analysis.openWorld === true
+        && Array.isArray(analysis.answers)
+        && analysis.answers.length === 3
+        && analysis.answers.every((answer) => {
+          return answer.result !== null
+            && typeof answer.result === "object"
+            && ["SUPPORTED", "CONTRADICTED", "CONFLICT", "UNKNOWN"].includes(answer.result.status)
+        })
+    }
+
+    async function check(inputs, output) {
+      return output === true
+    }
+
+    return { run, check }
+
+@completeAnalysis verifyAnalysis $analysis

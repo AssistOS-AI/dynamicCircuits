@@ -1,0 +1,20 @@
+@output request
+
+@loadRequest define
+    function run() {
+      return {
+        expectedCaseIds: ["A", "B", "C"],
+        findingFields: [
+          "applicableMinimumDays",
+          "exceptionUsed",
+          "compliant",
+          "reason"
+        ],
+        aggregateCountsRequired: true,
+        completeCoverageRequired: true,
+        sourceLocator: "input/task.md:3"
+      }
+    }
+    return { run }
+
+@request loadRequest

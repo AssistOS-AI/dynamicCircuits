@@ -1,0 +1,25 @@
+@input
+@output request
+
+# Executable adaptation of input/task.md. These are task-local requested
+# outputs and constraints, not reusable universal-claim policy.
+@loadRequest define
+    async function run() {
+      return {
+        source: {
+          path: "task.md",
+          locator: "Task",
+        },
+        targetClaim: "all_observations_are_strictly_positive",
+        requiredResults: [
+          "universal_claim_verdict",
+          "mean_kept_separate_from_universal_proof",
+          "first_counterexample_in_source_order_when_present",
+          "counterexample_dataset_membership_verification",
+        ],
+      }
+    }
+
+    return { run }
+
+@request loadRequest

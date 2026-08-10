@@ -83,11 +83,19 @@ function analysisInstructions(kbDir) {
 
 Analyze every file listed in \`.dynamic-circuits/input-manifest.json\`. Read the applicable skills through the \`circuitSkills\` symbolic link before authoring or executing SOP Lang.
 
-Load reusable circuits from ${JSON.stringify(path.join(kbDir, "circuits"))}. Create task-specific \`.sop\` files under \`sop/\` and all human-readable or machine-readable reports under \`results/\`. Do not write generated reports beside input sources.
+The semantic source boundary for this run is strict: read task evidence and requests from \`input/\`, executable reusable knowledge from the configured KB \`circuits/\`, and only the project skills/runtime documentation needed to author valid SOP. Do not inspect evaluation expectations, prior results, evaluation README or HTML pages, KB candidates, KB learning reports, or sibling task workspaces. If such content is encountered accidentally, do not use it to construct the circuit.
+
+Load reviewed reusable circuits from ${JSON.stringify(path.join(kbDir, "circuits"))}. Treat the analysis as three explicit symbolic stages:
+
+1. Translate the human-readable task sources into one or more task-local SOP packages under \`sop/task/\`. These packages represent the task request and current facts; they must not duplicate policy logic already supplied by KB circuits.
+2. Create the larger root package \`task.analysis\` under \`sop/task/analysis.sop\`. It must obtain the task values from those input packages, invoke the applicable reviewed \`kb.*\` packages, require no external inputs, and expose the complete analysis result through public outputs.
+3. Compile and test \`task.analysis\`. After the coding agent exits, the CLI executes this fixed entrypoint and writes \`results/runtime-result.md\` directly from runtime outputs and the receipt.
+
+SOP files are executable intermediate artifacts, not the user-facing report. Do not create \`result.json\`, and do not write a semantic result report. The coding agent may write \`results/agent-summary.md\` only as a provenance journal covering input coverage, generated packages, compile/test attempts, assumptions, and limitations. It is not an analysis result and must not restate or reinterpret the circuit verdict. The executor-owned \`runtime-result.md\` is the only authoritative run result.
 
 Treat the knowledge base as read-only. Keep every generated artifact in this workspace. Record reusable discoveries in the report; do not write KB candidates during a task analysis.
 
-Compile and run generated circuits with the project CLI when their behavior contributes to the analysis. Report unsupported inputs, ambiguity, refusal, and execution errors explicitly. Never claim that a circuit ran when it only exists as source.
+Report unsupported inputs, ambiguity, refusal, and execution errors explicitly. Never claim that a circuit ran when it only exists as source, and never substitute a hand-written report for a failed or skipped circuit execution.
 `;
 }
 
@@ -98,6 +106,8 @@ function learningInstructions(kbDir) {
 Learn reusable executable knowledge from every file listed in \`.dynamic-circuits/input-manifest.json\`. Read \`circuit-learner\` and \`author-sop-circuit\` through the linked skill catalog before creating artifacts.
 
 Read source documents only from \`input/\` and existing trusted packages from \`circuits/\`. Write new rule, matcher, verifier, interpretation, test, provenance, and manifest artifacts only under \`candidates/\`. Write learning reports under \`results/\`.
+
+The semantic source boundary is strict. Do not inspect evaluation expectations, prior results, evaluation README or HTML pages, candidates from sibling KBs, or sibling task workspaces. Project skills and compiler/runtime documentation may be read only to implement valid SOP; they are not domain evidence.
 
 Do not overwrite or promote packages in \`circuits/\`. Compilation proves mechanical validity, not semantic trust. Preserve source paths, spans, assumptions, ambiguity, negative cases, and review requirements for every candidate.
 
@@ -208,9 +218,13 @@ export function buildAnalysisPrompt(workspace) {
     "Read AGENTS.md and, when present, .dynamic-circuits/AGENT_INSTRUCTIONS.md.",
     `Process all ${count} files in .dynamic-circuits/input-manifest.json.`,
     `Inspect relevant reusable circuits in ${workspace.kbDir}/circuits.`,
-    "Author task-local SOP Lang in sop/, execute relevant circuits, and write grounded reports to results/.",
-    "Finish with results/agent-summary.md containing coverage, generated circuits, execution outcomes,",
-    "limitations, and any KB candidates. Do not use direct LLM API integrations.",
+    "Use only task input/ and reviewed KB circuits as semantic sources. Do not inspect expected outcomes, prior results, evaluation README/HTML, KB candidates or learning reports, or sibling workspaces.",
+    "Encode the task request and current facts as task-local SOP packages under sop/task/ without copying KB policy logic.",
+    "Author the no-input root package task.analysis at sop/task/analysis.sop; it must consume those packages, invoke reviewed kb.* circuits, and expose the complete result as public outputs.",
+    "Compile and test task.analysis. The CLI will execute it after you exit and will generate results/runtime-result.md itself.",
+    "Never create result.json or a semantic result report. Do not edit or pre-create results/runtime-result.md.",
+    "You may write results/agent-summary.md only as a provenance journal: input coverage, generated/reused circuits, compile/test attempts, assumptions, limitations, and reusable discoveries.",
+    "Do not put verdicts or interpretations of circuit output in that journal. Do not use direct LLM API integrations.",
   ].join(" ");
 }
 
@@ -221,6 +235,7 @@ export function buildLearningPrompt(workspace) {
     "Read AGENTS.md and, when present, .dynamic-circuits/AGENT_INSTRUCTIONS.md.",
     `Process all ${count} files in .dynamic-circuits/input-manifest.json.`,
     "Extract facts, definitions, rules, exceptions, priorities, contexts, procedures, claims, and ambiguity.",
+    "Use only this KB input/ and trusted circuits/ as semantic sources. Do not inspect evaluation expectations, prior results, evaluation README/HTML, or sibling workspaces.",
     "Write reviewable SOP packages, tests, provenance, and manifests only under candidates/.",
     "Compile and exercise candidates, but never modify or promote trusted circuits/.",
     "Write results/learning-summary.md with coverage, metrics, assumptions, gaps, and promotion recommendations.",

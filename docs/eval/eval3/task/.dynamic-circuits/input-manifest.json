@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "chapter-01.md",
+      "bytes": 153,
+      "sha256": "5a7fc454637ff371e976865064631901f39ae90ec648997accb83df70d62e008"
+    },
+    {
+      "path": "chapter-02.md",
+      "bytes": 142,
+      "sha256": "73d1386c6015138a40da1bb6d38af1b787f7c7e0f57c8e4546d6635f6f4ae14d"
+    },
+    {
+      "path": "chapter-03.md",
+      "bytes": 145,
+      "sha256": "7c0c121352b88ab0a64b140c928fcfbb76a68ee6e160e28dc8c8831c19dcd98a"
+    },
+    {
+      "path": "task.md",
+      "bytes": 230,
+      "sha256": "048dd0bd0ff94fe988212681cf933bb4c59a9a44c55d2deaf13eeb885f6b6dd8"
+    }
+  ]
+}

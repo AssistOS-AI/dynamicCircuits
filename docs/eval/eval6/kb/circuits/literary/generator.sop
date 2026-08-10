@@ -1,0 +1,81 @@
+@input brief
+@output markdown
+
+@generate define brief
+    function refusalForBrief(brief, ctx) {
+      if (brief === null || typeof brief !== "object" || Array.isArray(brief)) {
+        return ctx.reject("BRIEF_NOT_OBJECT")
+      }
+      const scalarFields = [
+        "title",
+        "protagonist",
+        "setting",
+        "object",
+        "immediateGoal",
+        "obstacle",
+        "choice",
+        "consequence",
+        "closingImage",
+      ]
+      for (const field of scalarFields) {
+        if (brief[field] === undefined) return ctx.reject("MISSING_FIELD", { field })
+        if (typeof brief[field] !== "string") return ctx.reject("NON_STRING_FIELD", { field })
+        if (brief[field].trim().length === 0) return ctx.reject("EMPTY_FIELD", { field })
+      }
+      if (brief.motifs === undefined) return ctx.reject("MISSING_FIELD", { field: "motifs" })
+      if (!Array.isArray(brief.motifs)) return ctx.reject("MOTIFS_NOT_ARRAY")
+      if (brief.motifs.length !== 3) {
+        return ctx.reject("INVALID_MOTIF_COUNT", { actual: brief.motifs.length, expected: 3 })
+      }
+      for (let index = 0; index < brief.motifs.length; index += 1) {
+        if (typeof brief.motifs[index] !== "string") {
+          return ctx.reject("NON_STRING_MOTIF", { index })
+        }
+        if (brief.motifs[index].trim().length === 0) {
+          return ctx.reject("EMPTY_MOTIF", { index })
+        }
+      }
+      if (/\r|\n/.test(brief.title)) return ctx.reject("TITLE_CONTAINS_NEWLINE")
+      return null
+    }
+
+    function assemble(brief) {
+      return [
+        "# " + brief.title,
+        "",
+        "## Arrival",
+        brief.protagonist + " is present in " + brief.setting + ". The concrete object is " + brief.object
+          + ", and the immediate goal is " + brief.immediateGoal
+          + ". These supplied details define the arrival: the protagonist, setting, object, and purpose remain together,"
+          + " while the opening adds no name, fact, quotation, or event beyond the brief.",
+        "",
+        "## Pressure",
+        "The obstacle is " + brief.obstacle + ". Under that pressure, the first motif recurs: " + brief.motifs[0]
+          + ". The obstacle stands against the immediate goal, and the assigned motif marks that pressure without"
+          + " introducing another decision, consequence, person, place, object, or event.",
+        "",
+        "## Choice",
+        "The supplied choice is " + brief.choice + ". The second motif accompanies it: " + brief.motifs[1]
+          + ". This is the decisive turn named by the brief; the paragraph holds to that choice, lets the assigned motif"
+          + " echo beside it, and adds no alternative action or outcome.",
+        "",
+        "## Consequence",
+        "The supplied consequence is " + brief.consequence + ". The third motif remains with its aftermath: "
+          + brief.motifs[2] + ". No further event follows; the consequence settles into the required final image, and the"
+          + " vignette closes exactly there: " + brief.closingImage,
+      ].join("\n")
+    }
+
+    function run({ brief }, ctx) {
+      const refusal = refusalForBrief(brief, ctx)
+      if (refusal) return refusal
+      return assemble(brief)
+    }
+
+    function check({ brief }, output) {
+      return typeof output === "string" && output === assemble(brief)
+    }
+
+    return { run, check }
+
+@markdown generate $brief

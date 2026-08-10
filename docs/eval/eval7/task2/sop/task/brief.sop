@@ -1,0 +1,52 @@
+@input
+@output brief source
+
+@loadBrief define
+    async function run() {
+      return {
+        documentTitle: "Orders Database SEV-2 Handoff",
+        service: "Orders PostgreSQL Cluster",
+        severity: "SEV-2",
+        incidentCommanderRole: "Database Incident Lead",
+        outgoingRole: "EU Database On-Call",
+        incomingRole: "US Database On-Call",
+        acknowledgementMinutes: 3,
+        escalationMinutes: 9,
+        evidenceLocations: [
+          "replication dashboard",
+          "slow-query capture",
+          "failover timeline",
+        ],
+        communicationChannel: "#inc-orders-db",
+        prohibitedAction: "force a primary failover during handoff",
+        approvalRole: "Database Incident Lead",
+      }
+    }
+
+    async function check(inputs, output) {
+      return inputs !== null
+        && typeof inputs === "object"
+        && output !== null
+        && typeof output === "object"
+        && output.documentTitle === "Orders Database SEV-2 Handoff"
+        && output.service === "Orders PostgreSQL Cluster"
+        && output.severity === "SEV-2"
+        && output.incidentCommanderRole === "Database Incident Lead"
+        && output.outgoingRole === "EU Database On-Call"
+        && output.incomingRole === "US Database On-Call"
+        && output.acknowledgementMinutes === 3
+        && output.escalationMinutes === 9
+        && Array.isArray(output.evidenceLocations)
+        && output.evidenceLocations.length === 3
+        && output.evidenceLocations[0] === "replication dashboard"
+        && output.evidenceLocations[1] === "slow-query capture"
+        && output.evidenceLocations[2] === "failover timeline"
+        && output.communicationChannel === "#inc-orders-db"
+        && output.prohibitedAction === "force a primary failover during handoff"
+        && output.approvalRole === "Database Incident Lead"
+    }
+
+    return { run, check }
+
+@brief loadBrief
+@source value "input/brief.md"

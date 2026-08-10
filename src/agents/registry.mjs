@@ -11,8 +11,7 @@ export function buildAgentInvocation(options) {
       "exec",
       "--ephemeral",
       "--skip-git-repo-check",
-      "--sandbox", "workspace-write",
-      "--ask-for-approval", "never",
+      "--approve-for-me",
       "--cd", workDir,
     ];
     if (options.model) args.push("--model", options.model);

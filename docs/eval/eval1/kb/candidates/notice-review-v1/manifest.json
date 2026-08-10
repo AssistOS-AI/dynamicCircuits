@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "notice-review-v1",
+  "candidateVersion": "1.0.0-candidate",
+  "status": "review-required",
+  "sopSubset": "implemented-v1",
+  "source": {
+    "path": "input/rule.md",
+    "bytes": 345,
+    "sha256": "45044b3cb7a68d06b1dd366586e4436dfb61648537f47208b2683d5b2dd5e142",
+    "linesRead": 3,
+    "linesTotal": 3
+  },
+  "packages": [
+    {
+      "name": "notice_review.evaluate",
+      "file": "sop/notice_review/evaluate.sop",
+      "packageHash": "sha256:4eac315a0c17edfc384aa2261e697c2c5e8a726591cebe557e832c0c30d34914",
+      "inputs": ["notice"],
+      "outputs": ["finding"]
+    }
+  ],
+  "semantics": {
+    "baseMinimumCalendarDays": 30,
+    "expeditedMinimumCalendarDays": 10,
+    "expeditedConditions": [
+      "expedited flag is true",
+      "subject explicitly requested expedited treatment",
+      "written consent is recorded"
+    ],
+    "verdicts": ["COMPLIANT", "NON_COMPLIANT"],
+    "missingConsentInference": "prohibited"
+  },
+  "artifacts": {
+    "contract": "README.md",
+    "inventory": "inventory.md",
+    "provenance": "provenance.json",
+    "testVectors": "tests/cases.json",
+    "testRunner": "tests/run-tests.mjs",
+    "executionReport": "tests/execution-report.md"
+  },
+  "testEvidence": {
+    "compile": { "attempted": 1, "succeeded": 1, "failed": 0 },
+    "vectors": { "total": 21, "passed": 21, "failed": 0 },
+    "outcomes": { "SUCCEEDED": 12, "REFUSED": 8, "INVOCATION_ERROR": 1 },
+    "semanticStatuses": { "COMPLIANT": 6, "NON_COMPLIANT": 6 },
+    "categories": {
+      "positive": 2,
+      "negative": 5,
+      "boundary": 3,
+      "exception": 2,
+      "malformed-input": 6,
+      "refusal": 3
+    }
+  },
+  "trustedOverlap": {
+    "inspectedPath": "circuits/",
+    "trustedFileCount": 0,
+    "overlap": "none"
+  },
+  "effects": [],
+  "capabilities": [],
+  "prohibitedCapabilities": [
+    "filesystem",
+    "process",
+    "network",
+    "clock",
+    "random",
+    "oracle",
+    "persistent-cache",
+    "direct-llm"
+  ],
+  "automaticApplicability": false,
+  "automaticPromotion": false,
+  "requiredReviewers": [
+    "notice-policy owner",
+    "legal or compliance owner",
+    "records or evidence owner",
+    "SOP runtime maintainer"
+  ]
+}

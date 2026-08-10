@@ -1,0 +1,37 @@
+@input
+@output request
+@invariant requestComplete covers request
+
+@loadRequest define
+    function run() {
+      return {
+        task: "boundary_release_review",
+        sourceLocator: "input/task.md:3-4",
+        recordIdentifiers: ["EDGE-01", "EDGE-02", "EDGE-03"],
+        ruleIdentifiers: ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10"],
+        expectedRecordCount: 3,
+        expectedRuleCount: 10,
+        expectedFindingCount: 30,
+        requiredOutputs: ["recordReports", "perRecordFailures", "aggregate", "coverage"]
+      }
+    }
+    function check(inputs, output) {
+      return output.recordIdentifiers.length === output.expectedRecordCount
+        && output.ruleIdentifiers.length === output.expectedRuleCount
+        && output.expectedFindingCount === output.expectedRecordCount * output.expectedRuleCount
+    }
+    return { run, check }
+
+@request loadRequest
+
+@validateRequest define request
+    function run({ request }) {
+      return request.sourceLocator === "input/task.md:3-4"
+        && request.recordIdentifiers.join(",") === "EDGE-01,EDGE-02,EDGE-03"
+        && request.ruleIdentifiers.join(",") === "R01,R02,R03,R04,R05,R06,R07,R08,R09,R10"
+        && request.requiredOutputs.join(",") === "recordReports,perRecordFailures,aggregate,coverage"
+    }
+    return { run }
+
+@requestValid validateRequest $request
+@requestComplete assertInvariant $requestValid "task request must preserve records, rules, outputs, and source locator"

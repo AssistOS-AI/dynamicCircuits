@@ -1,0 +1,116 @@
+@input
+@output recordReports perRecordFailures aggregate coverage
+@invariant analysisComplete covers request edge01 edge02 edge03 edge01Report edge02Report edge03Report analysis recordReports perRecordFailures aggregate coverage
+
+@request task.request
+@edge01 @edge02 @edge03 task.records
+
+@edge01Report kb.data_release_governance.review $edge01
+@edge02Report kb.data_release_governance.review $edge02
+@edge03Report kb.data_release_governance.review $edge03
+
+@assemble define request edge01 edge02 edge03 edge01Report edge02Report edge03Report
+    function run({ request, edge01, edge02, edge03, edge01Report, edge02Report, edge03Report }) {
+      const records = [edge01, edge02, edge03]
+      const recordReports = [edge01Report, edge02Report, edge03Report]
+      const perRecordFailures = recordReports.map((report) => ({
+        releaseIdentifier: report.releaseIdentifier,
+        failedRuleIdentifiers: report.failedRuleIdentifiers,
+        failCount: report.failCount
+      }))
+      const passCount = recordReports.reduce((total, report) => total + report.passCount, 0)
+      const failCount = recordReports.reduce((total, report) => total + report.failCount, 0)
+      const actualFindingCount = recordReports.reduce((total, report) => total + report.findings.length, 0)
+      const reviewedRecordIdentifiers = recordReports.map((report) => report.releaseIdentifier)
+      const findingsPerRecord = recordReports.map((report) => ({
+        releaseIdentifier: report.releaseIdentifier,
+        findingCount: report.findings.length,
+        ruleIdentifiers: report.findings.map((finding) => finding.ruleId)
+      }))
+      const complete = reviewedRecordIdentifiers.join(",") === request.recordIdentifiers.join(",")
+        && actualFindingCount === request.expectedFindingCount
+        && findingsPerRecord.every((entry) => entry.findingCount === request.expectedRuleCount)
+        && findingsPerRecord.every(
+          (entry) => entry.ruleIdentifiers.join(",") === request.ruleIdentifiers.join(",")
+        )
+      return {
+        recordReports,
+        perRecordFailures,
+        aggregate: {
+          recordCount: records.length,
+          totalFindingCount: actualFindingCount,
+          passCount,
+          failCount,
+          compliantRecordCount: recordReports.filter((report) => report.compliant).length,
+          nonCompliantRecordCount: recordReports.filter((report) => !report.compliant).length
+        },
+        coverage: {
+          sourceLocator: request.sourceLocator,
+          requestedRecordIdentifiers: request.recordIdentifiers,
+          reviewedRecordIdentifiers,
+          requestedRuleIdentifiers: request.ruleIdentifiers,
+          findingsPerRecord,
+          expectedFindingCount: request.expectedFindingCount,
+          actualFindingCount,
+          complete
+        }
+      }
+    }
+    function check(inputs, output) {
+      return output.recordReports.length === inputs.request.expectedRecordCount
+        && output.aggregate.totalFindingCount === inputs.request.expectedFindingCount
+        && output.aggregate.passCount + output.aggregate.failCount === output.aggregate.totalFindingCount
+        && output.coverage.complete === true
+    }
+    return { run, check }
+
+@analysis assemble $request $edge01 $edge02 $edge03 $edge01Report $edge02Report $edge03Report
+@recordReports get $analysis "recordReports"
+@perRecordFailures get $analysis "perRecordFailures"
+@aggregate get $analysis "aggregate"
+@coverage get $analysis "coverage"
+
+@validateAnalysis define request edge01 edge02 edge03 edge01Report edge02Report edge03Report recordReports perRecordFailures aggregate coverage
+    function run({
+      request,
+      edge01,
+      edge02,
+      edge03,
+      edge01Report,
+      edge02Report,
+      edge03Report,
+      recordReports,
+      perRecordFailures,
+      aggregate,
+      coverage
+    }) {
+      const records = [edge01, edge02, edge03]
+      const reports = [edge01Report, edge02Report, edge03Report]
+      const recordIdentifiers = records.map((record) => record.identifier)
+      const reportIdentifiers = reports.map((report) => report.releaseIdentifier)
+      const expectedRuleKey = request.ruleIdentifiers.join(",")
+      const reportsComplete = reports.every((report) => report.findings.length === request.expectedRuleCount)
+        && reports.every((report) => report.findings.map((finding) => finding.ruleId).join(",") === expectedRuleKey)
+      const failureViewsComplete = perRecordFailures.every((entry, index) => {
+        const report = reports[index]
+        return entry.releaseIdentifier === report.releaseIdentifier
+          && entry.failCount === report.failCount
+          && entry.failedRuleIdentifiers.join(",") === report.failedRuleIdentifiers.join(",")
+      })
+      return recordIdentifiers.join(",") === request.recordIdentifiers.join(",")
+        && reportIdentifiers.join(",") === request.recordIdentifiers.join(",")
+        && recordReports.length === reports.length
+        && recordReports.every((report, index) => report.releaseIdentifier === reports[index].releaseIdentifier)
+        && reportsComplete
+        && failureViewsComplete
+        && aggregate.recordCount === request.expectedRecordCount
+        && aggregate.totalFindingCount === request.expectedFindingCount
+        && aggregate.passCount + aggregate.failCount === aggregate.totalFindingCount
+        && coverage.expectedFindingCount === request.expectedFindingCount
+        && coverage.actualFindingCount === request.expectedFindingCount
+        && coverage.complete === true
+    }
+    return { run }
+
+@analysisValid validateAnalysis $request $edge01 $edge02 $edge03 $edge01Report $edge02Report $edge03Report $recordReports $perRecordFailures $aggregate $coverage
+@analysisComplete assertInvariant $analysisValid "analysis must retain all three records and all thirty reviewed findings"

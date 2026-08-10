@@ -1,0 +1,49 @@
+@output request pilotQ trainedQ sailorQ
+
+@loadRequest define
+    async function run() {
+      return {
+        source: "input/context-and-questions.md",
+        completeContext: true,
+        absenceIsNegation: false,
+        answerWithEvidence: true,
+        contextBoundaryLocator: "input/context-and-questions.md:9",
+        requestLocator: "input/context-and-questions.md:11",
+        questionCount: 3,
+      }
+    }
+
+    async function check(inputs, output) {
+      return output?.completeContext === true
+        && output?.absenceIsNegation === false
+        && output?.answerWithEvidence === true
+        && output?.questionCount === 3
+    }
+
+    return { run, check }
+
+@request loadRequest
+@pilotQ makePilotQuery
+@trainedQ makeTrainedQuery
+@sailorQ makeSailorQuery
+
+@makePilotQuery define
+    async function run() {
+      return { kind: "proposition", subject: "Nia", predicate: "pilot", polarity: "POSITIVE" }
+    }
+
+    return { run }
+
+@makeTrainedQuery define
+    async function run() {
+      return { kind: "proposition", subject: "Nia", predicate: "trained", polarity: "POSITIVE" }
+    }
+
+    return { run }
+
+@makeSailorQuery define
+    async function run() {
+      return { kind: "proposition", subject: "Nia", predicate: "sailor", polarity: "POSITIVE" }
+    }
+
+    return { run }

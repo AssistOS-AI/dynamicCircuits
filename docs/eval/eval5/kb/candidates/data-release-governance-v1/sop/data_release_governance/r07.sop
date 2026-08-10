@@ -1,0 +1,30 @@
+@input release
+@output finding
+@invariant findingIdentified covers finding
+
+@evaluate define release
+    function run({ release }, ctx) {
+      if (release === null || typeof release !== "object" || Array.isArray(release)) {
+        return ctx.reject("release_record_must_be_an_object", { ruleId: "R07" })
+      }
+      const directEuPath = release.residency === "EU"
+      const approvedNonEuPath = ["US", "mixed"].includes(release.residency)
+        && release.residencyApproval === true
+      const passes = directEuPath || approvedNonEuPath
+      return {
+        ruleId: "R07",
+        status: passes ? "PASS" : "FAIL",
+        reason: passes ? null : "non_eu_residency_requires_approval",
+        path: directEuPath ? "EU_DIRECT" : "NON_EU_OR_UNKNOWN",
+        sourceLocator: "input/knowledge-base.md:69"
+      }
+    }
+    function check(inputs, output) {
+      return output.ruleId === "R07" && ["PASS", "FAIL"].includes(output.status)
+    }
+    return { run, check }
+
+@finding evaluate $release
+@ruleId get $finding "ruleId"
+@ruleIdCorrect equal $ruleId "R07"
+@findingIdentified assertInvariant $ruleIdCorrect "R07 finding must retain its rule identifier"

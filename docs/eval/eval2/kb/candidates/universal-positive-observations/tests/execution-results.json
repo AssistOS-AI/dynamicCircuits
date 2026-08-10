@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "runtime": "Node.js v22.23.1; dependency-free Dynamic Circuits reference runtime",
+  "packageName": "candidate.universal_positive_review",
+  "packageHash": "sha256:3880135211c7db486c756c826f5b655fe97e69baff9f881bc99d999d00bf615d",
+  "commands": {
+    "compile": "node /home/salboaie/work/dynamicCircuits/src/cli.mjs sop compile --root candidates/universal-positive-observations/sop --prefix candidate --package candidate.universal_positive_review",
+    "exhaustiveTests": "node tests/run-tests.mjs",
+    "workingDirectoryForCompile": "/home/salboaie/work/dynamicCircuits/docs/eval/eval2/kb",
+    "workingDirectoryForTests": "/home/salboaie/work/dynamicCircuits/docs/eval/eval2/kb/candidates/universal-positive-observations"
+  },
+  "compile": {
+    "status": "passed",
+    "inputs": ["observations"],
+    "outputs": ["review"],
+    "nodeCount": 2,
+    "invariantCount": 1,
+    "deadNodeCount": 0
+  },
+  "metrics": {
+    "totalCases": 12,
+    "passed": 12,
+    "failed": 0,
+    "succeededOutcomes": 5,
+    "refusedOutcomes": 7,
+    "rejectedOutcomes": 0,
+    "errorOutcomes": 0
+  },
+  "cases": [
+    {
+      "id": "positive_all_strict",
+      "category": "positive",
+      "outcome": "SUCCEEDED",
+      "refusalCode": null,
+      "publicOutputHash": "sha256:679dda307300271488e61374be080d8b1a98fae7a5d365ba2d11d796a4644224",
+      "receiptHash": "sha256:b9bf9c6d3cf14c13a44c7dc63625189ddc7dab1dd47d3d2199b9bc56ca210799"
+    },
+    {
+      "id": "negative_counterexample",
+      "category": "negative",
+      "outcome": "SUCCEEDED",
+      "refusalCode": null,
+      "publicOutputHash": "sha256:2a65abced63521b142850b3a4d9f080d2cd86b2bf38cb560d06f484830055a2c",
+      "receiptHash": "sha256:36e4cce31bf158d6c0d9a6a6b3fb4f603319a8e2fcb94aeb47e6b6484011cc5f"
+    },
+    {
+      "id": "zero_boundary",
+      "category": "boundary",
+      "outcome": "SUCCEEDED",
+      "refusalCode": null,
+      "publicOutputHash": "sha256:5dfbc2b10b216ec0eda266ef441282c31189e18adf1aa031c3d7e37f6480da24",
+      "receiptHash": "sha256:63d6cb83cbb4c6ad4d4a8ea95b6e7ed295bad6dda1c4952f86bfb29dc24ec053"
+    },
+    {
+      "id": "smallest_positive_boundary",
+      "category": "boundary",
+      "outcome": "SUCCEEDED",
+      "refusalCode": null,
+      "publicOutputHash": "sha256:b5b2ce4bba13434b412abb2ead6400b307d74abd8a3ec806f583008ef05754c6",
+      "receiptHash": "sha256:7fe4202c93b7c8519052375a17d087a81df8a15ed80322bf8723ac60702e50e2"
+    },
+    {
+      "id": "positive_mean_not_universal",
+      "category": "aggregate-separation",
+      "outcome": "SUCCEEDED",
+      "refusalCode": null,
+      "publicOutputHash": "sha256:8d75a50443e988cbf098a3a1948aeb0dff034a7f063c98d6415be537a241b6b2",
+      "receiptHash": "sha256:b4a8c703c71b1b36413e893046fc813b8678be744464f9613642ab42f0baca19"
+    },
+    {
+      "id": "empty_dataset",
+      "category": "refusal",
+      "outcome": "REFUSED",
+      "refusalCode": "empty_dataset",
+      "publicOutputHash": null,
+      "receiptHash": "sha256:94fc6de466eb2659426d821e2d1219e250c03d40e5dab1551d26714c4017fd0b"
+    },
+    {
+      "id": "missing_value",
+      "category": "exception",
+      "outcome": "REFUSED",
+      "refusalCode": "missing_value",
+      "publicOutputHash": null,
+      "receiptHash": "sha256:de318a5eed05c311df097385bc5582a1ca689570db1df58e3441f6d59744751d"
+    },
+    {
+      "id": "non_numeric_value",
+      "category": "refusal",
+      "outcome": "REFUSED",
+      "refusalCode": "non_numeric_observation",
+      "publicOutputHash": null,
+      "receiptHash": "sha256:2840be1dcf4fdf4b9188e715af9ac8b932ef37ce52493bdeb1fcd38d689bbca7"
+    },
+    {
+      "id": "malformed_top_level",
+      "category": "malformed-input",
+      "outcome": "REFUSED",
+      "refusalCode": "observations_not_array",
+      "publicOutputHash": null,
+      "receiptHash": "sha256:3e78112b9cf01001f8ae325096a4079a4a8cac575d0a16f3563215a9dcc5aaf9"
+    },
+    {
+      "id": "missing_source_locator",
+      "category": "provenance-refusal",
+      "outcome": "REFUSED",
+      "refusalCode": "missing_source_locator",
+      "publicOutputHash": null,
+      "receiptHash": "sha256:a1391ce26dd8264248e51638a2ae627b3ea142b2d20afdbade6a4c1510c96980"
+    },
+    {
+      "id": "duplicate_identifier",
+      "category": "ambiguity-refusal",
+      "outcome": "REFUSED",
+      "refusalCode": "duplicate_observation_id",
+      "publicOutputHash": null,
+      "receiptHash": "sha256:4100f605ebff3b71da6a971929f68e180399bc5a0539194a69239b5749b0f2e5"
+    },
+    {
+      "id": "invalid_member_overrides_counterexample",
+      "category": "priority-exception",
+      "outcome": "REFUSED",
+      "refusalCode": "missing_value",
+      "publicOutputHash": null,
+      "receiptHash": "sha256:4b90c222fbf335087883da09ef4012a37c116b84adfff24b667d31be55f71d9c"
+    }
+  ],
+  "representativeCliChecks": [
+    {
+      "case": "positive_mean_not_universal",
+      "command": "node /home/salboaie/work/dynamicCircuits/src/cli.mjs sop run --root candidates/universal-positive-observations/sop --prefix candidate --package candidate.universal_positive_review --inputs '[[{\"id\":\"a1\",\"value\":10,\"source\":{\"path\":\"independent/aggregate.csv\",\"locator\":\"row 1\"}},{\"id\":\"a2\",\"value\":-2,\"source\":{\"path\":\"independent/aggregate.csv\",\"locator\":\"row 2\"}}]]'",
+      "outcome": "SUCCEEDED",
+      "semanticVerdict": "REFUTED",
+      "mean": 4,
+      "meanIsStrictlyPositive": true,
+      "invariant": true,
+      "receiptHash": "sha256:b4a8c703c71b1b36413e893046fc813b8678be744464f9613642ab42f0baca19"
+    },
+    {
+      "case": "zero_boundary",
+      "command": "node /home/salboaie/work/dynamicCircuits/src/cli.mjs sop run --root candidates/universal-positive-observations/sop --prefix candidate --package candidate.universal_positive_review --inputs '[[{\"id\":\"z0\",\"value\":0,\"source\":{\"path\":\"independent/boundary.md\",\"locator\":\"zero row\"}}]]'",
+      "outcome": "SUCCEEDED",
+      "semanticVerdict": "REFUTED",
+      "witnessValue": 0,
+      "invariant": true,
+      "receiptHash": "sha256:63d6cb83cbb4c6ad4d4a8ea95b6e7ed295bad6dda1c4952f86bfb29dc24ec053"
+    },
+    {
+      "case": "empty_dataset",
+      "command": "node /home/salboaie/work/dynamicCircuits/src/cli.mjs sop run --root candidates/universal-positive-observations/sop --prefix candidate --package candidate.universal_positive_review --inputs '[[]]'",
+      "outcome": "REFUSED",
+      "cliExitCode": 2,
+      "refusalCode": "empty_dataset",
+      "publicOutputHashes": [],
+      "receiptHash": "sha256:94fc6de466eb2659426d821e2d1219e250c03d40e5dab1551d26714c4017fd0b"
+    }
+  ],
+  "notes": [
+    "The exhaustive runner imports the repository compiler/runtime directly because this workspace sandbox blocks nested process creation.",
+    "The compile command and three representative run commands were also executed through the public CLI.",
+    "A REFUSED semantic outcome is intentionally reported by the CLI with process exit code 2 and no public outputs."
+  ]
+}

@@ -48,10 +48,10 @@
     <figure class="diagram">
       <figcaption><strong>Compilation</strong>SOP source becomes either a validated graph or a precise diagnostic</figcaption>
     <pre class="mermaid">flowchart LR
-      F[SOP files] --> P[Parser]
-      P --> C[Compiler]
-      C -->|valid| G[Dependency graph]
-      C -->|invalid| D[Diagnostic]</pre></figure>
+      F[/SOP source files/] --> P[Parser]
+      P --> C{Compiler validates graph?}
+      C -->|yes| G[(Dependency graph)]
+      C -->|no| D([Precise diagnostic])</pre></figure>
     <p>The compilation diagram has two possible results. Valid source becomes a dependency graph whose nodes contain resolved
       callees, arguments, outputs, dependencies, and source locations. Invalid source stops before runtime and returns a
       diagnostic such as <code>FREE_WIRE</code>, <code>CIRCUIT_ARITY_MISMATCH</code>, or <code>GRAPH_CYCLE</code>.</p>
@@ -59,9 +59,10 @@
     <figure class="diagram">
       <figcaption><strong>Execution</strong>Only nodes required by outputs and obligations are run</figcaption>
     <pre class="mermaid">flowchart LR
-      G[Dependency graph] --> S[Required slice]
-      S --> E[Execute nodes]
-      E --> R[Outputs and receipt]</pre></figure>
+      G[(Dependency graph)] --> S[Required slice]
+      S --> E{Execute nodes}
+      E --> O([Public outputs])
+      E --> R[(Execution receipt)]</pre></figure>
     <p>The execution diagram begins with the validated graph. The runtime selects nodes required by public outputs, goals, and
       invariants; nodes outside that slice are recorded as dead and remain unexecuted. Required nodes run in topological order.
       The result contains public outputs only after successful execution and always includes the corresponding receipt.</p>

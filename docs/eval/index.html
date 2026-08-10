@@ -11,25 +11,20 @@
   </script>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="../index.html">Dynamic Circuits Documentation</a>
-    <nav aria-label="Primary navigation">
-      <a href="../index.html">Overview</a>
-      <a href="../evaluation.html">Testing</a>
-      <a href="../specsLoader.html?spec=DS007-evaluation-and-testing.md">Evaluation specification</a>
-    </nav>
-  </header>
+  <div data-include="partials/header.html"></div>
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="../index.html">Documentation</a> / Evaluation catalog</p>
     <h1>Evaluation catalog</h1>
-    <p class="lead">Each evaluation folder has one self-contained page. Its left menu groups source documents, generated SOP code, and observed results; selecting a file shows its purpose, relationship to the evaluation, and exact content on the right.</p>
+    <p class="lead">Each evaluation folder has one self-contained page. Its left menu separates reusable KB material from the current task and its results; selecting a file shows its purpose, relationship to the evaluation, and exact content on the right.</p>
 
     <h2>Purpose of the catalog</h2>
     <p>The catalog separates evaluation cases so the interface remains usable as the repository grows. An evaluation page
       explains one question and one artifact set. It does not mix filenames or explanations from unrelated cases. The source
-      material under <code>input/</code> is human-readable Markdown intended for a coding agent. The SOP folder contains the
-      executable interpretation authored from that material. JSON is used only for machine-readable results, not as source
-      input to the coding agent or as a hidden parsing layer inside the circuits.</p>
+      material under <code>kb/input/</code> and <code>task/input/</code> is human-readable Markdown intended for a coding agent.
+      Reusable reviewed circuits live under <code>kb/circuits/</code>; current adaptation and wiring live under
+      <code>task/sop/</code>. JSON is used only for machine-readable task results, not as source input to the coding agent or as
+      a hidden parsing layer inside the circuits. The <a href="../workspace-conventions.html">KB/task convention</a> explains
+      how to classify files whose role is not immediately obvious.</p>
 
     <table>
       <thead><tr><th>Evaluation page</th><th>Question</th><th>Implemented transformation</th><th>Observed result</th></tr></thead>
@@ -52,11 +47,28 @@
           <td>Three source chapters enter repeated interpretation circuits and one cross-document consistency circuit.</td>
           <td>Two launch dates and two definitions are reported as unresolved conflicts.</td>
         </tr>
+        <tr>
+          <td><a href="eval4/index.html">Eval 4: context entailment</a></td>
+          <td>Can ordinary English facts and a rule support direct and derived answers without treating missing knowledge as false?</td>
+          <td>Two Markdown files become an executable fact/rule package, a fixed-point unary reasoner, and a task root.</td>
+          <td>Direct man and derived mortal propositions are supported; philosopher remains unknown.</td>
+        </tr>
+        <tr>
+          <td><a href="eval5/index.html">Eval 5: agent-generated composition</a></td>
+          <td>Can coding agents turn one large KB source and one large task source into a verified composed analysis?</td>
+          <td>A real learning run splits ten KB chapters into reviewed packages; a real analysis run encodes ten task records and executes one explicit 10 × 10 root.</td>
+          <td>100 covered decisions: 90 pass, 10 fail, one fully compliant release, and nine non-compliant releases.</td>
+        </tr>
       </tbody>
     </table>
-    <p>The table compares the evaluation intent and the source-to-circuit transformation. Open one row to inspect its files.
+    <p>The table compares the evaluation intent and the source-to-circuit transformation. Eval 4 shows the explicit
+      coding-agent interpretation required before the deterministic runtime can execute facts and rules. Eval 5 records both
+      coding-agent transformations, promotion, and a larger explicitly wired runtime execution without claiming automatic
+      semantic rule discovery. Open one row to inspect its files.
       The <a href="../evaluation.html">testing guide</a> explains how these cases relate to unit suites, while
       <a href="../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a> defines the normative evaluation contract.</p>
   </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="../partials-loader.js"></script>
 </body>
 </html>

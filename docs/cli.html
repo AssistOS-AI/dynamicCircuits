@@ -48,8 +48,9 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
     <ol>
       <li>The CLI creates missing task directories and inventories every regular file under <code>input/</code>.</li>
       <li>The coding agent reads the manifest, task documents, and applicable KB circuit interfaces.</li>
-      <li>It writes task-specific circuits to <code>sop/</code>, compiles them, and executes the circuits used by the analysis.</li>
-      <li>It writes reports and its coverage summary to <code>results/</code>.</li>
+      <li>It writes SOP packages for the current request and facts without copying reusable KB policy.</li>
+      <li>It writes a larger task root that consumes those packages and calls reviewed KB packages, then compiles and executes that root.</li>
+      <li>It derives a Markdown or text report from the observed output and receipt under <code>results/</code>; JSON is emitted only when the task requests it.</li>
     </ol>
     <p>Both single-dash and conventional double-dash forms are accepted. KB and work roots may not overlap because overlap
       would make read/write authority and input discovery ambiguous. Existing user guidance is preserved, and conflicting
@@ -59,10 +60,10 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
     <figure class="diagram">
       <figcaption><strong>KB folder contract</strong>Source, reviewed code, proposals, and reports have separate destinations</figcaption>
     <pre class="mermaid">flowchart LR
-      K[KB] --> I[input]
-      K --> C[circuits]
-      K --> N[candidates]
-      K --> R[results]</pre></figure>
+      K[(Persistent KB)] --> I[/input documents/]
+      K --> C[(reviewed circuits)]
+      K --> N[candidate packages]
+      K --> R([learning reports])</pre></figure>
     <p>The KB diagram shows the learning data lifecycle. <code>input/</code> contains evidence to extract; <code>circuits/</code>
       contains reviewed reusable packages; <code>candidates/</code> contains generated proposals awaiting review; and
       <code>results/</code> contains learning coverage and validation reports.</p>
@@ -70,13 +71,26 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
     <figure class="diagram">
       <figcaption><strong>Task folder contract</strong>One analysis keeps documents, generated code, and results apart</figcaption>
     <pre class="mermaid">flowchart LR
-      W[Task workspace] --> I[input]
-      W --> S[sop]
-      W --> R[results]
-      W --> M[manifests and skill links]</pre></figure>
+      W[(One task workspace)] --> I[/input documents/]
+      W --> S[generated SOP]
+      W --> R([analysis results])
+      W --> M[manifest and skill links]</pre></figure>
     <p>The task diagram shows the analysis boundary. Source files remain under <code>input/</code>, generated circuit source
       remains under <code>sop/</code>, and reports remain under <code>results/</code>. The manifest and skill links under the same
       workspace tell the coding agent what to process and how to author supported SOP Lang.</p>
+    <p>After preparing <code>./work/task-001</code>, the relevant tree has this shape. Managed metadata stays outside
+      <code>input/</code>, so a second preparation does not accidentally treat its own previous report as new source material:</p>
+    <pre><code>work/task-001/
+├── input/                         # files supplied by the user
+├── sop/                           # SOP authored for this task
+├── results/                       # reports and run summaries
+├── .dynamic-circuits/
+│   ├── input-manifest.json        # relative paths, sizes, SHA-256 hashes
+│   ├── workspace.json             # inferred mode and resolved roots
+│   └── last-run.json              # adapter process status after a run
+├── circuitSkills -> .../circuitSkills
+├── .agents/skills -> .../circuitSkills
+└── AGENTS.md                      # managed guidance unless user-owned</code></pre>
 
     <h2>Who can write where</h2>
     <p>Analysis treats the KB as read-only. Learning uses the KB as the coding agent's current directory, while generated instructions restrict reusable output to <code>candidates/</code>. This restriction is currently instructional rather than a host-mediated filesystem capability; <a href="specsLoader.html?spec=DS008-security-and-trust.md">DS008</a> records the limitation. The former explicit learn flag is rejected because mode is now inferred unambiguously.</p>
@@ -88,6 +102,9 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
       <code>author-sop-circuit</code> when it needs a deadline calculation, then returns to <code>analyze-task</code> to connect
       the circuit output and receipt to the final report. A KB learning run uses <code>circuit-learner</code> instead and writes
       the same reusable calculation as a candidate with provenance and tests.</p>
+    <p>Continue with the <a href="tutorial.html">manual tutorial</a> to create this tree and inspect a dry run. Use the
+      <a href="input-guide.html">input guide</a> before creating a real task, and use
+      <a href="sop-runtime.html">SOP runtime</a> when reviewing code generated under <code>sop/</code>.</p>
   </article></main>
   <div data-include="partials/footer.html"></div>
   <script src="partials-loader.js"></script>

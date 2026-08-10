@@ -1,0 +1,34 @@
+@output markdown verification
+@goal requestSatisfied covers request markdown verification
+
+@satisfyRequest define request markdown verification
+    function isObject(value) {
+      return value !== null && typeof value === "object" && !Array.isArray(value)
+    }
+
+    function evaluate(request, markdown, verification) {
+      return isObject(request)
+        && request.generateOperationalSop === true
+        && request.runIndependentVerifier === true
+        && request.returnFullMarkdown === true
+        && request.returnAllVerificationChecks === true
+        && request.performIncidentManagementAction === false
+        && typeof markdown === "string"
+        && markdown.length > 0
+        && isObject(verification)
+        && Array.isArray(verification.checks)
+    }
+
+    async function run({ request, markdown, verification }) {
+      return evaluate(request, markdown, verification)
+    }
+
+    async function check({ request, markdown, verification }, output) {
+      return output === evaluate(request, markdown, verification)
+    }
+
+    return { run, check }
+
+@brief @request task.source
+@markdown @verification kb.analysis $brief
+@requestSatisfied satisfyRequest $request $markdown $verification

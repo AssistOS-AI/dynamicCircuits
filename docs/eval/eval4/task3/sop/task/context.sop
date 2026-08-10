@@ -1,0 +1,42 @@
+@output context
+
+@loadContext define
+    async function run() {
+      return {
+        facts: [
+          {
+            kind: "fact",
+            subject: "Nia",
+            predicate: "pilot",
+            polarity: "POSITIVE",
+            locator: "input/context-and-questions.md:3",
+          },
+          {
+            kind: "fact",
+            subject: "Nia",
+            predicate: "pilot",
+            polarity: "NEGATIVE",
+            locator: "input/context-and-questions.md:5",
+          },
+        ],
+        rules: [
+          {
+            kind: "implication",
+            antecedent: { predicate: "pilot", polarity: "POSITIVE" },
+            consequent: { predicate: "trained", polarity: "POSITIVE" },
+            locator: "input/context-and-questions.md:7",
+          },
+        ],
+      }
+    }
+
+    async function check(inputs, output) {
+      return Array.isArray(output?.facts)
+        && output.facts.length === 2
+        && Array.isArray(output?.rules)
+        && output.rules.length === 1
+    }
+
+    return { run, check }
+
+@context loadContext

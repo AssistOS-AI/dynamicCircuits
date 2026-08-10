@@ -1,0 +1,59 @@
+@output context
+@invariant contextNormalized covers context
+
+@loadContext define
+    async function run() {
+      return {
+        facts: [
+          {
+            kind: "fact",
+            subject: "Socrate",
+            predicate: "man",
+            polarity: "POSITIVE",
+            locator: "context.md:3",
+          },
+          {
+            kind: "fact",
+            subject: "Plato",
+            predicate: "philosopher",
+            polarity: "POSITIVE",
+            locator: "context.md:7",
+          },
+        ],
+        rules: [
+          {
+            kind: "implication",
+            antecedent: { predicate: "man", polarity: "POSITIVE" },
+            consequent: { predicate: "mortal", polarity: "POSITIVE" },
+            locator: "context.md:5",
+          },
+        ],
+      }
+    }
+
+    async function check(inputs, output) {
+      return output !== null
+        && typeof output === "object"
+        && Array.isArray(output.facts)
+        && output.facts.length === 2
+        && Array.isArray(output.rules)
+        && output.rules.length === 1
+    }
+
+    return { run, check }
+
+@context loadContext
+
+@verifyContext define context
+    async function run({ context }) {
+      return context.facts.every((fact) => typeof fact.locator === "string")
+        && context.rules.every((rule) => typeof rule.locator === "string")
+    }
+
+    async function check(inputs, output) {
+      return output === true
+    }
+
+    return { run, check }
+
+@contextNormalized verifyContext $context

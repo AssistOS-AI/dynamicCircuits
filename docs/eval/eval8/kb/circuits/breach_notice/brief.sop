@@ -1,0 +1,88 @@
+@input brief
+@output validatedBrief
+@invariant briefSchemaValid covers briefSchemaValid validatedBrief brief
+
+@validatedBrief validateBrief $brief
+@briefSchemaValid assureBrief $validatedBrief $brief
+
+@validateBrief define brief
+    const REQUIRED_STRING_FIELDS = [
+      "sender",
+      "recipient",
+      "agreementTitle",
+      "agreementDate",
+      "noticeDate",
+      "contractClause",
+      "eventStatement",
+      "cureAction",
+      "cureDeadlineDate",
+      "permittedDeliveryMethod",
+      "reservationText",
+      "governingLawStatement"
+    ]
+    const ALLOWED_FIELDS = [...REQUIRED_STRING_FIELDS, "factualExhibits"]
+
+    async function run({ brief }, ctx) {
+      if (brief === null || typeof brief !== "object" || Array.isArray(brief)) {
+        return ctx.reject("INVALID_BRIEF", { errors: [{ code: "brief_must_be_object" }] })
+      }
+
+      const errors = []
+      for (const field of REQUIRED_STRING_FIELDS) {
+        if (typeof brief[field] !== "string") {
+          errors.push({ code: "field_must_be_string", field })
+        } else if (brief[field].length === 0) {
+          errors.push({ code: "field_must_be_non_empty", field })
+        }
+      }
+
+      if (!Array.isArray(brief.factualExhibits)) {
+        errors.push({ code: "exhibits_must_be_list", field: "factualExhibits" })
+      } else {
+        if (brief.factualExhibits.length === 0) {
+          errors.push({ code: "exhibits_must_be_non_empty", field: "factualExhibits" })
+        }
+        for (let index = 0; index < brief.factualExhibits.length; index += 1) {
+          const value = brief.factualExhibits[index]
+          if (typeof value !== "string") {
+            errors.push({ code: "exhibit_must_be_string", field: "factualExhibits", index })
+          } else if (value.length === 0) {
+            errors.push({ code: "exhibit_must_be_non_empty", field: "factualExhibits", index })
+          }
+        }
+      }
+
+      const unexpectedFields = Object.keys(brief)
+        .filter((field) => !ALLOWED_FIELDS.includes(field))
+        .sort()
+      if (unexpectedFields.length > 0) {
+        errors.push({ code: "unsupported_fields", fields: unexpectedFields })
+      }
+
+      if (errors.length > 0) return ctx.reject("INVALID_BRIEF", { errors })
+      return brief
+    }
+
+    async function check(inputs, output) {
+      return output === inputs.brief
+    }
+
+    return { run, check }
+
+@assureBrief define validatedBrief brief
+    async function run({ validatedBrief, brief }) {
+      const sameValue = JSON.stringify(validatedBrief) === JSON.stringify(brief)
+      return {
+        ok: sameValue,
+        requiredStringFieldCount: 12,
+        exhibitCount: validatedBrief.factualExhibits.length
+      }
+    }
+
+    async function check(inputs, output) {
+      return output.ok === (JSON.stringify(inputs.validatedBrief) === JSON.stringify(inputs.brief))
+        && output.requiredStringFieldCount === 12
+        && output.exhibitCount === inputs.validatedBrief.factualExhibits.length
+    }
+
+    return { run, check }

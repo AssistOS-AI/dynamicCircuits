@@ -1,0 +1,54 @@
+@output pilotAnswer trainedAnswer sailorAnswer
+@goal analysisComplete covers context request pilotQ trainedQ sailorQ pilotAnswer trainedAnswer sailorAnswer
+
+@context task.context
+@request @pilotQ @trainedQ @sailorQ task.request
+
+@pilotAnswer kb.unary_entailment.evaluate $context $pilotQ
+@trainedAnswer kb.unary_entailment.evaluate $context $trainedQ
+@sailorAnswer kb.unary_entailment.evaluate $context $sailorQ
+
+@analysisComplete verify $context $request $pilotQ $trainedQ $sailorQ $pilotAnswer $trainedAnswer $sailorAnswer
+
+@verify define context request pilotQ trainedQ sailorQ pilotAnswer trainedAnswer sailorAnswer
+    function isRecord(value) {
+      return value !== null && typeof value === "object" && !Array.isArray(value)
+    }
+
+    function queryMatches(result, query) {
+      return isRecord(result)
+        && result.schemaVersion === 1
+        && isRecord(result.query)
+        && result.query.subject === query.subject
+        && result.query.predicate === query.predicate
+        && result.query.polarity === query.polarity
+        && ["SUPPORTED", "CONTRADICTED", "CONFLICT", "UNKNOWN"].includes(result.status)
+    }
+
+    async function run(inputs) {
+      const {
+        context,
+        request,
+        pilotQ,
+        trainedQ,
+        sailorQ,
+        pilotAnswer,
+        trainedAnswer,
+        sailorAnswer,
+      } = inputs
+      return Array.isArray(context?.facts)
+        && Array.isArray(context?.rules)
+        && request?.completeContext === true
+        && request?.absenceIsNegation === false
+        && request?.answerWithEvidence === true
+        && request?.questionCount === 3
+        && queryMatches(pilotAnswer, pilotQ)
+        && queryMatches(trainedAnswer, trainedQ)
+        && queryMatches(sailorAnswer, sailorQ)
+    }
+
+    async function check(inputs, output) {
+      return output === true
+    }
+
+    return { run, check }

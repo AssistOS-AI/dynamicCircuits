@@ -1,0 +1,230 @@
+@input plan
+@output report
+@invariant reviewEvidenceComplete covers report
+
+@evaluate define plan
+    function isRecord(value) {
+      return value !== null && typeof value === "object" && !Array.isArray(value)
+    }
+    function isNonEmptyString(value) {
+      return typeof value === "string" && value.length > 0
+    }
+    function run({ plan }, ctx) {
+      if (!isRecord(plan)) return ctx.reject("plan_must_be_an_object")
+      if (!isNonEmptyString(plan.planId)) return ctx.reject("plan_id_required")
+      if (!Array.isArray(plan.chapters)) return ctx.reject("chapters_must_be_an_array")
+
+      const chapterIds = new Set()
+      const assertions = []
+      const assertionIds = new Set()
+      const definitions = []
+      const chaptersWithoutDate = []
+
+      for (let chapterIndex = 0; chapterIndex < plan.chapters.length; chapterIndex += 1) {
+        const chapter = plan.chapters[chapterIndex]
+        if (!isRecord(chapter)) return ctx.reject("chapter_must_be_an_object")
+        if (!isNonEmptyString(chapter.chapterId)) return ctx.reject("chapter_id_required")
+        if (chapterIds.has(chapter.chapterId)) return ctx.reject("duplicate_chapter_id")
+        chapterIds.add(chapter.chapterId)
+        if (!Object.prototype.hasOwnProperty.call(chapter, "launchDate")) {
+          return ctx.reject("launch_date_field_required")
+        }
+        if (!Array.isArray(chapter.definitions)) return ctx.reject("definitions_must_be_an_array")
+
+        if (chapter.launchDate === null) {
+          chaptersWithoutDate.push(chapter.chapterId)
+        } else {
+          const date = chapter.launchDate
+          if (!isRecord(date)) return ctx.reject("launch_date_must_be_object_or_null")
+          if (!isNonEmptyString(date.assertionId)) return ctx.reject("assertion_id_required")
+          if (assertionIds.has(date.assertionId)) return ctx.reject("duplicate_assertion_id")
+          if (!isNonEmptyString(date.value)) return ctx.reject("launch_date_value_required")
+          if (!isNonEmptyString(date.dateKey)) return ctx.reject("launch_date_key_required")
+          if (!Array.isArray(date.supersedes)) return ctx.reject("supersedes_must_be_an_array")
+          const targets = new Set()
+          for (const target of date.supersedes) {
+            if (!isNonEmptyString(target)) return ctx.reject("supersession_target_invalid")
+            if (targets.has(target)) return ctx.reject("duplicate_supersession_target")
+            targets.add(target)
+          }
+          assertionIds.add(date.assertionId)
+          assertions.push({
+            assertionId: date.assertionId,
+            chapterId: chapter.chapterId,
+            chapterIndex,
+            dateValue: date.value,
+            dateKey: date.dateKey,
+            supersedes: [...date.supersedes]
+          })
+        }
+
+        const chapterTermKeys = new Set()
+        for (const definition of chapter.definitions) {
+          if (!isRecord(definition)) return ctx.reject("definition_must_be_an_object")
+          if (!isNonEmptyString(definition.term)) return ctx.reject("definition_term_required")
+          if (!isNonEmptyString(definition.termKey)) return ctx.reject("definition_term_key_required")
+          if (chapterTermKeys.has(definition.termKey)) return ctx.reject("duplicate_term_key_in_chapter")
+          chapterTermKeys.add(definition.termKey)
+          if (!isNonEmptyString(definition.text)) return ctx.reject("definition_text_required")
+          if (!(definition.meaningKey === null || isNonEmptyString(definition.meaningKey))) {
+            return ctx.reject("meaning_key_must_be_string_or_null")
+          }
+          definitions.push({
+            chapterId: chapter.chapterId,
+            chapterIndex,
+            term: definition.term,
+            termKey: definition.termKey,
+            definitionText: definition.text,
+            meaningKey: definition.meaningKey
+          })
+        }
+      }
+
+      const assertionById = new Map(assertions.map((assertion) => [assertion.assertionId, assertion]))
+      const supersededBy = new Map()
+      const supersessions = []
+      for (const assertion of assertions) {
+        for (const targetId of assertion.supersedes) {
+          const target = assertionById.get(targetId)
+          if (!target || target.chapterIndex >= assertion.chapterIndex) {
+            return ctx.reject("supersession_target_must_be_an_earlier_assertion")
+          }
+          const superseders = supersededBy.get(targetId) || []
+          superseders.push(assertion.assertionId)
+          supersededBy.set(targetId, superseders)
+          supersessions.push({
+            targetAssertionId: targetId,
+            targetChapterId: target.chapterId,
+            supersededByAssertionId: assertion.assertionId,
+            supersedingChapterId: assertion.chapterId
+          })
+        }
+      }
+
+      const activeAssertions = assertions
+        .filter((assertion) => !supersededBy.has(assertion.assertionId))
+        .map((assertion) => ({
+          assertionId: assertion.assertionId,
+          chapterId: assertion.chapterId,
+          chapterIndex: assertion.chapterIndex,
+          dateValue: assertion.dateValue,
+          dateKey: assertion.dateKey
+        }))
+      const distinctActiveDateKeys = [...new Set(activeAssertions.map((item) => item.dateKey))]
+      const dateAssertions = assertions.map((assertion) => ({
+        assertionId: assertion.assertionId,
+        chapterId: assertion.chapterId,
+        chapterIndex: assertion.chapterIndex,
+        dateValue: assertion.dateValue,
+        dateKey: assertion.dateKey,
+        supersedes: assertion.supersedes
+      }))
+      let launchDateStatus = "CONSISTENT"
+      let launchDateReason = null
+      if (distinctActiveDateKeys.length > 1) {
+        launchDateStatus = "CONFLICT"
+        launchDateReason = "multiple_unsuperseded_launch_dates"
+      } else if (plan.chapters.length === 0 || chaptersWithoutDate.length > 0) {
+        launchDateStatus = "UNKNOWN"
+        launchDateReason = "launch_date_evidence_incomplete"
+      }
+
+      const termGroups = new Map()
+      for (const definition of definitions) {
+        if (!termGroups.has(definition.termKey)) termGroups.set(definition.termKey, [])
+        termGroups.get(definition.termKey).push(definition)
+      }
+      const termFindings = []
+      for (const [termKey, entries] of termGroups) {
+        const knownMeaningKeys = [...new Set(entries
+          .filter((entry) => entry.meaningKey !== null)
+          .map((entry) => entry.meaningKey))]
+        const definitionTexts = [...new Set(entries.map((entry) => entry.definitionText))]
+        const uncertaintyPresent = definitionTexts.length > 1
+          && entries.some((entry) => entry.meaningKey === null)
+        let status = "CONSISTENT"
+        let reason = null
+        if (knownMeaningKeys.length > 1) {
+          status = "CONFLICT"
+          reason = "incompatible_definition_meanings"
+        } else if (uncertaintyPresent) {
+          status = "UNKNOWN"
+          reason = "definition_compatibility_unclassified"
+        }
+        termFindings.push({
+          termKey,
+          status,
+          reason,
+          sourceChapters: [...new Set(entries.map((entry) => entry.chapterId))],
+          knownMeaningKeys,
+          uncertaintyPresent,
+          entries
+        })
+      }
+
+      const conflictingTermKeys = termFindings
+        .filter((finding) => finding.status === "CONFLICT")
+        .map((finding) => finding.termKey)
+      const unknownTermKeys = termFindings
+        .filter((finding) => finding.uncertaintyPresent)
+        .map((finding) => finding.termKey)
+      let reviewVerdict = "CONSISTENT"
+      if (launchDateStatus === "CONFLICT" || conflictingTermKeys.length > 0) {
+        reviewVerdict = "CONFLICT"
+      } else if (launchDateStatus === "UNKNOWN" || unknownTermKeys.length > 0) {
+        reviewVerdict = "UNKNOWN"
+      }
+
+      return {
+        planId: plan.planId,
+        reviewVerdict,
+        launchDateFinding: {
+          status: launchDateStatus,
+          reason: launchDateReason,
+          dateAssertions,
+          activeAssertions,
+          distinctActiveDateKeys,
+          chaptersWithoutDate,
+          supersessions
+        },
+        termFindings,
+        conflictingTermKeys,
+        unknownTermKeys,
+        uncertaintyPreserved: launchDateStatus === "UNKNOWN" || unknownTermKeys.length > 0,
+        preferredLaunchDate: null,
+        preferredDefinitions: [],
+        sourceLocators: ["input/review-rules.md:3"]
+      }
+    }
+    function check(inputs, output) {
+      const termConflictCount = output.termFindings
+        .filter((finding) => finding.status === "CONFLICT").length
+      const termUnknownCount = output.termFindings
+        .filter((finding) => finding.uncertaintyPresent).length
+      const hasConflict = output.launchDateFinding.status === "CONFLICT" || termConflictCount > 0
+      const hasUnknown = output.launchDateFinding.status === "UNKNOWN" || termUnknownCount > 0
+      return output.conflictingTermKeys.length === termConflictCount
+        && output.unknownTermKeys.length === termUnknownCount
+        && output.reviewVerdict === (hasConflict ? "CONFLICT" : hasUnknown ? "UNKNOWN" : "CONSISTENT")
+        && output.preferredLaunchDate === null
+        && output.preferredDefinitions.length === 0
+        && output.sourceLocators[0] === "input/review-rules.md:3"
+    }
+    return { run, check }
+
+@report evaluate $plan
+
+@validate define report
+    function run({ report }) {
+      const statuses = new Set(["CONSISTENT", "CONFLICT", "UNKNOWN"])
+      return statuses.has(report.reviewVerdict)
+        && statuses.has(report.launchDateFinding.status)
+        && report.termFindings.every((finding) => statuses.has(finding.status)
+          && typeof finding.uncertaintyPresent === "boolean")
+        && report.preferredLaunchDate === null
+        && report.preferredDefinitions.length === 0
+    }
+    return { run }
+
+@valid validate $report
+@reviewEvidenceComplete assertInvariant $valid "review must retain conflicts, uncertainty, and source evidence without selecting a preferred version"

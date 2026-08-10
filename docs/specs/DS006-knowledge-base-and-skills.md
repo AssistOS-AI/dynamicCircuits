@@ -20,12 +20,18 @@ skills linked into every prepared KB, workdir, and evaluation workspace.
 
 Trusted reusable `.sop` packages must live under `KB/circuits/`. New learning output must begin under `KB/candidates/` with its contract, provenance, examples, and tests. A coding agent must not promote candidates or overwrite trusted circuits. Task-specific circuits must remain under `WORK/sop/`.
 
+The KB source corpus and the current task are different contracts. `KB/input/` contains durable source knowledge intended
+for reuse or candidate extraction. `WORK/input/` contains the current dataset, cases, source documents, questions, and
+requested deliverable. Analysis may read reviewed KB circuits but may write only task SOP and task results. A discovery made
+during analysis must be reported for later learning and review; it must not move current task facts into the trusted KB or
+edit a reviewed package in place.
+
 The project must ship `circuitSkills/analyze-task`, `circuitSkills/author-sop-circuit`, and `circuitSkills/circuit-learner`. Each skill must contain valid concise frontmatter, imperative workflows, and only resources required for its task. `author-sop-circuit` must document the implemented subset and must warn agents not to claim future runtime capabilities.
 
 Workspace preparation links the entire `circuitSkills` directory rather than copying it. The visible `circuitSkills` link
 and `.agents/skills` discovery links resolve to that same catalog; an existing local discovery directory receives project
-skill links without losing unrelated entries. This keeps one maintained skill version across normal workspaces and
-`docs/eval/evalN` cases. Repository-maintenance skills under the root `.agents/` are read-only guidance for project work and
+skill links without losing unrelated entries. This keeps one maintained skill version across normal workspaces and both the
+`kb/` and `task/` directories inside `docs/eval/evalN` cases. Repository-maintenance skills under the root `.agents/` are read-only guidance for project work and
 are never modified or repurposed as runtime circuit skills.
 
 The three maintained skills consolidate the six historical roles. `author-sop-circuit` covers kernel implementation
@@ -55,6 +61,11 @@ Response: Workspaces receive current, discoverable instructions without duplicat
 ### Question #2: Why are candidates separate from trusted circuits?
 
 Response: Coding-agent extraction can be useful but remains an interpretation. Compilation and tests establish mechanical validity; semantic review is still required before reuse as trusted knowledge.
+
+### Question #3: Why must current task facts stay outside the KB?
+
+Response: Their authority and lifetime are limited to one request. Keeping them in the workdir prevents later analyses from
+mistaking an observation, question, or exceptional case for reviewed reusable knowledge.
 
 ## Conclusion
 

@@ -1,0 +1,18 @@
+@input brief
+@output markdown verification
+@goal verified covers markdown verification
+
+@assertVerified define markdown verification
+    async function run({ markdown, verification }) {
+      return typeof markdown === "string" && verification !== null && typeof verification === "object" && verification.ok === true
+    }
+
+    async function check({ markdown, verification }, output) {
+      return output === (typeof markdown === "string" && verification !== null && typeof verification === "object" && verification.ok === true)
+    }
+
+    return { run, check }
+
+@markdown candidate.generator $brief
+@verification candidate.verifier $brief $markdown
+@verified assertVerified $markdown $verification

@@ -1,0 +1,24 @@
+@input
+@output notice verification sourceContext
+@goal analysisComplete covers analysisComplete notice verification sourceContext brief generationReport
+
+@brief @sourceContext task.brief
+@notice @generationReport kb.breach_notice.generate $brief
+@verification kb.breach_notice.verify $brief $notice
+@analysisComplete assureComplete $notice $generationReport $verification $sourceContext
+
+@assureComplete define notice generationReport verification sourceContext
+    async function run({ notice, generationReport, verification, sourceContext }) {
+      return typeof notice === "string"
+        && notice.length > 0
+        && generationReport.ok === true
+        && verification.ok === true
+        && sourceContext.sourceLocator === "input/brief.md"
+        && sourceContext.support === "direct"
+    }
+
+    async function check(inputs, output) {
+      return output === true
+    }
+
+    return { run, check }

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "release-plan-consistency-v1",
+  "candidateVersion": "1.0.0-candidate",
+  "status": "review-required",
+  "sopSubset": "implemented-v1",
+  "source": {
+    "path": "input/review-rules.md",
+    "bytes": 422,
+    "sha256": "d37915155d2ffd2065714f525bcd3107112ca71941c8b5f89b4face55e6c100a"
+  },
+  "packages": [
+    {
+      "name": "release_plan_consistency.review",
+      "file": "sop/release_plan_consistency/review.sop",
+      "packageHash": "sha256:d6fc683c520a3203247f12203798deb16cd458d8b058999f983faabf55fc8bdd"
+    }
+  ],
+  "interfaces": {
+    "review": {
+      "inputs": ["plan"],
+      "outputs": ["report"],
+      "semanticVerdicts": ["CONSISTENT", "CONFLICT", "UNKNOWN"]
+    }
+  },
+  "artifacts": {
+    "contract": "README.md",
+    "inventory": "inventory.md",
+    "provenance": "provenance.json",
+    "testVectors": "tests/cases.json",
+    "testRunner": "tests/run-tests.mjs",
+    "executionReport": "tests/execution-report.md"
+  },
+  "applicability": {
+    "required": [
+      "one release plan",
+      "complete ordered chapter representation",
+      "explicit supersession references",
+      "caller-reviewed canonical identity keys"
+    ],
+    "notApplicable": [
+      "semantic similarity without reviewed meaning keys",
+      "date parsing or normalization",
+      "document extraction",
+      "cross-plan comparison",
+      "policy authority determination"
+    ]
+  },
+  "trustedOverlap": {
+    "inspectedPath": "circuits/",
+    "trustedPackageCount": 0,
+    "overlap": "none"
+  },
+  "capabilities": [],
+  "effects": [],
+  "prohibitedCapabilities": [
+    "filesystem",
+    "process",
+    "network",
+    "clock",
+    "random",
+    "oracle",
+    "direct-llm"
+  ],
+  "promotion": {
+    "automatic": false,
+    "requiredReviewers": [
+      "release-plan owner",
+      "terminology or domain owner",
+      "source-document owner",
+      "SOP runtime maintainer"
+    ]
+  }
+}

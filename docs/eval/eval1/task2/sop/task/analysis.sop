@@ -1,0 +1,100 @@
+@output findings counts coverage
+@goal completeAnalysis covers findings counts coverage
+
+@caseD @caseE @caseF @request task.input
+
+@findingD kb.notice_review.evaluate $caseD
+@findingE kb.notice_review.evaluate $caseE
+@findingF kb.notice_review.evaluate $caseF
+
+@assemble define caseD caseE caseF findingD findingE findingF request
+    function run({ caseD, caseE, caseF, findingD, findingE, findingF, request }) {
+      const cases = [caseD, caseE, caseF]
+      const policyFindings = [findingD, findingE, findingF]
+      const findings = cases.map((currentCase, index) => ({
+        caseId: currentCase.caseId,
+        taskSourceLocator: currentCase.sourceLocator,
+        policyFinding: policyFindings[index]
+      }))
+
+      const compliant = policyFindings.filter((finding) => finding.status === "COMPLIANT").length
+      const nonCompliant = policyFindings.filter((finding) => finding.status === "NON_COMPLIANT").length
+      const ordinaryMinimum = policyFindings.filter(
+        (finding) => finding.reviewPath === "ORDINARY_MINIMUM"
+      ).length
+      const expeditedException = policyFindings.filter(
+        (finding) => finding.reviewPath === "EXPEDITED_EXCEPTION"
+      ).length
+      const evaluatedCaseIds = findings.map((finding) => finding.caseId)
+      const missingCaseIds = request.expectedCaseIds.filter(
+        (caseId) => !evaluatedCaseIds.includes(caseId)
+      )
+      const unexpectedCaseIds = evaluatedCaseIds.filter(
+        (caseId) => !request.expectedCaseIds.includes(caseId)
+      )
+
+      return {
+        findings,
+        counts: {
+          total: findings.length,
+          compliant,
+          nonCompliant,
+          byReviewPath: {
+            ordinaryMinimum,
+            expeditedException
+          }
+        },
+        coverage: {
+          complete: findings.length === request.expectedCount
+            && missingCaseIds.length === 0
+            && unexpectedCaseIds.length === 0,
+          expectedCount: request.expectedCount,
+          evaluatedCount: findings.length,
+          expectedCaseIds: request.expectedCaseIds,
+          evaluatedCaseIds,
+          missingCaseIds,
+          unexpectedCaseIds,
+          requestSourceLocator: request.requestSourceLocator,
+          completenessSourceLocator: request.completenessSourceLocator
+        }
+      }
+    }
+
+    function check(inputs, output) {
+      const ids = output.findings.map((finding) => finding.caseId)
+      const statusesCounted = output.counts.compliant + output.counts.nonCompliant
+      const pathsCounted = output.counts.byReviewPath.ordinaryMinimum
+        + output.counts.byReviewPath.expeditedException
+      return output.findings.length === inputs.request.expectedCount
+        && ids.join(",") === inputs.request.expectedCaseIds.join(",")
+        && output.findings.every((finding, index) =>
+          finding.taskSourceLocator === [inputs.caseD, inputs.caseE, inputs.caseF][index].sourceLocator
+          && finding.policyFinding === [inputs.findingD, inputs.findingE, inputs.findingF][index])
+        && statusesCounted === output.counts.total
+        && pathsCounted === output.counts.total
+        && output.coverage.complete
+        && output.coverage.missingCaseIds.length === 0
+        && output.coverage.unexpectedCaseIds.length === 0
+    }
+
+    return { run, check }
+
+@assembled assemble $caseD $caseE $caseF $findingD $findingE $findingF $request
+@findings get $assembled "/findings"
+@counts get $assembled "/counts"
+@coverage get $assembled "/coverage"
+
+@validateCompleteAnalysis define findings counts coverage
+    function run({ findings, counts, coverage }) {
+      return Array.isArray(findings)
+        && findings.length === counts.total
+        && counts.total === coverage.expectedCount
+        && coverage.evaluatedCount === counts.total
+        && coverage.complete === true
+        && coverage.missingCaseIds.length === 0
+        && coverage.unexpectedCaseIds.length === 0
+    }
+    return { run }
+
+@analysisIsComplete validateCompleteAnalysis $findings $counts $coverage
+@completeAnalysis assertInvariant $analysisIsComplete "analysis must expose one finding per expected case with consistent counts and complete coverage"

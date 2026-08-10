@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "positive_all_strict",
+      "category": "positive",
+      "observations": [
+        {"id": "p1", "value": 1, "source": {"path": "independent/positive.md", "locator": "row p1"}},
+        {"id": "p2", "value": 2, "source": {"path": "independent/positive.md", "locator": "row p2"}},
+        {"id": "p3", "value": 3, "source": {"path": "independent/positive.md", "locator": "row p3"}}
+      ],
+      "expectedOutcome": "SUCCEEDED",
+      "expectedOutput": {
+        "claim": "all_observations_are_strictly_positive",
+        "verdict": "SUPPORTED",
+        "observationCount": 3,
+        "witness": null,
+        "aggregate": {"mean": 2, "meanIsStrictlyPositive": true}
+      }
+    },
+    {
+      "id": "negative_counterexample",
+      "category": "negative",
+      "observations": [
+        {"id": "n1", "value": -2, "source": {"path": "independent/negative.csv", "locator": "row 1"}},
+        {"id": "n2", "value": -4, "source": {"path": "independent/negative.csv", "locator": "row 2"}}
+      ],
+      "expectedOutcome": "SUCCEEDED",
+      "expectedOutput": {
+        "claim": "all_observations_are_strictly_positive",
+        "verdict": "REFUTED",
+        "observationCount": 2,
+        "witness": {"id": "n1", "value": -2, "source": {"path": "independent/negative.csv", "locator": "row 1"}},
+        "aggregate": {"mean": -3, "meanIsStrictlyPositive": false}
+      }
+    },
+    {
+      "id": "zero_boundary",
+      "category": "boundary",
+      "observations": [
+        {"id": "z0", "value": 0, "source": {"path": "independent/boundary.md", "locator": "zero row"}}
+      ],
+      "expectedOutcome": "SUCCEEDED",
+      "expectedOutput": {
+        "claim": "all_observations_are_strictly_positive",
+        "verdict": "REFUTED",
+        "observationCount": 1,
+        "witness": {"id": "z0", "value": 0, "source": {"path": "independent/boundary.md", "locator": "zero row"}},
+        "aggregate": {"mean": 0, "meanIsStrictlyPositive": false}
+      }
+    },
+    {
+      "id": "smallest_positive_boundary",
+      "category": "boundary",
+      "observations": [
+        {"id": "tiny", "value": 5e-324, "source": {"path": "independent/boundary.md", "locator": "tiny row"}}
+      ],
+      "expectedOutcome": "SUCCEEDED",
+      "expectedOutput": {
+        "claim": "all_observations_are_strictly_positive",
+        "verdict": "SUPPORTED",
+        "observationCount": 1,
+        "witness": null,
+        "aggregate": {"mean": 5e-324, "meanIsStrictlyPositive": true}
+      }
+    },
+    {
+      "id": "positive_mean_not_universal",
+      "category": "aggregate-separation",
+      "observations": [
+        {"id": "a1", "value": 10, "source": {"path": "independent/aggregate.csv", "locator": "row 1"}},
+        {"id": "a2", "value": -2, "source": {"path": "independent/aggregate.csv", "locator": "row 2"}}
+      ],
+      "expectedOutcome": "SUCCEEDED",
+      "expectedOutput": {
+        "claim": "all_observations_are_strictly_positive",
+        "verdict": "REFUTED",
+        "observationCount": 2,
+        "witness": {"id": "a2", "value": -2, "source": {"path": "independent/aggregate.csv", "locator": "row 2"}},
+        "aggregate": {"mean": 4, "meanIsStrictlyPositive": true}
+      }
+    },
+    {
+      "id": "empty_dataset",
+      "category": "refusal",
+      "observations": [],
+      "expectedOutcome": "REFUSED",
+      "expectedRefusalCode": "empty_dataset"
+    },
+    {
+      "id": "missing_value",
+      "category": "exception",
+      "observations": [
+        {"id": "m1", "value": null, "source": {"path": "independent/missing.md", "locator": "row m1"}}
+      ],
+      "expectedOutcome": "REFUSED",
+      "expectedRefusalCode": "missing_value"
+    },
+    {
+      "id": "non_numeric_value",
+      "category": "refusal",
+      "observations": [
+        {"id": "s1", "value": "3", "source": {"path": "independent/string.csv", "locator": "row 1"}}
+      ],
+      "expectedOutcome": "REFUSED",
+      "expectedRefusalCode": "non_numeric_observation"
+    },
+    {
+      "id": "malformed_top_level",
+      "category": "malformed-input",
+      "observations": {"id": "not-an-array"},
+      "expectedOutcome": "REFUSED",
+      "expectedRefusalCode": "observations_not_array"
+    },
+    {
+      "id": "missing_source_locator",
+      "category": "provenance-refusal",
+      "observations": [
+        {"id": "u1", "value": -1, "source": {"path": "independent/unlocated.csv", "locator": ""}}
+      ],
+      "expectedOutcome": "REFUSED",
+      "expectedRefusalCode": "missing_source_locator"
+    },
+    {
+      "id": "duplicate_identifier",
+      "category": "ambiguity-refusal",
+      "observations": [
+        {"id": "d1", "value": 2, "source": {"path": "independent/duplicates.csv", "locator": "row 1"}},
+        {"id": "d1", "value": -1, "source": {"path": "independent/duplicates.csv", "locator": "row 2"}}
+      ],
+      "expectedOutcome": "REFUSED",
+      "expectedRefusalCode": "duplicate_observation_id"
+    },
+    {
+      "id": "invalid_member_overrides_counterexample",
+      "category": "priority-exception",
+      "observations": [
+        {"id": "x1", "value": -5, "source": {"path": "independent/priority.csv", "locator": "row 1"}},
+        {"id": "x2", "value": null, "source": {"path": "independent/priority.csv", "locator": "row 2"}}
+      ],
+      "expectedOutcome": "REFUSED",
+      "expectedRefusalCode": "missing_value"
+    }
+  ]
+}

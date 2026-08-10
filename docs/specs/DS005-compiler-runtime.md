@@ -45,6 +45,12 @@ compiler's topological order, so independent-node source reordering cannot chang
 
 The `vm` boundary is a reference-development guard, not a production security sandbox. Asynchronous resource limits, worker isolation, persistent caching, effects, semantic indexes, mandatory closure, and trust-profile enforcement remain unsupported.
 
+For workspace analysis, the CLI registers `KB/circuits` with prefix `kb`, registers `WORK/sop` without a prefix, compiles
+the fixed no-input package `task.analysis`, executes it, and renders `WORK/results/runtime-result.md`. The renderer copies
+public output values, output hashes, goal and invariant checks, root-node statuses, child receipt hashes, package hash, and
+receipt hash. It performs no semantic summarization. Multiline string outputs are preserved as text blocks. An unsuccessful
+runtime still yields its available executor report before the CLI returns a classified analysis failure.
+
 ### Operational example
 
 If output `report` depends on nodes `parse`, `applyRule`, and `format`, those nodes execute in topological order. An unrelated
@@ -60,6 +66,12 @@ Response: Dead-node elimination follows the historical SSA model, limits uninten
 ### Question #2: Why explicitly narrow the sandbox guarantee?
 
 Response: Node `vm` can remove ambient globals and bound synchronous evaluation, but production-grade hostile-code isolation also requires workers or processes, memory budgets, and asynchronous cancellation that are not implemented yet.
+
+### Question #3: Why render Markdown instead of committing a runtime JSON fixture?
+
+Response: Canonical values and receipt hashes remain the executor evidence; Markdown makes those exact values statically
+browsable without introducing a hand-authored or agent-authored result object. Machine consumers can invoke `sop run`
+directly, while evaluation documentation compares a separate expectation document with the executor-owned report.
 
 ## Conclusion
 

@@ -1,0 +1,70 @@
+@input
+@output observations
+
+# Executable adaptation of the ordered table in input/dataset.md.
+@loadObservations define
+    async function run() {
+      return [
+        {
+          id: "observation-1",
+          value: 3,
+          source: { path: "dataset.md", locator: "Observation table: Position 1" },
+        },
+        {
+          id: "observation-2",
+          value: 7,
+          source: { path: "dataset.md", locator: "Observation table: Position 2" },
+        },
+        {
+          id: "observation-3",
+          value: 8,
+          source: { path: "dataset.md", locator: "Observation table: Position 3" },
+        },
+        {
+          id: "observation-4",
+          value: -2,
+          source: { path: "dataset.md", locator: "Observation table: Position 4" },
+        },
+        {
+          id: "observation-5",
+          value: 5,
+          source: { path: "dataset.md", locator: "Observation table: Position 5" },
+        },
+        {
+          id: "observation-6",
+          value: 6,
+          source: { path: "dataset.md", locator: "Observation table: Position 6" },
+        },
+        {
+          id: "observation-7",
+          value: 9,
+          source: { path: "dataset.md", locator: "Observation table: Position 7" },
+        },
+        {
+          id: "observation-8",
+          value: 6,
+          source: { path: "dataset.md", locator: "Observation table: Position 8" },
+        },
+      ]
+    }
+
+    return { run }
+
+@observations loadObservations
+
+@validateDatasetEncoding define observations
+    async function run({ observations }) {
+      const expectedValues = [3, 7, 8, -2, 5, 6, 9, 6]
+      if (!Array.isArray(observations) || observations.length !== expectedValues.length) return false
+      return observations.every((observation, index) => (
+        observation.id === `observation-${index + 1}`
+        && observation.value === expectedValues[index]
+        && observation.source.path === "dataset.md"
+        && observation.source.locator === `Observation table: Position ${index + 1}`
+      ))
+    }
+
+    return { run }
+
+@datasetEncodingValid validateDatasetEncoding $observations
+@invariant datasetEncodingValid covers observations

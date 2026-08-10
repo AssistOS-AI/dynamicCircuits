@@ -1,0 +1,25 @@
+@input
+@output report sourceEvidence
+@invariant analysisComplete covers report sourceEvidence
+
+@plan @sourceEvidence task.plan
+@report kb.release_plan_consistency.review $plan
+
+@validateAnalysis define report sourceEvidence
+    function run({ report, sourceEvidence }) {
+      return report !== null
+        && typeof report === "object"
+        && typeof report.reviewVerdict === "string"
+        && report.launchDateFinding !== null
+        && typeof report.launchDateFinding === "object"
+        && Array.isArray(report.termFindings)
+        && sourceEvidence !== null
+        && typeof sourceEvidence === "object"
+        && sourceEvidence.inputPath === "input/plan.md"
+        && Array.isArray(sourceEvidence.chapters)
+        && sourceEvidence.chapters.length === 2
+    }
+    return { run }
+
+@analysisShapeValid validateAnalysis $report $sourceEvidence
+@analysisComplete assertInvariant $analysisShapeValid "analysis must expose the reviewed report and task source evidence"

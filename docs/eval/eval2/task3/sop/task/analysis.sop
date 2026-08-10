@@ -1,0 +1,20 @@
+@input
+@output analysis
+
+@request @observations task.study
+@review kb.universal_positive_review $observations
+
+# Publishes the source-derived request together with the reviewed KB result.
+@composeAnalysis define request review
+    async function run({ request, review }) {
+      return { request, review }
+    }
+
+    async function check({ request, review }, output) {
+      return output.request === request && output.review === review
+    }
+
+    return { run, check }
+
+@analysis composeAnalysis $request $review
+

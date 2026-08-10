@@ -1,0 +1,74 @@
+@output small01 small02
+@invariant sourceRecordsRetained covers small01 small02
+
+@makeSmall01 define
+    function run() {
+      return {
+        identifier: "SMALL-01",
+        containsPersonalData: false,
+        consentBasis: "not-required",
+        sensitivity: "public",
+        encryptionAtRest: true,
+        retentionDays: 30,
+        deletionOwner: "Records Team",
+        accessLogging: false,
+        externalProcessors: false,
+        dpaStatus: "not-required",
+        residency: "EU",
+        residencyApproval: false,
+        anonymized: false,
+        incidentOwner: "Security Team",
+        license: "CC-BY-4.0",
+        sourceLocator: "input/task.md:5-22"
+      }
+    }
+    function check(inputs, output) {
+      return output.identifier === "SMALL-01"
+        && output.containsPersonalData === false
+        && output.retentionDays === 30
+    }
+    return { run, check }
+
+@makeSmall02 define
+    function run() {
+      return {
+        identifier: "SMALL-02",
+        containsPersonalData: true,
+        consentBasis: "missing",
+        sensitivity: "sensitive",
+        encryptionAtRest: false,
+        retentionDays: 0,
+        deletionOwner: "missing",
+        accessLogging: false,
+        externalProcessors: true,
+        dpaStatus: "missing",
+        residency: "US",
+        residencyApproval: false,
+        anonymized: false,
+        incidentOwner: "missing",
+        license: "missing",
+        sourceLocator: "input/task.md:24-41"
+      }
+    }
+    function check(inputs, output) {
+      return output.identifier === "SMALL-02"
+        && output.containsPersonalData === true
+        && output.sensitivity === "sensitive"
+        && output.retentionDays === 0
+    }
+    return { run, check }
+
+@small01 makeSmall01
+@small02 makeSmall02
+
+@validateSourceRecords define small01 small02
+    function run({ small01, small02 }) {
+      return small01.identifier === "SMALL-01"
+        && small02.identifier === "SMALL-02"
+        && small01.sourceLocator === "input/task.md:5-22"
+        && small02.sourceLocator === "input/task.md:24-41"
+    }
+    return { run }
+
+@recordsRetained validateSourceRecords $small01 $small02
+@sourceRecordsRetained assertInvariant $recordsRetained "both manifested source records must be retained"

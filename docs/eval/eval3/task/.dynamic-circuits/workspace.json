@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "kbDir": "/home/salboaie/work/dynamicCircuits/docs/eval/eval3/kb",
+  "workDir": "/home/salboaie/work/dynamicCircuits/docs/eval/eval3/task",
+  "mode": "analyze",
+  "paths": {
+    "input": "input",
+    "results": "results",
+    "sop": "sop",
+    "skills": "circuitSkills",
+    "agentSkillDiscovery": ".agents/skills"
+  }
+}

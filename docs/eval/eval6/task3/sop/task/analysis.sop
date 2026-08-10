@@ -1,0 +1,20 @@
+@output markdown verification
+@invariant resultComplete covers markdown verification
+
+@validateResult define markdown verification
+    function run({ markdown, verification }) {
+      return typeof markdown === "string"
+        && verification !== null
+        && typeof verification === "object"
+        && typeof verification.ok === "boolean"
+        && Array.isArray(verification.checks)
+        && Array.isArray(verification.missingRequirements)
+        && Array.isArray(verification.unexpectedStructuralConditions)
+        && verification.counts !== null
+        && typeof verification.counts === "object"
+    }
+    return { run }
+
+@brief task.brief
+@markdown @verification kb.literary.composition $brief
+@resultComplete validateResult $markdown $verification

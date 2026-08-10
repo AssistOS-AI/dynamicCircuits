@@ -32,10 +32,12 @@
       language summary as proof of applicability.</p>
 
     <h2>2. Find possible rules</h2>
+    <figure class="diagram">
+      <figcaption><strong>Candidate discovery</strong>One fact set can select both a base rule and an exception</figcaption>
     <pre class="mermaid">flowchart LR
-      F[Case B facts] --> Q[Registry query]
-      Q --> B[30-day rule]
-      Q --> E[10-day exception]</pre>
+      F[/Case B facts/] --> Q{Registry query}
+      Q --> B[30-day base rule]
+      Q --> E[10-day exception]</pre></figure>
     <p>The query uses declared metadata such as fact families, domain, version, jurisdiction, and required inputs. Similarity
       search may help propose candidates, but it cannot decide applicability. In this example the query returns both notice
       packages because both consume notice-case facts. The receipt records which registry snapshot and shard were searched,
@@ -59,10 +61,13 @@
       needs and return <code>UNKNOWN</code> when the source cannot establish it.</p>
 
     <h2>4. Repeat until nothing new appears</h2>
+    <figure class="diagram">
+      <figcaption><strong>Mandatory closure</strong>Derived facts are checked again until no rule instance is added</figcaption>
     <pre class="mermaid">flowchart LR
-      M[Matched instances] --> X[Execute rules]
-      X --> N[Publish new facts]
-      N --> M</pre>
+      M{Matched instances?} -->|yes| X[Execute rules]
+      X --> N[(Publish new facts)]
+      N --> M
+      M -->|no| F([Fixed point reached])</pre></figure>
     <p>Some rules derive facts that activate other rules. The system therefore executes matched instances, indexes their new
       facts, and reruns mandatory matchers. It stops only when a complete round creates no new facts or instances. Stable
       instance keys suppress duplicates, and configured round or instance limits turn the result into

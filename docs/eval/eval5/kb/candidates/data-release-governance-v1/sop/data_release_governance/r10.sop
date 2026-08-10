@@ -1,0 +1,28 @@
+@input release
+@output finding
+@invariant findingIdentified covers finding
+
+@evaluate define release
+    function run({ release }, ctx) {
+      if (release === null || typeof release !== "object" || Array.isArray(release)) {
+        return ctx.reject("release_record_must_be_an_object", { ruleId: "R10" })
+      }
+      const accepted = ["CC-BY-4.0", "ODC-BY-1.0", "internal-only"]
+      const passes = accepted.includes(release.license)
+      return {
+        ruleId: "R10",
+        status: passes ? "PASS" : "FAIL",
+        reason: passes ? null : "recognized_license_required",
+        path: "APPLICABLE",
+        sourceLocator: "input/knowledge-base.md:94"
+      }
+    }
+    function check(inputs, output) {
+      return output.ruleId === "R10" && ["PASS", "FAIL"].includes(output.status)
+    }
+    return { run, check }
+
+@finding evaluate $release
+@ruleId get $finding "ruleId"
+@ruleIdCorrect equal $ruleId "R10"
+@findingIdentified assertInvariant $ruleIdCorrect "R10 finding must retain its rule identifier"

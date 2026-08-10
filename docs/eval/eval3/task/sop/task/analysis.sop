@@ -1,0 +1,61 @@
+@output report sourceContext
+@goal analysisComplete covers report sourceContext
+
+@chapter01 task.chapter_01
+@chapter02 task.chapter_02
+@chapter03 task.chapter_03
+@request task.request
+
+@assemble define chapter01 chapter02 chapter03 request
+    function run({ chapter01, chapter02, chapter03, request }, ctx) {
+      const expectedComparisons = request.comparisons.length === 2
+        && request.comparisons[0] === "launch_dates"
+        && request.comparisons[1] === "definitions"
+      if (request.interpretationScope !== "each_chapter_independently"
+        || !expectedComparisons
+        || request.conflictReporting !== "every_conflict_with_source_labels"
+        || request.resolutionRule !== "explicit_supersession_required") {
+        return ctx.reject("unsupported_review_request")
+      }
+      return {
+        planId: "task-release-plan",
+        chapters: [chapter01, chapter02, chapter03],
+        sourceContext: {
+          request,
+          chapters: [chapter01, chapter02, chapter03]
+        }
+      }
+    }
+    function check(inputs, output) {
+      return output.chapters.length === 3
+        && output.sourceContext.request === inputs.request
+        && output.sourceContext.chapters.length === 3
+        && output.chapters.every((chapter, index) => chapter === output.sourceContext.chapters[index])
+    }
+    return { run, check }
+
+@plan assemble $chapter01 $chapter02 $chapter03 $request
+@report kb.release_plan_consistency.review $plan
+@sourceContext get $plan "sourceContext"
+
+@validate define report sourceContext
+    function run({ report, sourceContext }) {
+      const chapterIds = sourceContext.chapters.map((chapter) => chapter.chapterId)
+      const sourceLocators = sourceContext.chapters.map((chapter) => chapter.sourceLocator)
+      const reportChapterIds = new Set([
+        ...report.launchDateFinding.dateAssertions.map((item) => item.chapterId),
+        ...report.launchDateFinding.chaptersWithoutDate,
+        ...report.termFindings.flatMap((finding) => finding.sourceChapters)
+      ])
+      return sourceContext.request.sourceLocator === "input/task.md:3"
+        && chapterIds.length === 3
+        && new Set(chapterIds).size === 3
+        && sourceLocators.every((locator) => typeof locator === "string" && locator.startsWith("input/"))
+        && chapterIds.every((chapterId) => reportChapterIds.has(chapterId))
+        && report.preferredLaunchDate === null
+        && report.preferredDefinitions.length === 0
+    }
+    return { run }
+
+@complete validate $report $sourceContext
+@analysisComplete assertInvariant $complete "analysis must cover every labeled chapter and preserve the no-resolution request"

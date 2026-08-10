@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eval 7: Operational SOP generation — Dynamic Circuits</title>
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page">
+    <p class="breadcrumbs"><a href="../index.html">Evaluation catalog</a> / Eval 7</p>
+    <h1>Eval 7: Operational SOP generation</h1>
+    <p class="lead">A generator produces a handoff SOP and an independent verifier checks roles, deadlines, steps, evidence, prohibited actions, and completion fields.</p>
+    <h2>What this page lets you inspect</h2>
+    <p>The executor publishes the full SOP and twelve passing checks. Use the menu below to compare each human source with its generated executable representation and with the exact executor output. Each selected file has a role-specific explanation above it.</p>
+    <p>The menu deliberately separates source text from SOP. <strong>KB source texts</strong> are what the learning agent read; <strong>KB reviewed SOP circuits</strong> are executable artifacts promoted after tests. <strong>Task input texts</strong> contain only current material; <strong>Task generated SOP circuits</strong> show Codex's explicit interpretation. The final group distinguishes the executor-owned result from the agent's provenance journal.</p>
+    <p><code>expected.md</code> is outside both input trees. It is used only after execution to compare expectations with observed output; Eval 6 demonstrates how a correct verifier can force an expectation correction. Read <a href="../../evaluation.html">the evaluation method</a> and <a href="../../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a> for the common contract.</p>
+    <div class="eval-browser">
+      <aside class="eval-menu"><h2>Files by purpose</h2><div id="eval-menu"></div></aside>
+      <section class="eval-viewer">
+        <div class="eval-case-summary"><h2 id="file-title">File</h2><p id="file-explanation"></p><span id="file-role" class="status"></span></div>
+        <pre class="file-view"><code id="file-content">Loading…</code></pre>
+      </section>
+    </div>
+  </main>
+  <script>
+    window.evalPage = {
+      caseRoot: "eval7",
+      defaultFile: "task/results/runtime-result.md",
+      groups: [
+        { title: "Evaluation contract and provenance", files: [
+            { file: "README.md", role: "Evaluation walkthrough", explanation: "Explains the question, real coding-agent stages, scale, observed result, reproduction commands, and limitations." },
+            { file: "run-provenance.md", role: "Recorded process evidence", explanation: "Records both Codex commands, timestamps, prompt hashes, exit codes, and the executor receipt hash." },
+            { file: "expected.md", role: "Expectation and comparison", explanation: "Keeps the source-derived expectation separate from all inputs and compares it explicitly with the observed executor result." }
+          ] },
+        { title: "KB source texts", files: [
+            { file: "kb/input/operational-sop-generation-rules.md", role: "Reusable human source", explanation: "Human-readable reusable knowledge supplied to the learning agent; this is not executable SOP." }
+          ] },
+        { title: "KB reviewed SOP circuits", files: [
+            { file: "kb/circuits/generator.sop", role: "Reviewed KB circuit", explanation: "Executable SOP generated during learning and separately promoted for task reuse." },
+            { file: "kb/circuits/verifier.sop", role: "Reviewed KB circuit", explanation: "Executable SOP generated during learning and separately promoted for task reuse." },
+            { file: "kb/circuits/analysis.sop", role: "Reviewed KB circuit", explanation: "Executable SOP generated during learning and separately promoted for task reuse." }
+          ] },
+        { title: "Task input texts", files: [
+            { file: "task/input/brief.md", role: "Current human input", explanation: "Current evidence, brief, or request read by the task coding agent; it contains no generated SOP." }
+          ] },
+        { title: "Task generated SOP circuits", files: [
+            { file: "task/sop/task/source.sop", role: "Generated task adaptation", explanation: "Coding-agent executable encoding of current task content, kept separate from human input." },
+            { file: "task/sop/task/analysis.sop", role: "Generated task root", explanation: "The fixed no-input task.analysis root composes current task packages with reviewed kb.* circuits." }
+          ] },
+        { title: "Task observed executor result", files: [
+            { file: "task/results/runtime-result.md", role: "Authoritative runtime result", explanation: "Rendered directly by the CLI from task.analysis public outputs, assurance checks, and receipt evidence." },
+            { file: "task/results/agent-summary.md", role: "Coding-agent provenance only", explanation: "Records input coverage and authoring attempts. It is not a result and does not override runtime-result.md." }
+          ] }
+      ]
+    };
+  </script>
+  <script src="../eval-browser.js"></script>
+  <div data-include="partials/footer.html"></div>
+  <script src="../../partials-loader.js"></script>
+</body>
+</html>

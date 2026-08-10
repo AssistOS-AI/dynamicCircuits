@@ -1,0 +1,68 @@
+@output caseD caseE caseF request
+
+@loadInput define
+    function run() {
+      return {
+        cases: {
+          D: {
+            caseId: "D",
+            reviewDays: 29,
+            expedited: false,
+            subjectExplicitlyRequestedExpedited: false,
+            writtenConsentRecorded: false,
+            sourceLocator: "input/cases-and-request.md:8"
+          },
+          E: {
+            caseId: "E",
+            reviewDays: 9,
+            expedited: true,
+            subjectExplicitlyRequestedExpedited: true,
+            writtenConsentRecorded: true,
+            sourceLocator: "input/cases-and-request.md:9"
+          },
+          F: {
+            caseId: "F",
+            reviewDays: 30,
+            expedited: true,
+            subjectExplicitlyRequestedExpedited: true,
+            writtenConsentRecorded: false,
+            sourceLocator: "input/cases-and-request.md:10"
+          }
+        },
+        request: {
+          requestedOutputs: ["per_case_findings", "aggregate_counts", "complete_coverage"],
+          expectedCaseIds: ["D", "E", "F"],
+          expectedCount: 3,
+          requestSourceLocator: "input/cases-and-request.md:3-4",
+          completenessSourceLocator: "input/cases-and-request.md:12",
+          interpretation: {
+            expeditedRequestedSuppliesExpeditedFlag: true,
+            expeditedRequestedSuppliesExplicitRequestFlag: true,
+            consentIsIndependent: true,
+            sourceLocator: "input/cases-and-request.md:6-12"
+          }
+        }
+      }
+    }
+
+    function check(inputs, output) {
+      return Object.keys(output.cases).join(",") === "D,E,F"
+        && output.request.expectedCount === 3
+        && output.request.expectedCaseIds.join(",") === "D,E,F"
+        && output.cases.D.sourceLocator === "input/cases-and-request.md:8"
+        && output.cases.E.sourceLocator === "input/cases-and-request.md:9"
+        && output.cases.F.sourceLocator === "input/cases-and-request.md:10"
+        && output.cases.E.subjectExplicitlyRequestedExpedited
+        && output.cases.E.writtenConsentRecorded
+        && output.cases.F.subjectExplicitlyRequestedExpedited
+        && !output.cases.F.writtenConsentRecorded
+    }
+
+    return { run, check }
+
+@inputData loadInput
+@caseD get $inputData "/cases/D"
+@caseE get $inputData "/cases/E"
+@caseF get $inputData "/cases/F"
+@request get $inputData "/request"
+

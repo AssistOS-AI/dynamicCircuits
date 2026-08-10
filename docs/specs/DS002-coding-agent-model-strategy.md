@@ -18,7 +18,11 @@ may author files inside its prepared workspace; deterministic SOP execution rema
 
 ## Core Content
 
-The CLI must expose an `--agent` parameter. `codex` is the built-in default and must be invoked non-interactively in the work directory with workspace-write sandboxing, no interactive approvals, an ephemeral session, and the prompt supplied through standard input. `--model` may forward an explicit model choice without embedding a repository-wide model name.
+The CLI must expose an `--agent` parameter. `codex` is the built-in default and must be invoked non-interactively in the
+work directory with automatic approval review through the current Codex CLI `--approve-for-me` interface, which uses its
+workspace-write sandbox and cannot be combined with a separate `--sandbox` argument. The invocation uses an ephemeral
+session and supplies the prompt through standard input. The adapter must not retain removed Codex flags such as
+`--ask-for-approval`. `--model` may forward an explicit model choice without embedding a repository-wide model name.
 
 The adapter registry must own process-specific arguments. A `generic` adapter must accept an explicit executable through `--agent-command` and deliver the task prompt over standard input. New OpenCode, Claude Code, or other adapters may be added as separate registry implementations once their invocation contracts are verified; workspace and SOP modules must not contain product-specific branches.
 

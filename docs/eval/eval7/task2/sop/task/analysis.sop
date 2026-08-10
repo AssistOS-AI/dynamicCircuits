@@ -1,0 +1,29 @@
+@input
+@output markdown verification source
+@goal resultGrounded covers markdown verification source
+
+@checkGrounding define markdown verification source
+    async function run({ markdown, verification, source }) {
+      return typeof markdown === "string"
+        && markdown.length > 0
+        && verification !== null
+        && typeof verification === "object"
+        && verification.ok === true
+        && source === "input/brief.md"
+    }
+
+    async function check({ markdown, verification, source }, output) {
+      const expected = typeof markdown === "string"
+        && markdown.length > 0
+        && verification !== null
+        && typeof verification === "object"
+        && verification.ok === true
+        && source === "input/brief.md"
+      return output === expected
+    }
+
+    return { run, check }
+
+@brief @source task.brief
+@markdown @verification kb.analysis $brief
+@resultGrounded checkGrounding $markdown $verification $source

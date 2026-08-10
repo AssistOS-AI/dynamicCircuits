@@ -49,48 +49,86 @@ node src/cli.mjs help</code></pre>
     <p>Eval 1 contains a human-readable notice rule and three cases. Its committed SOP code is the reviewed executable
       interpretation. Compile the root package first:</p>
     <pre><code>node src/cli.mjs sop compile \
-  --root ./docs/eval/eval1/sop \
+  --kb-root ./docs/eval/eval1/kb/circuits \
+  --root ./docs/eval/eval1/task/sop \
   --prefix eval1 \
   --package eval1.analysis</code></pre>
     <p>Expected observation: stdout contains compiled package IR with package name <code>eval1.analysis</code>, two public
-      outputs, three nested calls to <code>eval1.policy</code>, dependencies, goals, and dead-node metadata.</p>
+      outputs, three nested calls to <code>kb.policy</code>, dependencies, goals, and dead-node metadata.</p>
     <p>Execute the same package:</p>
     <pre><code>node src/cli.mjs sop run \
-  --root ./docs/eval/eval1/sop \
+  --kb-root ./docs/eval/eval1/kb/circuits \
+  --root ./docs/eval/eval1/task/sop \
   --prefix eval1 \
   --package eval1.analysis</code></pre>
     <p>Expected observation: outcome <code>SUCCEEDED</code>; case A is non-compliant; case B is compliant through the expedited
       exception; case C is ordinarily compliant; statistics are total 3, compliant 2, violations 1. The receipt contains one
       root circuit, three child policy receipts, node input/output hashes, and a passing goal. Compare it with
-      <a href="eval/eval1/index.html?file=results/result.json">the checked result summary</a>.</p>
+      <a href="eval/eval1/index.html?file=task/results/result.json">the checked result summary</a>.</p>
 
     <h3>Change one case interactively</h3>
     <p>Run the reusable policy circuit directly to see how one fact changes the decision. These three calls use the same case
       identifier and 10 notice days. Only the evidence flags or notice value change:</p>
-    <pre><code>node src/cli.mjs sop run --root ./docs/eval/eval1/sop --prefix eval1 \
-  --package eval1.policy --inputs '["manual","10","false","false"]'
+    <pre><code>node src/cli.mjs sop run --kb-root ./docs/eval/eval1/kb/circuits \
+  --root ./docs/eval/eval1/task/sop --prefix eval1 \
+  --package kb.policy --inputs '["manual","10","false","false"]'
 
-node src/cli.mjs sop run --root ./docs/eval/eval1/sop --prefix eval1 \
-  --package eval1.policy --inputs '["manual","10","true","true"]'
+node src/cli.mjs sop run --kb-root ./docs/eval/eval1/kb/circuits \
+  --root ./docs/eval/eval1/task/sop --prefix eval1 \
+  --package kb.policy --inputs '["manual","10","true","true"]'
 
-node src/cli.mjs sop run --root ./docs/eval/eval1/sop --prefix eval1 \
-  --package eval1.policy --inputs '["manual","unknown","true","true"]'</code></pre>
+node src/cli.mjs sop run --kb-root ./docs/eval/eval1/kb/circuits \
+  --root ./docs/eval/eval1/task/sop --prefix eval1 \
+  --package kb.policy --inputs '["manual","unknown","true","true"]'</code></pre>
     <p>The first call succeeds with <code>compliant: false</code> because the ordinary minimum is 30. The second succeeds with
       <code>exceptionUsed: true</code> and <code>compliant: true</code> because both exception conditions are present. The third
       returns <code>REFUSED</code> and no public output because <code>unknown</code> is not a finite notice duration. The quoted
       array is only the CLI transport for ordered circuit ports; task and KB source documents remain readable text files.</p>
 
+    <h3>Run the Socrate context example</h3>
+    <p>Eval 4 shows adaptation from a short context after the coding agent has made its interpretation explicit as SOP:</p>
+    <pre><code>node src/cli.mjs sop run \
+  --kb-root ./docs/eval/eval4/kb/circuits \
+  --root ./docs/eval/eval4/task/sop \
+  --prefix eval4 \
+  --package eval4.analysis</code></pre>
+    <p>Expected observation: outcome <code>SUCCEEDED</code>; “Socrate is a man” has direct support; “Socrate is mortal” has
+      derived support through the rule “every man is mortal”; and “Socrate is a philosopher” remains <code>UNKNOWN</code>.
+      The second public output contains the two direct facts and the derived mortal fact. Open
+      <a href="eval/eval4/index.html">Eval 4</a> to compare the English source, generated knowledge circuit, reusable reasoner,
+      and result.</p>
+
+    <h3>Run the large 10 × 10 evaluation</h3>
+    <p>Eval 5 starts from two source files: one KB document with ten rule chapters and one task document with ten records.
+      Codex generated the focused KB circuits during learning, a reviewer promoted them, and a separate Codex run generated
+      the task request package, record package, and larger root below. Rerunning the root tests the actual generated
+      composition without calling Codex again or relying on planned automatic semantic matching:</p>
+    <pre><code>node src/cli.mjs sop run \
+  --kb-root ./docs/eval/eval5/kb/circuits \
+  --root ./docs/eval/eval5/task/sop \
+  --prefix eval5 \
+  --package eval5.analysis</code></pre>
+    <p>Expected observation: outcome <code>SUCCEEDED</code>; 10 records and 10 findings per record; 100 total decisions; 90
+      passes and 10 failures; one fully compliant record. The receipt is intentionally large because it retains ten review
+      executions and 100 nested rule executions. Use <a href="eval/eval5/index.html">the Eval 5 browser</a> to compare the two
+      large source documents, Codex-generated KB candidates, promotion record, task-local SOP layers, and Markdown report.
+      Eval 5 deliberately has no <code>result.json</code>.</p>
+
     <h2>2. Prepare a task</h2>
-    <p>Reuse the eval's Markdown documents as raw agent input, but do not copy its generated <code>sop/</code> or
-      <code>results/</code>. The new task therefore starts with source material only:</p>
-    <pre><code>mkdir -p ./work/manual-notice/input ./kb
-cp ./docs/eval/eval1/input/*.md ./work/manual-notice/input/
+    <p>Reproduce the two workspace roles instead of mixing every Markdown file into one input folder. Seed the KB with the
+      reusable policy source and its reviewed circuit. Copy only current cases and the requested output into the task; do not
+      copy the eval's task SOP or results:</p>
+    <pre><code>mkdir -p ./kb/input ./kb/circuits ./work/manual-notice/input
+cp ./docs/eval/eval1/kb/input/rule.md ./kb/input/notice-rule.md
+cp ./docs/eval/eval1/kb/circuits/policy.sop ./kb/circuits/policy.sop
+cp ./docs/eval/eval1/task/input/*.md ./work/manual-notice/input/
 node src/cli.mjs prepare \
   -kbdir ./kb \
   -workdir ./work/manual-notice</code></pre>
     <p>Expected observation: the CLI prints a workspace manifest with mode <code>analyze</code>. Inspect these paths:</p>
     <ul>
-      <li><code>work/manual-notice/.dynamic-circuits/input-manifest.json</code> lists all three Markdown inputs with hashes.</li>
+      <li><code>work/manual-notice/.dynamic-circuits/input-manifest.json</code> lists the two current task inputs with hashes.</li>
+      <li><code>kb/input/notice-rule.md</code> preserves the reusable source and <code>kb/circuits/policy.sop</code> is the reviewed package available to the task.</li>
       <li><code>work/manual-notice/sop/</code> and <code>results/</code> exist and are initially empty.</li>
       <li><code>work/manual-notice/circuitSkills</code> and <code>.agents/skills</code> resolve to the maintained project skills.</li>
       <li><code>work/manual-notice/AGENTS.md</code> explains input coverage, read-only KB access, and output locations.</li>
@@ -117,8 +155,8 @@ node src/cli.mjs prepare \
     <ol>
       <li>Open <code>results/agent-summary.md</code>. It should account for every input, list generated and reused circuits,
         report execution outcomes, and state limitations.</li>
-      <li>Inspect every file under <code>sop/</code>. Policy values and case facts should appear as executable circuit logic or
-        explicit inputs, not as claims that were never compiled.</li>
+      <li>Inspect every file under <code>sop/</code>. One package family should represent the current request and facts; a larger
+        root should consume those packages and invoke reviewed KB packages rather than copying reusable policy logic.</li>
       <li>Follow the compile and run commands recorded by the agent. Every conclusion supported by a circuit should have a
         successful or explicitly classified runtime result.</li>
       <li>Compare the generated classification with eval 1. Differences should be explained by a different interpretation,
@@ -126,13 +164,14 @@ node src/cli.mjs prepare \
       <li>Inspect <code>.dynamic-circuits/last-run.json</code> for adapter, mode, working directory, prompt digest, timestamps,
         exit status, and signal.</li>
     </ol>
-    <p>A useful run produces grounded reports plus executable SOP code that can be compiled again. A report with no input
+    <p>A useful run produces grounded reports plus executable SOP code that can be compiled again. The normal user-facing
+      result is Markdown or text; JSON is generated only when the task explicitly asks for it. A report with no input
       coverage, no circuit execution evidence, or hidden source assumptions is incomplete even when the prose sounds plausible.</p>
 
     <h2>5. Learn a KB rule</h2>
     <p>Learning uses no workdir. Copy only reusable source material into the KB input directory:</p>
     <pre><code>mkdir -p ./kb/input
-cp ./docs/eval/eval1/input/rule.md ./kb/input/notice-rule.md
+cp ./docs/eval/eval1/kb/input/rule.md ./kb/input/notice-rule.md
 node src/cli.mjs -kbdir ./kb -agent codex --dry-run
 node src/cli.mjs -kbdir ./kb -agent codex</code></pre>
     <p>Expected observation: mode <code>learn</code> and KB as the agent current directory. The agent reads
@@ -174,6 +213,12 @@ node src/cli.mjs -kbdir ./kb -agent codex</code></pre>
       <li>Update the input guidance when new document or artifact support becomes executable.</li>
       <li>Run <code>npm run check</code> and the static-site verifier after every tutorial change.</li>
     </ul>
+    <p>If the directory roles are still unclear, read <a href="getting-started.html">Start here</a> and the
+      <a href="cli.html">workspace contract</a>. For a new task that does not reuse the committed eval documents, use the
+      <a href="input-guide.html">input guide</a>. To understand a generated command, wire, refusal, or receipt, continue with
+      the <a href="sop-runtime.html">runtime guide</a>. Normative CLI and evaluation behavior is maintained in
+      <a href="specsLoader.html?spec=DS003-workspace-cli.md">DS003</a> and
+      <a href="specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a>.</p>
   </article></main>
   <div data-include="partials/footer.html"></div>
   <script src="partials-loader.js"></script>

@@ -38,6 +38,31 @@ the agent working directory but authorizes generated knowledge only under `candi
 read but not edit `circuits/`. The explicit `--learn` option is obsolete and rejected with migration guidance. Agent
 completion state is recorded in the active workspace's `.dynamic-circuits/last-run.json`.
 
+An analysis run uses three visible stages. First, the coding agent translates the task documents into task-local packages
+under `sop/task/` without copying reusable KB policy. Second, it authors the no-input root `task.analysis` at
+`sop/task/analysis.sop`; this root obtains current values from task packages, invokes reviewed `kb.*` packages, and exposes
+the complete analysis through public outputs. Third, after the coding-agent process exits successfully, the CLI compiles and
+executes that fixed root and writes `results/runtime-result.md` directly from the returned values and receipt. The CLI does
+not create a JSON result artifact.
+
+`runtime-result.md` is the authoritative result. A coding agent may write `results/agent-summary.md` only as a provenance
+journal covering input coverage, generated packages, compile/test attempts, assumptions, limitations, and reusable
+discoveries. That journal must not restate or interpret the semantic verdict. Before a live analysis, the CLI removes an old
+managed runtime report so an agent or runtime failure cannot leave stale output looking current. `.dynamic-circuits/last-run.json`
+records both the coding-agent completion state and the executor entrypoint, outcome, hashes, and report path.
+
+The analysis semantic-source boundary includes manifest-listed task input and reviewed KB circuits. Evaluation expectations,
+prior results, evaluation presentation pages, KB candidates, learning reports, and sibling workspaces are excluded. Project
+skills and compiler/runtime documentation may be read only to author mechanically valid SOP. Learning applies the analogous
+boundary to the active KB's `input/` and `circuits/`.
+
+Source placement follows intended lifetime. Reusable policies, interpretation rules, glossaries, and reference material
+belong under `KB/input/`; reviewed reusable SOP belongs under `KB/circuits/`. Current cases, observations, documents,
+questions, requested outputs, and task-local constraints belong under `WORK/input/`; their executable adaptation belongs
+under `WORK/sop/`, and outputs belong under `WORK/results/`. Mixed documents should be split when doing so preserves their
+meaning. A rule that is explicitly limited to one request may remain task-local. Repetition across tasks may justify a KB
+candidate, but never automatic promotion.
+
 Codex is the default adapter. A generic command adapter proves extensibility and the registry is the boundary for future
 OpenCode, Claude Code, and other coding agents. `--dry-run` prints an argument-vector invocation and generated prompt. It
 must not use a shell command string or direct model API.
@@ -61,6 +86,24 @@ Response: Separation prevents recursive input discovery, accidental report inges
 
 Response: The static site may be mounted below a prefix such as `/workspace-files/dynamicCircuits/docs/`. Relative
 `specsLoader.html?spec=...` links preserve that prefix; root-relative links incorrectly jump to the server root.
+
+### Question #4: Why classify files by lifetime instead of file type?
+
+Response: A Markdown policy and a Markdown case table have the same format but different authority and reuse. Lifetime-based
+placement keeps durable rules available to later tasks without allowing one task's observations or requests to become
+implicit global knowledge.
+
+### Question #5: Why generate SOP for both the KB and the task input?
+
+Response: The two SOP families have different authority. KB SOP packages encode reviewed reusable rules learned from durable
+sources. Task SOP packages encode only the current request and facts. The task root makes their connection explicit, so the
+runtime can verify the actual composition and the report can cite an observed result instead of relying on agent prose.
+
+### Question #6: Who owns the official analysis result?
+
+Response: The SOP executor owns it. Codex authors executable source and may record provenance, but only the CLI's deterministic
+rendering of the runtime public outputs and receipt is an official result. This prevents post-execution prose from silently
+changing, omitting, or embellishing circuit output.
 
 ## Conclusion
 

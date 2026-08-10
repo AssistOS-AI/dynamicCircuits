@@ -1,0 +1,34 @@
+@input
+@output brief
+
+@provideBrief define
+    function expectedBrief() {
+      return {
+        title: "The Quiet Ferry",
+        protagonist: "Ilie",
+        setting: "a river crossing at dawn",
+        object: "a sealed blue letter",
+        immediateGoal: "reach the opposite bank before sunrise",
+        obstacle: "the ferryman refuses payment",
+        choice: "Ilie offers the letter as collateral",
+        consequence: "the ferry departs while the letter remains unopened",
+        closingImage: "reeds drawing silver lines across the water",
+        motifs: ["bell rope", "cold coin", "white heron"],
+        source: {
+          path: "input/brief.md",
+          locator: "Compact vignette brief",
+        },
+      }
+    }
+
+    function run() {
+      return expectedBrief()
+    }
+
+    function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(expectedBrief())
+    }
+
+    return { run, check }
+
+@brief provideBrief

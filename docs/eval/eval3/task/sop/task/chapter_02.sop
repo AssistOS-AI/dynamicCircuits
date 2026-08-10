@@ -1,0 +1,20 @@
+@output chapter
+
+@build define
+    function run() {
+      return {
+        chapterId: "chapter-02",
+        sourceLocator: "input/chapter-02.md:3",
+        launchDate: {
+          assertionId: "chapter-02.launch-date",
+          value: "2026-07-01",
+          dateKey: "2026-07-01",
+          supersedes: [],
+          sourceLocator: "input/chapter-02.md:3"
+        },
+        definitions: []
+      }
+    }
+    return { run }
+
+@chapter build

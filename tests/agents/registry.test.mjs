@@ -7,6 +7,9 @@ test("builds a non-interactive Codex invocation without a direct API", () => {
   assert.equal(invocation.command, "codex");
   assert.deepEqual(invocation.args.slice(0, 2), ["exec", "--ephemeral"]);
   assert.ok(!invocation.args.includes("--add-dir"));
+  assert.ok(invocation.args.includes("--approve-for-me"));
+  assert.ok(!invocation.args.includes("--ask-for-approval"));
+  assert.ok(!invocation.args.includes("--sandbox"));
   assert.ok(invocation.args.includes("test-model"));
   assert.equal(invocation.args.at(-1), "-");
 });

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "data-release-governance-v1",
+  "candidateVersion": "1.0.0-candidate",
+  "status": "review-required",
+  "sopSubset": "implemented-v1",
+  "source": {
+    "path": "input/knowledge-base.md",
+    "bytes": 7098,
+    "sha256": "86019bae0a8c3f0b9f26a99a6bcf71682d41021b1b778c8bb42bb5dbfaea0fcf"
+  },
+  "packages": [
+    { "name": "data_release_governance.r01", "file": "sop/data_release_governance/r01.sop", "packageHash": "sha256:cb3342cbbe8590bdbf0cb5241ca62a86c0bc09dac6b6d7cf3ab3289c86c642ca" },
+    { "name": "data_release_governance.r02", "file": "sop/data_release_governance/r02.sop", "packageHash": "sha256:f33e7591880defb46a9c7c88f7034b4c4428fc505be2ec0ea35bf218016c8163" },
+    { "name": "data_release_governance.r03", "file": "sop/data_release_governance/r03.sop", "packageHash": "sha256:000c08719c93c3f5201ae5dc854cea0d1bc4f210d0773cf5fe598532531248ad" },
+    { "name": "data_release_governance.r04", "file": "sop/data_release_governance/r04.sop", "packageHash": "sha256:f8f2c68583b83e09dc9d0f6e607bc7d367ebc1ab8154d899c8e3d9a7406cb509" },
+    { "name": "data_release_governance.r05", "file": "sop/data_release_governance/r05.sop", "packageHash": "sha256:643d4e475ee3add1e6528ceb77ac1193c2a03c07a6014297d201d35dc899b9b0" },
+    { "name": "data_release_governance.r06", "file": "sop/data_release_governance/r06.sop", "packageHash": "sha256:0ee40ecaef9f25fea1d634f768e08e5efcd42be560f564b2f5ef94a9ca42ddaa" },
+    { "name": "data_release_governance.r07", "file": "sop/data_release_governance/r07.sop", "packageHash": "sha256:4cd91558e3789362b5a1900576d2dc37c545288566c28554b5a2db3c523851ab" },
+    { "name": "data_release_governance.r08", "file": "sop/data_release_governance/r08.sop", "packageHash": "sha256:6c0bca9af9695993d2f8d76ae2e299453815353197f64950a00878b258883f5b" },
+    { "name": "data_release_governance.r09", "file": "sop/data_release_governance/r09.sop", "packageHash": "sha256:aa81f0c947c53ee34e2eb26fbfc548b57276d094455074e676a7b24c415bc084" },
+    { "name": "data_release_governance.r10", "file": "sop/data_release_governance/r10.sop", "packageHash": "sha256:a6a72fe828f9f91c108fd826ecfb8c085f9d1f3c2c04dd1ba8bbb02ea2619643" },
+    { "name": "data_release_governance.review", "file": "sop/data_release_governance/review.sop", "packageHash": "sha256:c331c5dd94406fabfc26000df9d82d4dec9df79d8f5f8ca4af914c858fffa197" }
+  ],
+  "interfaces": {
+    "focusedRules": { "inputs": ["release"], "outputs": ["finding"] },
+    "review": { "inputs": ["release"], "outputs": ["report"] }
+  },
+  "artifacts": {
+    "contract": "README.md",
+    "inventory": "inventory.md",
+    "provenance": "provenance.json",
+    "testVectors": "tests/cases.json",
+    "testRunner": "tests/run-tests.mjs",
+    "executionReport": "tests/execution-report.md"
+  },
+  "trustedOverlap": {
+    "inspectedPath": "circuits/",
+    "trustedPackageCount": 0,
+    "overlap": "none"
+  },
+  "capabilities": [],
+  "effects": [],
+  "prohibitedCapabilities": ["filesystem", "process", "network", "clock", "random", "oracle", "direct-llm"],
+  "promotion": {
+    "automatic": false,
+    "requiredReviewers": [
+      "data-release policy owner",
+      "privacy or legal owner",
+      "security owner",
+      "records-management owner",
+      "SOP runtime maintainer"
+    ]
+  }
+}

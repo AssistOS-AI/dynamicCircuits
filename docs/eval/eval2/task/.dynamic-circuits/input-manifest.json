@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "claim.md",
+      "bytes": 108,
+      "sha256": "28d3765e72a05515f483806586cca35e99400371874ffcf38befb6e19a767b20"
+    },
+    {
+      "path": "dataset.md",
+      "bytes": 364,
+      "sha256": "82609ae98f87ef430e7b9185fb6a273e7a8fa22f3aaa39b4d0e68121f0983623"
+    },
+    {
+      "path": "task.md",
+      "bytes": 211,
+      "sha256": "54014de48b3b6a806287630cfaf11856d21eca10621c88a77a17f959ef95c479"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+@input
+@output brief
+
+@brief suppliedBrief
+
+@suppliedBrief define
+    const BRIEF = {
+      sender: "Cedar Library Cooperative",
+      recipient: "Bright Scan Services Ltd",
+      agreementTitle: "Collection Digitization Agreement",
+      agreementDate: "5 January 2026",
+      noticeDate: "12 August 2026",
+      contractClause: "Section 9, Handling of Originals",
+      eventStatement: "The handling report states that one bound volume was returned with a detached cover; the report lists a €0 replacement estimate and uses the phrase statutory penalty only as a disputed vendor annotation.",
+      cureAction: "provide the conservation assessment and proposed handling correction",
+      cureDeadlineDate: "22 August 2026",
+      permittedDeliveryMethod: "courier delivery to the contractual notice office",
+      reservationText: "Cedar Library Cooperative reserves all rights stated in the Agreement.",
+      governingLawStatement: "The Agreement states that Irish law governs.",
+      factualExhibits: [
+        "Exhibit A — handling report",
+        "Exhibit B — condition photographs"
+      ]
+    }
+
+    async function run() {
+      return BRIEF
+    }
+
+    async function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(BRIEF)
+    }
+
+    return { run, check }

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "incident-handoff-sop-v1",
+  "status": "review-required",
+  "semanticVersion": "0.1.0",
+  "sopLanguageSubset": "implemented-v1",
+  "packages": [
+    {
+      "name": "candidate.generator",
+      "path": "sop/generator.sop",
+      "inputs": ["brief"],
+      "outputs": ["markdown"]
+    },
+    {
+      "name": "candidate.verifier",
+      "path": "sop/verifier.sop",
+      "inputs": ["brief", "markdown"],
+      "outputs": ["report"]
+    },
+    {
+      "name": "candidate.analysis",
+      "path": "sop/analysis.sop",
+      "inputs": ["brief"],
+      "outputs": ["markdown", "verification"]
+    }
+  ],
+  "semanticSources": [
+    {
+      "path": "input/operational-sop-generation-rules.md",
+      "sha256": "65126021101525255727dd0912ecbe40d498099d200b3cd9a617a9a6951143f4",
+      "bytes": 2190,
+      "relevantLines": ["5-13", "17-33", "37-41"]
+    }
+  ],
+  "trustedCircuitOverlap": [],
+  "capabilities": ["deterministic-document-generation", "independent-structural-verification", "composed-verification-goal"],
+  "effects": [],
+  "promotionRequires": [
+    "domain review of brief validation policy",
+    "security review of verbatim Markdown insertion",
+    "package-prefix rewrite from candidate.* to the promoted root prefix",
+    "successful recompilation and regression execution after promotion"
+  ]
+}

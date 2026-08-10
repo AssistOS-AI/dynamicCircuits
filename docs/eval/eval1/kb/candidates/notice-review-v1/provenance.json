@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "path": "input/rule.md",
+    "bytes": 345,
+    "sha256": "45044b3cb7a68d06b1dd366586e4436dfb61648537f47208b2683d5b2dd5e142",
+    "mediaType": "text/markdown; charset=utf-8"
+  },
+  "coverage": [
+    {
+      "artifact": "candidate identity",
+      "lines": "1",
+      "heading": "Notice review rule",
+      "evidence": "The source identifies one notice-review rule."
+    },
+    {
+      "artifact": "notice_review.evaluate base threshold",
+      "lines": "3",
+      "span": "sentence 1",
+      "evidence": "The ordinary review minimum is 30 calendar days."
+    },
+    {
+      "artifact": "notice_review.evaluate expedited exception",
+      "lines": "3",
+      "span": "sentence 2",
+      "evidence": "The 10-day path is conditioned on expedited treatment, explicit request, and recorded written consent."
+    },
+    {
+      "artifact": "notice_review.evaluate semantic verdict",
+      "lines": "3",
+      "span": "sentence 3",
+      "evidence": "A notice below the selected threshold is non-compliant."
+    },
+    {
+      "artifact": "notice_review.evaluate evidence handling",
+      "lines": "3",
+      "span": "sentence 4",
+      "evidence": "Missing consent is retained as missing and is not inferred from the expedited flag."
+    }
+  ],
+  "transformations": [
+    "The source paragraph was separated into a base threshold, a conditioned exception, a comparison rule, and an evidence prohibition.",
+    "The candidate returns the selected path and evidence state so reviewers can distinguish default and exception reasoning.",
+    "No source claim was generalized into automatic applicability, jurisdiction, or external evidence verification."
+  ],
+  "reviewRequired": true
+}

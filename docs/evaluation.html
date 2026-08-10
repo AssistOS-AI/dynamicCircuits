@@ -15,7 +15,7 @@
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="index.html">Documentation</a> / Evaluation</p>
     <h1>Tests and evaluation cases</h1>
-    <p class="lead">Unit tests cover the parser, compiler, runtime, CLI, workspace preparation, agent adapters, documentation links, and historical integrity. Three evaluation workspaces execute legal, scientific, and cross-document analysis circuits against committed inputs.</p>
+    <p class="lead">Unit tests cover the parser, compiler, runtime, CLI, workspace preparation, agent adapters, documentation links, and historical integrity. Five evaluation workspaces execute policy, scientific, cross-document, contextual-reasoning, and large 10 × 10 composition cases against committed inputs.</p>
 
     <h2>Purpose and relationship to the system</h2>
     <p>The project has two verification levels. Unit tests isolate one contract, such as free-wire detection or workspace
@@ -48,22 +48,29 @@
       to add matrix regeneration and documentation verification.</p>
 
     <h2>Evaluation cases</h2>
-    <p>Each case contains four artifact groups: <code>input/</code> stores the source documents and evaluation task;
-      <code>sop/</code> stores the executable circuits; <code>results/</code> stores the checked machine summary and human
-      report; and <code>README.md</code> states the evaluation question, reproduction command, observed result, complexity,
-      and limitations.</p>
+    <p>Each case reproduces two workspaces. <code>kb/input/</code> stores reusable rules or reference knowledge and
+      <code>kb/circuits/</code> stores their reviewed executable packages. <code>task/input/</code> stores the current dataset and
+      request, <code>task/sop/</code> stores the task-specific interpretation and wiring, and <code>task/results/</code> stores the
+      checked machine summary and human report. <code>README.md</code> states the evaluation question, reproduction command,
+      observed result, complexity, and limitations. See the <a href="workspace-conventions.html">KB/task convention</a> for
+      the classification rule and package namespaces.</p>
     <table>
       <thead><tr><th>Case</th><th>What is evaluated</th><th>Observed result</th></tr></thead>
       <tbody>
         <tr><td><a href="eval/eval1/index.html">Eval 1</a></td><td>Ordinary notice period plus written-consent exception, across three cases.</td><td>One violation, two compliant cases, including one evidenced exception.</td></tr>
         <tr><td><a href="eval/eval2/index.html">Eval 2</a></td><td>Universal positive-value claim versus exhaustive counterexample search and mean.</td><td>Claim refuted by <code>-2</code> despite positive mean <code>5.25</code>.</td></tr>
         <tr><td><a href="eval/eval3/index.html">Eval 3</a></td><td>Three-document timeline and terminology reconciliation with source attribution.</td><td>Both conflict classes retained; neither alternative chosen silently.</td></tr>
+        <tr><td><a href="eval/eval4/index.html">Eval 4</a></td><td>English context converted into direct facts, a unary rule, and three symbolic questions.</td><td>Direct and derived propositions supported; absent proposition remains unknown.</td></tr>
+        <tr><td><a href="eval/eval5/index.html">Eval 5</a></td><td>One large KB document and one large task document transformed by two real Codex runs.</td><td>Generated KB and task SOP compose into an executed 100-decision root: 90 pass and 10 fail.</td></tr>
       </tbody>
     </table>
-    <p>The three rows exercise different failure risks. Eval 1 checks that an exception does not replace the base rule for
+    <p>The five rows exercise different failure risks. Eval 1 checks that an exception does not replace the base rule for
       unrelated cases. Eval 2 checks that an aggregate statistic does not answer a universal claim. Eval 3 checks that
-      repeated interpretation and synthesis preserve incompatible source claims. Open the <a href="eval/index.html">evaluation
-      file browser</a> to select any rule, input, circuit, report, or JSON result in a single two-pane view.</p>
+      repeated interpretation and synthesis preserve incompatible source claims. Eval 4 checks direct evidence, rule-derived
+      evidence, and open-world unknown behavior after coding-agent interpretation. Eval 5 checks real source-to-SOP learning,
+      reviewed promotion, real task-to-SOP interpretation, 10 repeated review instances, 100 nested rule instances, and exact
+      aggregate coverage. Open the <a href="eval/index.html">evaluation catalog</a>, choose one evaluation, then select any
+      source, circuit, review record, or report in that case's two-pane view.</p>
     <p>Runtime <code>SUCCEEDED</code> means the circuit completed and its local goals passed. The domain result can still be a
       violation, a refuted claim, or an unresolved conflict; each case therefore states runtime outcome, semantic result, and
       scope limit separately.</p>

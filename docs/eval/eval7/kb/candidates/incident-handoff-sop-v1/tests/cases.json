@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "baseBrief": {
+    "documentTitle": "Payments API SEV-1 Handoff",
+    "service": "Payments API",
+    "severity": "SEV-1",
+    "incidentCommanderRole": "Incident Commander",
+    "outgoingRole": "Primary On-call",
+    "incomingRole": "Relief On-call",
+    "acknowledgementMinutes": 5,
+    "escalationMinutes": 15,
+    "evidenceLocations": ["https://status.example/inc-42", "s3://incident-evidence/inc-42"],
+    "communicationChannel": "#inc-payments",
+    "prohibitedAction": "restart the ledger database",
+    "approvalRole": "Database Duty Manager"
+  },
+  "cases": [
+    { "id": "positive_generator", "category": "positive", "package": "candidate.generator", "expectedOutcome": "SUCCEEDED" },
+    { "id": "positive_verifier", "category": "positive", "package": "candidate.verifier", "expectedOutcome": "SUCCEEDED", "expectedOk": true },
+    { "id": "positive_composition", "category": "positive", "package": "candidate.analysis", "expectedOutcome": "SUCCEEDED", "expectedOk": true },
+    { "id": "negative_missing_checklist", "category": "negative", "package": "candidate.verifier", "mutation": "remove incoming sign-off", "expectedOutcome": "SUCCEEDED", "expectedOk": false },
+    { "id": "negative_extra_heading", "category": "negative", "package": "candidate.verifier", "mutation": "append extra heading", "expectedOutcome": "SUCCEEDED", "expectedOk": false },
+    { "id": "boundary_fractional_deadlines", "category": "boundary", "package": "candidate.analysis", "overrides": { "acknowledgementMinutes": 0.5, "escalationMinutes": 0.75 }, "expectedOutcome": "SUCCEEDED" },
+    { "id": "exception_named_approval_only", "category": "exception", "package": "candidate.generator", "expectedOutcome": "SUCCEEDED", "requiredText": "Only Database Duty Manager may approve an override" },
+    { "id": "malformed_non_object", "category": "malformed", "package": "candidate.generator", "input": "not-an-object", "expectedOutcome": "REFUSED" },
+    { "id": "malformed_evidence_member", "category": "malformed", "package": "candidate.generator", "overrides": { "evidenceLocations": [42] }, "expectedOutcome": "REFUSED" },
+    { "id": "refusal_zero_ack", "category": "refusal", "package": "candidate.generator", "overrides": { "acknowledgementMinutes": 0 }, "expectedOutcome": "REFUSED" },
+    { "id": "refusal_equal_deadlines", "category": "refusal", "package": "candidate.generator", "overrides": { "escalationMinutes": 5 }, "expectedOutcome": "REFUSED" },
+    { "id": "refusal_multiline_value", "category": "refusal", "package": "candidate.generator", "overrides": { "documentTitle": "Unsafe\n## Injected" }, "expectedOutcome": "REFUSED" },
+    { "id": "refusal_non_string_markdown", "category": "refusal", "package": "candidate.verifier", "markdown": 17, "expectedOutcome": "REFUSED" }
+  ]
+}

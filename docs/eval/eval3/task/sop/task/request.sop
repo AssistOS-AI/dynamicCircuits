@@ -1,0 +1,16 @@
+@output request
+
+@build define
+    function run() {
+      return {
+        requestId: "release-plan-cross-chapter-review",
+        sourceLocator: "input/task.md:3",
+        interpretationScope: "each_chapter_independently",
+        comparisons: ["launch_dates", "definitions"],
+        conflictReporting: "every_conflict_with_source_labels",
+        resolutionRule: "explicit_supersession_required"
+      }
+    }
+    return { run }
+
+@request build

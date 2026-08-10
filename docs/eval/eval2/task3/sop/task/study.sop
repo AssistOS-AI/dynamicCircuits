@@ -1,0 +1,72 @@
+@input
+@output request observations
+
+# Encodes the request and complete source-located dataset from input/study.md.
+@loadStudy define
+    async function run() {
+      return {
+        request: {
+          claim: "all_observations_are_strictly_positive",
+          requestedResults: ["claim_verdict", "mean", "first_refuting_observation"],
+          witnessOrder: "source_order",
+          datasetScope: "complete_four_observation_dataset",
+          source: {
+            path: "input/study.md",
+            locator: "lines 3-10",
+          },
+        },
+        observations: [
+          {
+            id: "Z1",
+            value: 0,
+            source: {
+              path: "input/study.md",
+              locator: "table Value row, Z1 column",
+            },
+          },
+          {
+            id: "Z2",
+            value: 5,
+            source: {
+              path: "input/study.md",
+              locator: "table Value row, Z2 column",
+            },
+          },
+          {
+            id: "Z3",
+            value: -1,
+            source: {
+              path: "input/study.md",
+              locator: "table Value row, Z3 column",
+            },
+          },
+          {
+            id: "Z4",
+            value: 10,
+            source: {
+              path: "input/study.md",
+              locator: "table Value row, Z4 column",
+            },
+          },
+        ],
+      }
+    }
+
+    async function check(inputs, output) {
+      return output.request.claim === "all_observations_are_strictly_positive"
+        && output.request.witnessOrder === "source_order"
+        && output.request.datasetScope === "complete_four_observation_dataset"
+        && output.observations.length === 4
+        && output.observations.every((observation) => (
+          observation.source.path === "input/study.md"
+          && typeof observation.source.locator === "string"
+          && observation.source.locator.length > 0
+        ))
+    }
+
+    return { run, check }
+
+@study loadStudy
+@request get $study "request"
+@observations get $study "observations"
+

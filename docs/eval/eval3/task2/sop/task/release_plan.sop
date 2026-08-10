@@ -1,0 +1,119 @@
+@output plan evidence
+
+@build define
+    function run() {
+      return {
+        plan: {
+          planId: "consistent-release-plan",
+          chapters: [
+            {
+              chapterId: "chapter-a",
+              launchDate: {
+                assertionId: "chapter-a-production-launch-date",
+                value: "2026-09-01",
+                dateKey: "2026-09-01",
+                supersedes: [],
+                support: "DIRECT",
+                sourceLocator: "input/plan.md:8"
+              },
+              definitions: [
+                {
+                  term: "Node",
+                  termKey: "node",
+                  text: "an executable semantic circuit package with explicit ports",
+                  meaningKey: "executable-semantic-circuit-package-with-explicit-ports",
+                  support: "DIRECT",
+                  sourceLocator: "input/plan.md:8"
+                }
+              ],
+              completeness: "COMPLETE",
+              sourceLocators: ["input/plan.md:6", "input/plan.md:8", "input/plan.md:14"]
+            },
+            {
+              chapterId: "chapter-b",
+              launchDate: {
+                assertionId: "chapter-b-production-launch-date",
+                value: "2026-09-01",
+                dateKey: "2026-09-01",
+                supersedes: [],
+                support: "DIRECT",
+                sourceLocator: "input/plan.md:12"
+              },
+              definitions: [
+                {
+                  term: "Node",
+                  termKey: "node",
+                  text: "an executable semantic circuit package with explicit ports",
+                  meaningKey: "executable-semantic-circuit-package-with-explicit-ports",
+                  support: "DIRECT",
+                  sourceLocator: "input/plan.md:12"
+                }
+              ],
+              completeness: "COMPLETE",
+              sourceLocators: ["input/plan.md:10", "input/plan.md:12", "input/plan.md:14"]
+            }
+          ]
+        },
+        evidence: {
+          taskRequest: {
+            interpretChaptersIndependently: true,
+            compareDates: true,
+            compareDefinitions: true,
+            reportConflicts: true,
+            reportUncertainty: true,
+            preferredValueAuthorized: false,
+            sourceLocator: "input/plan.md:3-4"
+          },
+          scopeFacts: {
+            chaptersComplete: true,
+            supersessionRelationship: "NONE",
+            sourceLocator: "input/plan.md:14"
+          },
+          factSources: [
+            {
+              factId: "chapter-a-production-launch-date",
+              support: "DIRECT",
+              sourceLocator: "input/plan.md:8"
+            },
+            {
+              factId: "chapter-a-node-definition",
+              support: "DIRECT",
+              sourceLocator: "input/plan.md:8"
+            },
+            {
+              factId: "chapter-b-production-launch-date",
+              support: "DIRECT",
+              sourceLocator: "input/plan.md:12"
+            },
+            {
+              factId: "chapter-b-node-definition",
+              support: "DIRECT",
+              sourceLocator: "input/plan.md:12"
+            },
+            {
+              factId: "chapter-completeness-and-non-supersession",
+              support: "DIRECT",
+              sourceLocator: "input/plan.md:14"
+            }
+          ],
+          sourceDocument: "input/plan.md",
+          sourceManifestEntry: {
+            bytes: 518,
+            sha256: "6903e7339be4217975ca8d96b6d0fe6f2d525c89764bacc09e93bd07535def31"
+          },
+          normalizationMethod: "coding-agent-authored task facts from manifest-listed natural-language evidence"
+        }
+      }
+    }
+    function check(inputs, output) {
+      return output.plan.planId === "consistent-release-plan"
+        && output.plan.chapters.length === 2
+        && output.plan.chapters.every((chapter) => chapter.completeness === "COMPLETE")
+        && output.plan.chapters.every((chapter) => chapter.launchDate.supersedes.length === 0)
+        && output.evidence.taskRequest.preferredValueAuthorized === false
+    }
+    return { run, check }
+
+@payload build
+@plan get $payload "/plan"
+@evidence get $payload "/evidence"

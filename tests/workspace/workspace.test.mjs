@@ -19,7 +19,12 @@ test("prepares isolated KB/work directories and inventories every regular input 
   assert.deepEqual(workspace.inputManifest.files.map(({ path: file }) => file), ["a.txt", "nested/b.txt"]);
   assert.equal((await lstat(path.join(workDir, "circuitSkills"))).isSymbolicLink(), true);
   assert.equal((await lstat(path.join(workDir, ".agents", "skills"))).isSymbolicLink(), true);
-  assert.match(await readFile(path.join(workDir, "AGENTS.md"), "utf8"), /Treat the knowledge base as read-only/);
+  const guidance = await readFile(path.join(workDir, "AGENTS.md"), "utf8");
+  assert.match(guidance, /Treat the knowledge base as read-only/);
+  assert.match(guidance, /Translate the human-readable task sources/);
+  assert.match(guidance, /larger root package `task\.analysis`/);
+  assert.match(guidance, /Do not create `result\.json`/);
+  assert.match(guidance, /executor-owned `runtime-result\.md` is the only authoritative run result/);
 });
 
 test("does not overwrite a user-owned AGENTS.md", async (context) => {

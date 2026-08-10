@@ -1,0 +1,63 @@
+@input
+@output brief
+
+# Direct transcription of the current task facts and request from input/brief.md.
+# Reusable generation and verification policy remains in the reviewed kb.* packages.
+@encodeBrief define
+    function buildBrief() {
+      return {
+        documentTitle: "Identity Gateway SEV-1 Handoff",
+        service: "Identity Gateway",
+        severity: "SEV-1",
+        incidentCommanderRole: "Security Incident Commander",
+        outgoingRole: "Authentication Primary",
+        incomingRole: "Authentication Relief",
+        acknowledgementMinutes: 1,
+        escalationMinutes: 2,
+        evidenceLocations: [
+          "authentication error graph",
+          "token validation trace",
+          "customer-impact log",
+          "change audit",
+        ],
+        communicationChannel: "#inc-identity",
+        prohibitedAction: "rotate signing keys during handoff",
+        approvalRole: "Security Incident Commander",
+        request: {
+          operation: "generate_and_independently_verify_sop",
+          performOperationalActions: false,
+        },
+        source: {
+          path: "input/brief.md",
+          sha256: "cc07e36bed00d2c125e0a33a5630f0f31df890679b0a45691bee8a682fc21867",
+          support: "direct",
+          locators: {
+            documentTitle: "line 3",
+            service: "line 5",
+            severity: "line 7",
+            incidentCommanderRole: "line 9",
+            outgoingRole: "line 11",
+            incomingRole: "line 13",
+            acknowledgementMinutes: "line 15",
+            escalationMinutes: "line 17",
+            evidenceLocations: "line 19",
+            communicationChannel: "line 21",
+            prohibitedAction: "line 23",
+            approvalRole: "line 25",
+            request: "line 27",
+          },
+        },
+      }
+    }
+
+    async function run() {
+      return buildBrief()
+    }
+
+    async function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(buildBrief())
+    }
+
+    return { run, check }
+
+@brief encodeBrief

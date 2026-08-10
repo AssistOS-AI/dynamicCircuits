@@ -1,32 +1,20 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dynamic Circuits Documentation</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eval 1: Notice exception — Dynamic Circuits</title>
   <link rel="stylesheet" href="../../styles.css">
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
-  </script>
 </head>
 <body>
-  <header class="site-header"><a class="brand" href="../../index.html">Dynamic Circuits Documentation</a>
-    <nav><a href="../index.html">All evaluations</a><a href="../../evaluation.html">Testing guide</a><a href="../../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a></nav>
-  </header>
+  <div data-include="partials/header.html"></div>
   <main class="page">
     <p class="breadcrumbs"><a href="../index.html">Evaluation catalog</a> / Eval 1</p>
-    <h1>Eval 1: notice-period exception</h1>
-    <p class="lead">This case checks whether a coding-agent interpretation preserves an ordinary 30-day rule, applies a 10-day exception only when both expedited treatment and written consent are present, and classifies every supplied case.</p>
-    <h2>How the evaluation works</h2>
-    <p>The source side consists entirely of prose and a Markdown table. <code>rule.md</code> states the policy,
-      <code>cases.md</code> states the facts, and <code>task.md</code> states the requested outputs. The generated
-      <code>policy.sop</code> turns the reusable rule into executable code with explicit case inputs. The task-specific
-      <code>analysis.sop</code> encodes the three interpreted cases as calls to that rule, aggregates findings, and verifies
-      complete classification.</p>
-    <p>The runtime executes <code>eval1.analysis</code> with no JSON input. Its public findings and statistics are compared with
-      <code>results/result.json</code>. The successful runtime outcome confirms that the executable interpretation produced
-      the committed result; the scope limit remains the authority and completeness of the supplied policy text.</p>
+    <h1>Eval 1: Notice exception</h1>
+    <p class="lead">A reusable notice-period rule is learned from policy prose, then applied to three current cases. The executor—not Codex—publishes the classifications and coverage evidence.</p>
+    <h2>What this page lets you inspect</h2>
+    <p>The run classifies A as non-compliant, B as compliant through the exception, and C as ordinarily compliant. Use the menu below to compare each human source with its generated executable representation and with the exact executor output. Each selected file has a role-specific explanation above it.</p>
+    <p>The menu deliberately separates source text from SOP. <strong>KB source texts</strong> are what the learning agent read; <strong>KB reviewed SOP circuits</strong> are executable artifacts promoted after tests. <strong>Task input texts</strong> contain only current material; <strong>Task generated SOP circuits</strong> show Codex's explicit interpretation. The final group distinguishes the executor-owned result from the agent's provenance journal.</p>
+    <p><code>expected.md</code> is outside both input trees. It is used only after execution to compare expectations with observed output; Eval 6 demonstrates how a correct verifier can force an expectation correction. Read <a href="../../evaluation.html">the evaluation method</a> and <a href="../../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a> for the common contract.</p>
     <div class="eval-browser">
       <aside class="eval-menu"><h2>Files by purpose</h2><div id="eval-menu"></div></aside>
       <section class="eval-viewer">
@@ -37,26 +25,38 @@
   </main>
   <script>
     window.evalPage = {
-      caseRoot: "eval1", defaultFile: "README.md", groups: [
-        { title: "Evaluation contract", files: [
-          { file: "README.md", role: "Scope and reproduction", explanation: "Defines the evaluation question, identifies each artifact, states the observed result and limitation, and provides the command used to reproduce the circuit run." }
-        ]},
-        { title: "Source documents", files: [
-          { file: "input/rule.md", role: "Policy source", explanation: "Human-readable policy supplied to the coding agent. It defines the ordinary minimum, the expedited exception, and the evidence required to use that exception." },
-          { file: "input/cases.md", role: "Case facts", explanation: "Human-readable table of the three cases. The coding agent converts each row into an explicit call in the task-specific root circuit." },
-          { file: "input/task.md", role: "Requested analysis", explanation: "Defines which fields and aggregate counts the final analysis must produce and requires coverage of every case." }
-        ]},
-        { title: "Generated SOP code", files: [
-          { file: "sop/policy.sop", role: "Reusable rule circuit", explanation: "Executable interpretation of the prose policy. It accepts one case through explicit scalar inputs, selects the applicable minimum, and returns one structured finding." },
-          { file: "sop/analysis.sop", role: "Task root circuit", explanation: "Executable interpretation of the case table and task. It calls the reusable rule three times, aggregates results, calculates statistics, and checks complete coverage." }
-        ]},
-        { title: "Observed results", files: [
-          { file: "results/result.json", role: "Checked machine summary", explanation: "Machine-readable public result used by the automated test. JSON appears here as an output format, not as coding-agent input." },
-          { file: "results/report.md", role: "Human report", explanation: "Explains each case classification and states the policy-scope limitation in reader-facing form." }
-        ]}
+      caseRoot: "eval1",
+      defaultFile: "task/results/runtime-result.md",
+      groups: [
+        { title: "Evaluation contract and provenance", files: [
+            { file: "README.md", role: "Evaluation walkthrough", explanation: "Explains the question, real coding-agent stages, scale, observed result, reproduction commands, and limitations." },
+            { file: "run-provenance.md", role: "Recorded process evidence", explanation: "Records both Codex commands, timestamps, prompt hashes, exit codes, and the executor receipt hash." },
+            { file: "expected.md", role: "Expectation and comparison", explanation: "Keeps the source-derived expectation separate from all inputs and compares it explicitly with the observed executor result." }
+          ] },
+        { title: "KB source texts", files: [
+            { file: "kb/input/rule.md", role: "Reusable human source", explanation: "Human-readable reusable knowledge supplied to the learning agent; this is not executable SOP." }
+          ] },
+        { title: "KB reviewed SOP circuits", files: [
+            { file: "kb/circuits/notice_review/evaluate.sop", role: "Reviewed KB circuit", explanation: "Executable SOP generated during learning and separately promoted for task reuse." }
+          ] },
+        { title: "Task input texts", files: [
+            { file: "task/input/cases.md", role: "Current human input", explanation: "Current evidence, brief, or request read by the task coding agent; it contains no generated SOP." },
+            { file: "task/input/task.md", role: "Current human input", explanation: "Current evidence, brief, or request read by the task coding agent; it contains no generated SOP." }
+          ] },
+        { title: "Task generated SOP circuits", files: [
+            { file: "task/sop/task/cases.sop", role: "Generated task adaptation", explanation: "Coding-agent executable encoding of current task content, kept separate from human input." },
+            { file: "task/sop/task/request.sop", role: "Generated task adaptation", explanation: "Coding-agent executable encoding of current task content, kept separate from human input." },
+            { file: "task/sop/task/analysis.sop", role: "Generated task root", explanation: "The fixed no-input task.analysis root composes current task packages with reviewed kb.* circuits." }
+          ] },
+        { title: "Task observed executor result", files: [
+            { file: "task/results/runtime-result.md", role: "Authoritative runtime result", explanation: "Rendered directly by the CLI from task.analysis public outputs, assurance checks, and receipt evidence." },
+            { file: "task/results/agent-summary.md", role: "Coding-agent provenance only", explanation: "Records input coverage and authoring attempts. It is not a result and does not override runtime-result.md." }
+          ] }
       ]
     };
   </script>
   <script src="../eval-browser.js"></script>
+  <div data-include="partials/footer.html"></div>
+  <script src="../../partials-loader.js"></script>
 </body>
 </html>

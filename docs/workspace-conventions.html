@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KB and task directory convention</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs"><a href="index.html">Documentation</a> / KB and task convention</p>
+    <h1>Keep reusable knowledge separate from the current task</h1>
+    <p class="lead">Every analysis uses two explicit workspaces. The knowledge base stores rules, reference material, and reviewed circuits that may be reused. The task workspace stores only the current request, its case data, the SOP written for that request, and its results. Evaluation fixtures use the same names: <code>kb/</code> and <code>task/</code>.</p>
+
+    <h2>The decision to make before adding a file</h2>
+    <p>Classify a file by its intended lifetime, not by its extension. Put a document in the KB when it defines knowledge that
+      should remain applicable after the current analysis finishes: a policy, terminology guide, interpretation rule, or
+      reference corpus. Put a document in the task when it identifies the current cases, observations, chapters, questions,
+      requested output, or acceptance criteria. A Markdown policy and a Markdown case list are both readable text, but they
+      belong to different workspaces because one is reusable and the other describes this run.</p>
+    <table>
+      <thead><tr><th>If the file contains…</th><th>Place it in…</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>A reusable rule, policy, glossary, or reference document</td><td><code>kb/input/</code></td><td>It is source knowledge that a learning run may interpret and package for later tasks.</td></tr>
+        <tr><td>A reviewed reusable SOP package</td><td><code>kb/circuits/</code></td><td>Analysis may load it as trusted executable knowledge without rewriting it.</td></tr>
+        <tr><td>The current cases, dataset, chapters, questions, or requested deliverable</td><td><code>task/input/</code></td><td>It defines this analysis and should not silently become permanent knowledge.</td></tr>
+        <tr><td>SOP that adapts KB knowledge to the current input</td><td><code>task/sop/</code></td><td>It is an executable interpretation owned by this task.</td></tr>
+        <tr><td>Reports, findings, receipts, or checked summaries</td><td><code>task/results/</code></td><td>They are outputs and must never be rediscovered as new source input.</td></tr>
+      </tbody>
+    </table>
+    <p>The table is also a review rule. If a case table appears in <code>kb/input/</code>, reviewers should ask whether those
+      observations are genuinely reusable reference data. If a general policy appears in <code>task/input/</code>, reviewers
+      should ask whether later tasks need the same rule and whether it should instead enter the KB learning and promotion
+      process described in the <a href="cli.html">CLI workspace guide</a>.</p>
+
+    <figure class="diagram">
+      <figcaption><strong>Two workspaces, one analysis</strong><span>The coding agent reads both sides, but writes task artifacts only on the task side during analysis.</span></figcaption>
+      <pre class="mermaid">
+flowchart LR
+  subgraph knowledgeSpace[Knowledge base]
+    KI[Reusable source knowledge] --> KC[Reviewed kb.* circuits]
+  end
+  subgraph taskSpace[Current task]
+    TI[Cases and request] --> TS[Task-specific SOP]
+    TS --> TR[Reports and results]
+  end
+  KC --> TS
+  classDef knowledge fill:#e8f2ff,stroke:#2864a6,color:#17324d;
+  classDef task fill:#fff4dc,stroke:#a76518,color:#4b3214;
+  class KI,KC knowledge;
+  class TI,TS,TR task;
+      </pre>
+    </figure>
+    <p>The left-to-right connection is deliberately one-way. During analysis, the agent may inspect and call reviewed KB
+      circuits, but it must not edit them. It combines those circuits with the current input in <code>task/sop/</code> and
+      publishes evidence under <code>task/results/</code>. A potentially reusable discovery is reported as a candidate; it is
+      not promoted into <code>kb/circuits/</code> by the same run. This boundary prevents one unusual case from silently
+      changing the rule used by every later case.</p>
+
+    <h2>General CLI layout</h2>
+    <p>Normal CLI use keeps the KB and task as sibling or otherwise non-overlapping directories. The names do not have to be
+      literally <code>kb</code> and <code>task</code>, because <code>-kbdir</code> and <code>-workdir</code> identify their roles.
+      Relative paths make examples portable from the current directory:</p>
+    <pre><code>./kb/
+  input/          reusable source documents
+  circuits/       reviewed reusable SOP
+  candidates/     unpromoted learning proposals
+  results/        learning reports
+
+./task/
+  input/          current request and case data
+  sop/            task-specific SOP
+  results/        analysis outputs</code></pre>
+    <p>Run <code>agent -kbdir ./kb</code> when the KB itself is the active workspace and the agent is learning candidate
+      circuits. Run <code>agent -kbdir ./kb -workdir ./task</code> when the agent is analyzing the current task. There is no
+      separate <code>--learn</code> switch: the absence of <code>-workdir</code> selects learning, while its presence selects
+      analysis. The <a href="tutorial.html">manual CLI tutorial</a> provides commands and expected observations for both modes.</p>
+
+    <h2>Evaluation layout</h2>
+    <p>An evaluation is a committed reproduction of the same two-workspace arrangement. Keeping both directories below one
+      <code>evalN/</code> folder makes every input, circuit, and result statically browsable without weakening the boundary:</p>
+    <pre><code>docs/eval/evalN/
+  README.md
+  index.html
+  kb/
+    input/          reusable rules and reference knowledge
+    circuits/       reviewed reusable packages named kb.*
+  task/
+    input/          current evaluation data and request
+    sop/            packages named evalN.*
+    results/        expected output and report</code></pre>
+    <p>Package names reinforce the filesystem roles. A reusable evaluation circuit is loaded with prefix <code>kb</code> and
+      called as, for example, <code>kb.policy</code>. Its task root is loaded with prefix <code>eval1</code> and called as
+      <code>eval1.analysis</code>. A direct deterministic run therefore supplies both roots:</p>
+    <pre><code>node src/cli.mjs sop run \
+  --kb-root ./docs/eval/eval1/kb/circuits \
+  --root ./docs/eval/eval1/task/sop \
+  --prefix eval1 \
+  --package eval1.analysis</code></pre>
+    <p>The command does not ask the coding agent to reinterpret the Markdown. It executes the already reviewed fixture so the
+      parser, compiler, cross-root package resolution, and semantic output remain deterministic. The evaluation page then
+      places the source knowledge, current task, executable interpretation, and observed result next to one another for
+      inspection. Start with the <a href="eval/index.html">evaluation catalog</a> and open a case to see the convention applied.</p>
+
+    <h2>How to classify an ambiguous document</h2>
+    <p>Some documents contain both a durable rule and one-time facts. Split them instead of choosing a misleading folder. For
+      a policy review, place the policy clause in <code>kb/input/rule.md</code>; place employee cases and the requested report
+      fields in <code>task/input/</code>. For a document-consistency review, general comparison rules belong in
+      <code>kb/input/</code>, while the chapters being compared belong in <code>task/input/</code>. The task SOP can call a KB
+      interpreter repeatedly without making those chapters part of the reusable corpus.</p>
+    <p>A rule may remain task-local when the request explicitly says it applies only to this run. Record that scope in the
+      task source and encode it in <code>task/sop/</code>; do not place it in <code>kb/circuits/</code> merely because it looks like
+      a rule. Conversely, repetition across several tasks is evidence for a separately reviewed KB candidate, not authority
+      for automatic promotion.</p>
+
+    <h2>Contracts and further reading</h2>
+    <p><a href="specsLoader.html?spec=DS003-workspace-cli.md">DS003</a> defines preparation, manifests, inferred modes, and
+      write boundaries. <a href="specsLoader.html?spec=DS006-knowledge-base-and-skills.md">DS006</a> defines trusted circuits,
+      candidates, and the skill workflows. <a href="specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a> requires
+      every evaluation to reproduce the two-workspace topology. For the implementation flow after classification, continue
+      with <a href="architecture.html">Architecture</a> and <a href="sop-runtime.html">SOP runtime</a>.</p>
+  </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="partials-loader.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+@input
+@output rows request
+@invariant taskEvidenceComplete covers rows request
+
+@loadTaskEvidence define
+    function run() {
+      return {
+        rows: [
+          {
+            caseId: "G",
+            notice: {
+              reviewDays: 45,
+              expedited: false,
+              subjectExplicitlyRequestedExpedited: false,
+              writtenConsentRecorded: false
+            },
+            sourceLocator: "input/cases-and-request.md:8"
+          },
+          {
+            caseId: "H",
+            notice: {
+              reviewDays: 10,
+              expedited: true,
+              subjectExplicitlyRequestedExpedited: true,
+              writtenConsentRecorded: true
+            },
+            sourceLocator: "input/cases-and-request.md:9"
+          },
+          {
+            caseId: "I",
+            notice: {
+              reviewDays: 10,
+              expedited: true,
+              subjectExplicitlyRequestedExpedited: true,
+              writtenConsentRecorded: false
+            },
+            sourceLocator: "input/cases-and-request.md:10"
+          },
+          {
+            caseId: "J",
+            notice: {
+              reviewDays: 30,
+              expedited: false,
+              subjectExplicitlyRequestedExpedited: false,
+              writtenConsentRecorded: false
+            },
+            sourceLocator: "input/cases-and-request.md:11"
+          }
+        ],
+        request: {
+          requestedOutputs: [
+            "applicableMinimum",
+            "exceptionUse",
+            "compliance",
+            "reason",
+            "totals",
+            "coverageEvidence"
+          ],
+          requestedCaseIds: ["G", "H", "I", "J"],
+          requestLocator: "input/cases-and-request.md:3-4",
+          evidenceBoundaryLocator: "input/cases-and-request.md:13",
+          inputSource: "input/cases-and-request.md",
+          inputSha256: "68884e9f38ea46783f626e0dd1d0ee651afaf608d70dff76b8c261e9167ae495",
+          normalization: {
+            sourceField: "Expedited requested",
+            targetFields: ["expedited", "subjectExplicitlyRequestedExpedited"],
+            method: "The single supplied yes/no value is mapped to both reviewed-circuit request flags.",
+            sourceLocator: "input/cases-and-request.md:6"
+          }
+        }
+      }
+    }
+
+    function check(inputs, output) {
+      return Array.isArray(output.rows)
+        && output.rows.length === 4
+        && output.rows.every((row) => typeof row.caseId === "string"
+          && row.notice !== null
+          && typeof row.notice === "object"
+          && typeof row.sourceLocator === "string")
+        && output.request.requestedCaseIds.length === output.rows.length
+        && output.request.inputSource === "input/cases-and-request.md"
+    }
+
+    return { run, check }
+
+@taskEvidence loadTaskEvidence
+@rows get $taskEvidence "rows"
+@request get $taskEvidence "request"
+
+@validateTaskEvidence define rows request
+    function run({ rows, request }) {
+      return rows.map((row) => row.caseId).every((caseId, index) => caseId === request.requestedCaseIds[index])
+        && new Set(rows.map((row) => row.caseId)).size === rows.length
+    }
+    return { run }
+
+@taskEvidenceValid validateTaskEvidence $rows $request
+@taskEvidenceComplete assertInvariant $taskEvidenceValid "task evidence must cover each requested case exactly once"

@@ -1,0 +1,65 @@
+@output caseA caseB caseC
+
+# Source facts from input/cases.md:8.
+@loadCaseA define
+    function run() {
+      const expeditedRequested = false
+      const writtenConsentRecorded = false
+      return {
+        caseId: "A",
+        reviewDays: 10,
+        expedited: expeditedRequested,
+        subjectExplicitlyRequestedExpedited: expeditedRequested,
+        writtenConsentRecorded,
+        sourceFacts: {
+          expeditedRequested,
+          writtenConsentRecorded
+        },
+        sourceLocator: "input/cases.md:8"
+      }
+    }
+    return { run }
+
+# Source facts from input/cases.md:9. The two booleans remain independent.
+@loadCaseB define
+    function run() {
+      const expeditedRequested = true
+      const writtenConsentRecorded = true
+      return {
+        caseId: "B",
+        reviewDays: 10,
+        expedited: expeditedRequested,
+        subjectExplicitlyRequestedExpedited: expeditedRequested,
+        writtenConsentRecorded,
+        sourceFacts: {
+          expeditedRequested,
+          writtenConsentRecorded
+        },
+        sourceLocator: "input/cases.md:9"
+      }
+    }
+    return { run }
+
+# Source facts from input/cases.md:10.
+@loadCaseC define
+    function run() {
+      const expeditedRequested = false
+      const writtenConsentRecorded = false
+      return {
+        caseId: "C",
+        reviewDays: 30,
+        expedited: expeditedRequested,
+        subjectExplicitlyRequestedExpedited: expeditedRequested,
+        writtenConsentRecorded,
+        sourceFacts: {
+          expeditedRequested,
+          writtenConsentRecorded
+        },
+        sourceLocator: "input/cases.md:10"
+      }
+    }
+    return { run }
+
+@caseA loadCaseA
+@caseB loadCaseB
+@caseC loadCaseC

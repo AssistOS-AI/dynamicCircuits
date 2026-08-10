@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "path": "input/knowledge-base.md",
+    "bytes": 7098,
+    "sha256": "86019bae0a8c3f0b9f26a99a6bcf71682d41021b1b778c8bb42bb5dbfaea0fcf",
+    "mediaType": "text/markdown; charset=utf-8"
+  },
+  "coverage": [
+    {
+      "artifact": "candidate contract and composition semantics",
+      "lines": "3-13",
+      "heading": "Corpus purpose",
+      "evidence": "Ten independent PASS/FAIL rules; retain all findings."
+    },
+    {
+      "artifact": "data_release_governance.r01",
+      "lines": "15-23",
+      "heading": "Rule R01 — Documented consent basis",
+      "evidence": "Personal data requires documented consent; non-personal is the bypass."
+    },
+    {
+      "artifact": "data_release_governance.r02",
+      "lines": "25-32",
+      "heading": "Rule R02 — Encryption for sensitive releases",
+      "evidence": "Confidential and restricted data require encryption at rest."
+    },
+    {
+      "artifact": "data_release_governance.r03",
+      "lines": "34-40",
+      "heading": "Rule R03 — Bounded retention period",
+      "evidence": "Retention is an integer from 1 through 365 days."
+    },
+    {
+      "artifact": "data_release_governance.r04",
+      "lines": "42-49",
+      "heading": "Rule R04 — Named deletion owner",
+      "evidence": "A trimmed, non-empty deletion owner other than missing is required."
+    },
+    {
+      "artifact": "data_release_governance.r05",
+      "lines": "51-58",
+      "heading": "Rule R05 — Access logging for non-public data",
+      "evidence": "Non-public sensitivity classes require access logging."
+    },
+    {
+      "artifact": "data_release_governance.r06",
+      "lines": "60-67",
+      "heading": "Rule R06 — Agreement for external processors",
+      "evidence": "External processor use requires a signed DPA."
+    },
+    {
+      "artifact": "data_release_governance.r07",
+      "lines": "69-75",
+      "heading": "Rule R07 — Approval for non-EU residency",
+      "evidence": "EU passes directly; US or mixed needs approval; unknown fails."
+    },
+    {
+      "artifact": "data_release_governance.r08",
+      "lines": "77-83",
+      "heading": "Rule R08 — Anonymization of personal data",
+      "evidence": "Personal data requires anonymization independently of consent."
+    },
+    {
+      "artifact": "data_release_governance.r09",
+      "lines": "85-92",
+      "heading": "Rule R09 — Named incident-response owner",
+      "evidence": "Every release needs a trimmed, non-empty incident owner."
+    },
+    {
+      "artifact": "data_release_governance.r10",
+      "lines": "94-101",
+      "heading": "Rule R10 — Recognized release license",
+      "evidence": "The fixture accepts exactly three stated license identifiers."
+    },
+    {
+      "artifact": "data_release_governance.review and test requirements",
+      "lines": "103-108",
+      "heading": "Required reusable composition",
+      "evidence": "Stable-order review retains findings, failures, counts, and compliance."
+    }
+  ],
+  "transformationNotes": [
+    "Examples were used as branch witnesses, not copied as corpus facts.",
+    "Source-defined failure reason strings are preserved exactly.",
+    "Source heading lines are emitted in successful findings.",
+    "Interpretation choices and ambiguity remain review requirements."
+  ]
+}

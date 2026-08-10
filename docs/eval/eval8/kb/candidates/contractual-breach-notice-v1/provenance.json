@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "candidate": "contractual-breach-notice-v1",
+  "source": {
+    "path": "input/legal-notice-generation-rules.md",
+    "bytes": 2473,
+    "sha256": "f24be339d485bce52a9d35393dab9d0d48cc5611489dc80e18b5770d314f47c3",
+    "coverage": "lines 1-36"
+  },
+  "spans": [
+    {
+      "id": "P1",
+      "lines": "5-8",
+      "supports": ["fact_bounded_scope", "not_legal_advice", "no_invented_facts"],
+      "excerpt": "document-assembly fixture, not legal advice"
+    },
+    {
+      "id": "P2",
+      "lines": "12-15",
+      "supports": ["brief_schema", "non_empty_fields", "ordered_exhibits", "no_deadline_calculation"],
+      "excerpt": "Every field is required and non-empty. Exhibits must be a non-empty ordered list."
+    },
+    {
+      "id": "P3",
+      "lines": "19-21",
+      "supports": ["single_title", "exact_heading_order"],
+      "excerpt": "returns Markdown with one title and these exact ordered headings"
+    },
+    {
+      "id": "P4",
+      "lines": "23-25",
+      "supports": ["verbatim_values", "factual_label", "clause_caution", "unchanged_deadline"],
+      "excerpt": "reproduce every supplied field verbatim"
+    },
+    {
+      "id": "P5",
+      "lines": "26-28",
+      "supports": ["limitations_sentence", "currency_exception", "penalty_exception"],
+      "excerpt": "must contain no currency symbol and no words `statutory penalty` unless"
+    },
+    {
+      "id": "P6",
+      "lines": "32-36",
+      "supports": ["independent_verifier", "report_shape", "party_counts", "no_repair", "composed_goal"],
+      "excerpt": "It does not repair the notice. The composed goal passes only when all checks pass."
+    }
+  ],
+  "implementationMap": {
+    "P1": ["sop/breach_notice/generate.sop", "contract.md"],
+    "P2": ["sop/breach_notice/brief.sop"],
+    "P3": ["sop/breach_notice/generate.sop", "sop/breach_notice/verify.sop"],
+    "P4": ["sop/breach_notice/generate.sop", "sop/breach_notice/verify.sop"],
+    "P5": ["sop/breach_notice/generate.sop", "sop/breach_notice/verify.sop"],
+    "P6": ["sop/breach_notice/verify.sop", "sop/breach_notice/generate.sop"]
+  }
+}

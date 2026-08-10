@@ -1,0 +1,47 @@
+@output request
+@goal requestAccepted covers request
+
+@makeRequest define
+    function run() {
+      return {
+        title: "Large Data Release Review Task",
+        sourceLocator: "input/task.md:1-14",
+        expectedInputFileCount: 1,
+        expectedRecordCount: 10,
+        expectedRuleIdentifiers: ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10"],
+        expectedFindingCount: 100,
+        requiredReportContent: [
+          "per-release failed rule identifiers",
+          "per-release failure reasons",
+          "aggregate pass and fail counts",
+          "compliant and non-compliant record counts",
+          "input coverage",
+          "reused circuits",
+          "execution outcome",
+          "limitations"
+        ],
+        preserveEveryRuleFinding: true,
+        preserveMissingAndMalformedValues: true
+      }
+    }
+    function check(inputs, output) {
+      return output.expectedInputFileCount === 1
+        && output.expectedRecordCount === 10
+        && output.expectedRuleIdentifiers.length === 10
+        && output.expectedFindingCount === 100
+        && output.preserveEveryRuleFinding === true
+        && output.preserveMissingAndMalformedValues === true
+    }
+    return { run, check }
+
+@request makeRequest
+
+@validateRequest define request
+    function run({ request }) {
+      return request.expectedRecordCount * request.expectedRuleIdentifiers.length === request.expectedFindingCount
+        && request.requiredReportContent.length === 8
+    }
+    return { run }
+
+@requestValid validateRequest $request
+@requestAccepted assertInvariant $requestValid "task request must retain its complete 10 by 10 coverage contract"

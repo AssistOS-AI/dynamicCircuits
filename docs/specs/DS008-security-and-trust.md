@@ -21,7 +21,8 @@ DS011, trust policy in DS018, receipts in DS019, and future capability brokers d
 
 Workspace preparation must reject overlapping KB and work roots, must not follow input or package symbolic links during inventory and discovery, and must refuse a pre-existing `circuitSkills` path unless it is the expected link. User-owned `AGENTS.md` content must not be overwritten.
 
-The Codex adapter uses workspace-write sandboxing and no interactive approval prompts. Analysis starts in the workdir and
+The Codex adapter uses workspace-write sandboxing and automatic approval review so non-interactive runs do not wait for a
+human prompt. Analysis starts in the workdir and
 does not add the KB as a writable root. Learning starts in the KB, so candidate-only authority is currently a generated
 instruction rather than an operating-system-enforced subdirectory boundary. The CLI cannot replace the coding agent's own
 sandbox enforcement and records its invocation result. Future learning should stage candidates in an isolated workspace

@@ -1,0 +1,60 @@
+@output brief request
+
+@makeBrief define
+    function expectedBrief() {
+      return {
+        documentTitle: "Payment API SEV-1 Shift Handoff",
+        service: "Payment Authorization API",
+        severity: "SEV-1",
+        incidentCommanderRole: "Incident Commander",
+        outgoingRole: "Primary On-Call Engineer",
+        incomingRole: "Relief On-Call Engineer",
+        acknowledgementMinutes: 5,
+        escalationMinutes: 12,
+        evidenceLocations: [
+          "incident timeline",
+          "metrics dashboard",
+          "deployment diff",
+          "customer-impact log",
+        ],
+        communicationChannel: "#inc-payment-sev1",
+        prohibitedAction: "deploy or roll back production changes during handoff",
+        approvalRole: "Incident Commander",
+        sourceLocator: "input/brief.md",
+      }
+    }
+
+    async function run() {
+      return expectedBrief()
+    }
+
+    async function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(expectedBrief())
+    }
+
+    return { run, check }
+
+@makeRequest define
+    function expectedRequest() {
+      return {
+        generateOperationalSop: true,
+        runIndependentVerifier: true,
+        returnFullMarkdown: true,
+        returnAllVerificationChecks: true,
+        performIncidentManagementAction: false,
+        sourceLocator: "input/brief.md",
+      }
+    }
+
+    async function run() {
+      return expectedRequest()
+    }
+
+    async function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(expectedRequest())
+    }
+
+    return { run, check }
+
+@brief makeBrief
+@request makeRequest

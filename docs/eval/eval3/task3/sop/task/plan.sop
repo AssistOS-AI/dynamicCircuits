@@ -1,0 +1,74 @@
+@input
+@output plan sourceEvidence
+
+@makePlan define
+    function run() {
+      return {
+        planId: "explicit-supersession-plan",
+        chapters: [
+          {
+            chapterId: "Chapter A",
+            launchDate: {
+              assertionId: "Launch-date assertion A",
+              value: "2026-10-10",
+              dateKey: "2026-10-10",
+              supersedes: []
+            },
+            definitions: [
+              {
+                term: "Node",
+                termKey: "node",
+                text: "an executable semantic circuit package with explicit ports",
+                meaningKey: "executable-semantic-circuit-package-with-explicit-ports"
+              }
+            ]
+          },
+          {
+            chapterId: "Chapter B",
+            launchDate: {
+              assertionId: "Launch-date assertion B",
+              value: "2026-10-17",
+              dateKey: "2026-10-17",
+              supersedes: ["Launch-date assertion A"]
+            },
+            definitions: [
+              {
+                term: "Node",
+                termKey: "node",
+                text: "an executable semantic circuit package with explicit ports",
+                meaningKey: "executable-semantic-circuit-package-with-explicit-ports"
+              }
+            ]
+          }
+        ]
+      }
+    }
+    return { run }
+
+@makeSourceEvidence define
+    function run() {
+      return {
+        manifestPath: ".dynamic-circuits/input-manifest.json",
+        inputPath: "input/plan.md",
+        requestLocators: ["input/plan.md:3", "input/plan.md:4"],
+        completenessLocator: "input/plan.md:15",
+        chapters: [
+          {
+            chapterId: "Chapter A",
+            headingLocator: "input/plan.md:6",
+            assertionLocator: "input/plan.md:8",
+            definitionLocator: "input/plan.md:8"
+          },
+          {
+            chapterId: "Chapter B",
+            headingLocator: "input/plan.md:10",
+            assertionLocators: ["input/plan.md:12", "input/plan.md:13"],
+            definitionLocators: ["input/plan.md:12", "input/plan.md:13"]
+          }
+        ]
+      }
+    }
+    return { run }
+
+@plan makePlan
+@sourceEvidence makeSourceEvidence

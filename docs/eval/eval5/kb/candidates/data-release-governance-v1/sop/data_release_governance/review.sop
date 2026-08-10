@@ -1,0 +1,55 @@
+@input release
+@output report
+@invariant completeFindingSet covers report r01 r02 r03 r04 r05 r06 r07 r08 r09 r10
+
+@r01 data_release_governance.r01 $release
+@r02 data_release_governance.r02 $release
+@r03 data_release_governance.r03 $release
+@r04 data_release_governance.r04 $release
+@r05 data_release_governance.r05 $release
+@r06 data_release_governance.r06 $release
+@r07 data_release_governance.r07 $release
+@r08 data_release_governance.r08 $release
+@r09 data_release_governance.r09 $release
+@r10 data_release_governance.r10 $release
+
+@assemble define release r01 r02 r03 r04 r05 r06 r07 r08 r09 r10
+    function run({ release, r01, r02, r03, r04, r05, r06, r07, r08, r09, r10 }, ctx) {
+      if (!Object.prototype.hasOwnProperty.call(release, "identifier")) {
+        return ctx.reject("release_identifier_required")
+      }
+      const findings = [r01, r02, r03, r04, r05, r06, r07, r08, r09, r10]
+      const failedRuleIdentifiers = findings
+        .filter((finding) => finding.status === "FAIL")
+        .map((finding) => finding.ruleId)
+      const failCount = failedRuleIdentifiers.length
+      return {
+        releaseIdentifier: release.identifier,
+        findings,
+        failedRuleIdentifiers,
+        passCount: findings.length - failCount,
+        failCount,
+        compliant: failCount === 0
+      }
+    }
+    function check(inputs, output) {
+      const ids = output.findings.map((finding) => finding.ruleId).join(",")
+      return ids === "R01,R02,R03,R04,R05,R06,R07,R08,R09,R10"
+        && output.findings.length === 10
+        && output.passCount + output.failCount === 10
+        && output.failedRuleIdentifiers.length === output.failCount
+        && output.compliant === (output.failCount === 0)
+    }
+    return { run, check }
+
+@report assemble $release $r01 $r02 $r03 $r04 $r05 $r06 $r07 $r08 $r09 $r10
+
+@validateReport define report
+    function run({ report }) {
+      return report.findings.length === 10
+        && report.findings.every((finding, index) => finding.ruleId === `R${String(index + 1).padStart(2, "0")}`)
+    }
+    return { run }
+
+@reportComplete validateReport $report
+@completeFindingSet assertInvariant $reportComplete "review must retain R01 through R10 in stable order"

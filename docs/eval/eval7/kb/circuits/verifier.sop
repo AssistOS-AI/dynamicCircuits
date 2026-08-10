@@ -1,0 +1,143 @@
+@input brief markdown
+@output report
+
+@verify define brief markdown
+    function validText(value) {
+      return typeof value === "string" && value.trim().length > 0 && !/[\r\n]/.test(value)
+    }
+
+    function validateBrief(brief) {
+      if (brief === null || typeof brief !== "object" || Array.isArray(brief)) return "brief_not_object"
+      const textFields = [
+        "documentTitle",
+        "service",
+        "severity",
+        "incidentCommanderRole",
+        "outgoingRole",
+        "incomingRole",
+        "communicationChannel",
+        "prohibitedAction",
+        "approvalRole",
+      ]
+      for (const field of textFields) {
+        if (!validText(brief[field])) return `missing_or_malformed_${field}`
+      }
+      if (!Array.isArray(brief.evidenceLocations) || brief.evidenceLocations.length === 0 || !brief.evidenceLocations.every(validText)) {
+        return "missing_or_malformed_evidenceLocations"
+      }
+      if (typeof brief.acknowledgementMinutes !== "number" || !Number.isFinite(brief.acknowledgementMinutes) || brief.acknowledgementMinutes <= 0) {
+        return "non_positive_or_malformed_acknowledgementMinutes"
+      }
+      if (typeof brief.escalationMinutes !== "number" || !Number.isFinite(brief.escalationMinutes) || brief.escalationMinutes <= 0) {
+        return "non_positive_or_malformed_escalationMinutes"
+      }
+      if (brief.escalationMinutes <= brief.acknowledgementMinutes) return "deadline_order_invalid"
+      return null
+    }
+
+    function sameArray(left, right) {
+      return left.length === right.length && left.every((value, index) => value === right[index])
+    }
+
+    function procedureSteps(brief) {
+      return [
+        `1. Declare handoff: ${brief.outgoingRole} declares the handoff to ${brief.incomingRole} in ${brief.communicationChannel}.`,
+        `2. Freeze the timeline snapshot: ${brief.outgoingRole} freezes the current incident timeline.`,
+        `3. Identify open risks: ${brief.outgoingRole} identifies all open risks for ${brief.incomingRole}.`,
+        `4. Transfer evidence links: ${brief.outgoingRole} transfers every evidence location to ${brief.incomingRole}.`,
+        `5. Incoming acknowledgement: ${brief.incomingRole} acknowledges the handoff within ${brief.acknowledgementMinutes} minutes.`,
+        `6. Commander confirmation: ${brief.incidentCommanderRole} confirms the transfer before the ${brief.escalationMinutes} minutes escalation deadline.`,
+        `7. Completion record: ${brief.incomingRole} records completion with all required sign-offs and the UTC timestamp.`,
+      ]
+    }
+
+    function makeCheck(name, ok, evidence) {
+      return { name, ok, evidence }
+    }
+
+    function verifyDocument(brief, markdown) {
+      const lines = markdown.split(/\r?\n/)
+      const expectedHeadings = [
+        `# ${brief.documentTitle}`,
+        "## Scope",
+        "## Roles",
+        "## Preconditions",
+        "## Handoff Procedure",
+        "## Verification",
+        "## Escalation",
+        "## Prohibited Actions",
+        "## Record of Completion",
+      ]
+      const observedHeadings = lines.filter((line) => /^#{1,6}\s/.test(line))
+      const procedureStart = lines.indexOf("## Handoff Procedure")
+      const procedureEnd = lines.indexOf("## Verification")
+      const observedSteps = procedureStart >= 0 && procedureEnd > procedureStart
+        ? lines.slice(procedureStart + 1, procedureEnd).filter((line) => /^\d+\.\s/.test(line))
+        : []
+      const expectedSteps = procedureSteps(brief)
+      const roles = [brief.incidentCommanderRole, brief.outgoingRole, brief.incomingRole, brief.approvalRole]
+      const missingRoles = roles.filter((role) => !markdown.includes(role))
+      const deadlineTokens = [
+        `${brief.acknowledgementMinutes} minutes`,
+        `${brief.escalationMinutes} minutes`,
+      ]
+      const missingDeadlines = deadlineTokens.filter((token) => !markdown.includes(token))
+      const missingEvidence = brief.evidenceLocations.filter((location) => !markdown.includes(location))
+      const completionItems = [
+        "- [ ] Incident ID",
+        "- [ ] Outgoing sign-off",
+        "- [ ] Incoming sign-off",
+        "- [ ] Commander sign-off",
+        "- [ ] UTC timestamp",
+      ]
+      const missingCompletionItems = completionItems.filter((item) => !lines.includes(item))
+      const noSideEffectStatement = "This generated SOP is a document only; generating it performs no operational action."
+      const mustNotStatement = `MUST NOT ${brief.prohibitedAction}`
+      const overrideStatement = `Only ${brief.approvalRole} may approve an override to this MUST NOT rule.`
+      const checks = [
+        makeCheck("headingOrder", sameArray(observedHeadings, expectedHeadings), { expected: expectedHeadings, observed: observedHeadings }),
+        makeCheck("procedureSteps", sameArray(observedSteps, expectedSteps), { expected: expectedSteps, observed: observedSteps }),
+        makeCheck("scopeFields", markdown.includes(brief.service) && markdown.includes(brief.severity), { service: brief.service, severity: brief.severity }),
+        makeCheck("rolePresence", missingRoles.length === 0, { required: roles, missing: missingRoles }),
+        makeCheck("deadlinePresence", missingDeadlines.length === 0, { required: deadlineTokens, missing: missingDeadlines }),
+        makeCheck("deadlineOrdering", brief.escalationMinutes > brief.acknowledgementMinutes, { acknowledgementMinutes: brief.acknowledgementMinutes, escalationMinutes: brief.escalationMinutes }),
+        makeCheck("evidenceLocations", missingEvidence.length === 0, { required: brief.evidenceLocations, missing: missingEvidence }),
+        makeCheck("communicationChannel", markdown.includes(brief.communicationChannel), { required: brief.communicationChannel }),
+        makeCheck("prohibitedMustNot", markdown.includes(mustNotStatement), { required: mustNotStatement }),
+        makeCheck("approvalOverride", markdown.includes(overrideStatement), { required: overrideStatement }),
+        makeCheck("noOperationalSideEffect", markdown.includes(noSideEffectStatement), { required: noSideEffectStatement }),
+        makeCheck("completionChecklist", missingCompletionItems.length === 0, { required: completionItems, missing: missingCompletionItems }),
+      ]
+      const missing = checks.filter((item) => !item.ok).map((item) => item.name)
+      return {
+        ok: missing.length === 0,
+        checks,
+        missing,
+        measuredCounts: {
+          headingCount: observedHeadings.length,
+          numberedStepCount: observedSteps.length,
+          expectedRoleCount: roles.length,
+          presentRoleCount: roles.length - missingRoles.length,
+          expectedEvidenceLocationCount: brief.evidenceLocations.length,
+          presentEvidenceLocationCount: brief.evidenceLocations.length - missingEvidence.length,
+          completionChecklistItemCount: completionItems.length - missingCompletionItems.length,
+        },
+      }
+    }
+
+    async function run({ brief, markdown }, ctx) {
+      const refusal = validateBrief(brief)
+      if (refusal) return ctx.reject(refusal)
+      if (typeof markdown !== "string") return ctx.reject("markdown_not_string")
+      return verifyDocument(brief, markdown)
+    }
+
+    async function check({ brief, markdown }, output) {
+      if (validateBrief(brief) !== null || typeof markdown !== "string") return false
+      const expected = verifyDocument(brief, markdown)
+      return JSON.stringify(output) === JSON.stringify(expected)
+    }
+
+    return { run, check }
+
+@report verify $brief $markdown

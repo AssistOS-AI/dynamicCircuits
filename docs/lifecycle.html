@@ -29,31 +29,39 @@
       directory. The task is writable; reviewed KB circuits are readable and remain outside the task's write area.</p>
 
     <h2>The CLI prepares the folder</h2>
+    <figure class="diagram">
+      <figcaption><strong>Workspace preparation</strong>The CLI inventories inputs before Codex receives the task</figcaption>
     <pre class="mermaid">flowchart LR
-      I[input files] --> M[hash manifest]
-      M --> W[sop and results folders]
-      W --> A[Codex workspace]</pre>
+      I[/Input files/] --> P{Prepare task}
+      P --> M[(Hash manifest)]
+      P --> W[sop, results, skills]
+      M --> A([Codex workspace])
+      W --> A</pre></figure>
     <p>The CLI recursively inventories regular files under <code>input/</code>. For each file it records the relative path, byte
       size, and SHA-256 digest in <code>.dynamic-circuits/input-manifest.json</code>. It creates missing <code>sop/</code> and
       <code>results/</code> folders, writes managed instructions when no user-owned guidance exists, and links the project
       <code>circuitSkills</code> catalog for Codex discovery. It then starts Codex in that prepared directory.</p>
 
     <h2>Codex turns prose into SOP</h2>
-    <p>Codex must account for every manifest entry. It reads the policy, cases, and requested output; inspects reusable package
-      interfaces under <code>kb/circuits/</code>; and writes task code under <code>sop/</code>. For the notice example, a useful
+    <p>Codex must account for every manifest entry. It reads the cases and requested output, inspects reusable package
+      interfaces under <code>kb/circuits/</code>, and writes task code under <code>sop/</code>. For the notice example, a useful
       implementation separates:</p>
     <ul>
-      <li>a rule circuit that accepts one case and selects either the 30-day minimum or the 10-day exception;</li>
-      <li>a task circuit that supplies the interpreted case rows, calls the rule once per case, aggregates findings, and checks coverage.</li>
+      <li>a reviewed KB rule circuit that accepts one case and selects either the 30-day minimum or the 10-day exception;</li>
+      <li>a task-value package that represents the interpreted case rows and requested output;</li>
+      <li>a larger task root that loads those values, calls the KB rule once per case, aggregates findings, and checks coverage.</li>
     </ul>
     <p>The source documents remain unchanged. SOP is the agent's reviewable interpretation of them. A reviewer can therefore
       detect a missing exception, a transcribed value, or a case that was never wired before trusting the prose report.</p>
 
     <h2>Local code checks and runs SOP</h2>
+    <figure class="diagram">
+      <figcaption><strong>Local verification</strong>Generated SOP must compile before any graph node executes</figcaption>
     <pre class="mermaid">flowchart LR
-      S[generated SOP] --> C[compile]
-      C --> X[execute]
-      X --> R[outputs and receipt]</pre>
+      S[/Generated SOP/] --> C{Graph valid?}
+      C -->|yes| X[Execute required nodes]
+      C -->|no| D([Compiler diagnostic])
+      X --> R([Outputs and receipt])</pre></figure>
     <p>The parser reads directives and local JavaScript command bodies. The compiler derives package names from file paths,
       resolves child calls, validates ordered arguments and immutable wires, rejects graph cycles, and identifies nodes
       required by outputs and goals. Only a valid graph reaches the runtime.</p>
@@ -63,19 +71,24 @@
       when a required child fails.</p>
 
     <h2>The report is grounded in execution</h2>
-    <p>Codex writes reader-facing material under <code>results/</code>. A useful report names all input files, explains the
+    <p>After the larger root executes, Codex writes reader-facing material under <code>results/</code>. A useful report names all input files, explains the
       policy interpretation, lists the circuits compiled and run, states each runtime outcome, reports uncovered material,
-      and distinguishes limitations from conclusions. The receipt supplies machine evidence: package hashes, node states,
+      and distinguishes limitations from conclusions. Markdown or text is the default; JSON is used only when explicitly
+      requested. The receipt supplies machine evidence: package hashes, node states,
       input and output hashes, child receipts, goal results, and public outputs.</p>
     <p>For the committed notice case, the report says case A violates the ordinary minimum, case B satisfies the documented
       exception, and case C satisfies the ordinary minimum. It can point to a successful receipt and a passing three-case
       coverage goal. It must not claim that an unknown external law or an absent KB rule was checked.</p>
 
     <h2>What the planned assurance stage adds</h2>
+    <figure class="diagram">
+      <figcaption><strong>Planned coverage check</strong>Expected rule instances must be found, run, and audited</figcaption>
     <pre class="mermaid">flowchart LR
-      F[published case facts] --> M[match all rules]
-      M --> E[execute expected instances]
-      E --> P[accept or explain gap]</pre>
+      F[/Published case facts/] --> M{Matcher outcome}
+      M -->|MATCH| E[Execute expected instance]
+      M -->|UNKNOWN| G[Record evidence gap]
+      E --> P([Acceptance audit])
+      G --> P</pre></figure>
     <p>Today Codex selects the explicit rule calls and a human reviews coverage. The planned semantic registry will query all
       rule packages that consume notice-case facts. Deterministic matchers will decide whether the ordinary rule and exception
       apply to each case. Mandatory closure will execute newly expected instances until no new facts activate more rules.

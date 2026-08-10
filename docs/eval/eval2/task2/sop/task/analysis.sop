@@ -1,0 +1,19 @@
+@input
+@output analysis
+
+# Load task-local facts and request metadata, then delegate reusable review semantics to the reviewed KB circuit.
+@observations @request task.study
+@review kb.universal_positive_review $observations
+
+@assembleAnalysis define request review
+    async function run({ request, review }) {
+      return { request, review }
+    }
+
+    async function check({ request, review }, output) {
+      return Boolean(output) && output.request === request && output.review === review
+    }
+
+    return { run, check }
+
+@analysis assembleAnalysis $request $review

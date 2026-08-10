@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Start here — Dynamic Circuits</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs"><a href="index.html">Documentation</a> / Start here</p>
+    <h1>Understand the project in ten minutes</h1>
+    <p class="lead">Dynamic Circuits gives a coding agent a folder of documents, asks it to write executable analysis code, and uses a local compiler and runtime to check and run that code. This page explains the pieces without assuming knowledge of SOP Lang.</p>
+
+    <h2>The practical problem</h2>
+    <p>A coding agent can read a policy and write a convincing answer, but prose alone does not show exactly which rule was
+      applied to which facts. It is difficult to rerun one calculation, detect an omitted case, or distinguish a failed
+      precondition from a false conclusion. This project makes the agent leave an executable representation of the analysis
+      next to the report.</p>
+    <p>The user supplies readable source files. Codex, or another configured coding agent, interprets them and authors SOP
+      files. Local project code parses those SOP files, checks their dependency graph, runs required commands, and emits
+      outputs plus a receipt. The report can then refer to work that another user can execute again.</p>
+
+    <h2>The four moving parts</h2>
+    <table>
+      <thead><tr><th>Part</th><th>What it does</th><th>What it does not do</th></tr></thead>
+      <tbody>
+        <tr><td>User documents</td><td>State policies, evidence, cases, datasets, review rules, and requested output.</td><td>They do not need to contain JSON or SOP syntax.</td></tr>
+        <tr><td>Coding agent</td><td>Reads documents, writes task-value SOP and a larger KB-composing root, runs it, then drafts a report from the output.</td><td>It does not become part of deterministic circuit execution.</td></tr>
+        <tr><td>SOP kernel</td><td>Parses, compiles, and executes explicit circuit calls; returns classified outcomes and receipts.</td><td>It does not reinterpret the original prose or guess a missing rule.</td></tr>
+        <tr><td>Filesystem contract</td><td>Separates persistent KB knowledge from one task's inputs, generated code, and results.</td><td>It does not automatically promote generated candidates to trusted knowledge.</td></tr>
+      </tbody>
+    </table>
+    <p>The separation is deliberate. The coding agent handles document understanding and code generation. The kernel handles
+      repeatable graph mechanics. A reviewer can compare both: “Did the agent encode the document correctly?” and “Did the
+      encoded graph execute correctly?” are different questions and have different evidence.</p>
+
+    <h2>One example from source to answer</h2>
+    <p>A source policy says that normal notice is 30 days. It also says that 10 days is enough when expedited treatment was
+      requested and written consent was recorded. A case table contains three rows. The requested task asks for one finding
+      per row and aggregate totals.</p>
+    <figure class="diagram">
+      <figcaption><strong>Notice-analysis example</strong>Each stage leaves an artifact that can be inspected independently</figcaption>
+      <pre class="mermaid">flowchart LR
+        D[/Policy and cases/] --> S[Generated SOP]
+        S --> O([Three findings])
+        S --> E[(Execution receipt)]
+        O --> R[Grounded report]
+        E --> R</pre>
+    </figure>
+    <p>At the first arrow, Codex's interpretation is split by lifetime: reusable policy belongs in reviewed KB SOP, while
+      current cases and the requested output become task-value SOP. A larger task root connects the two. At the second arrow,
+      the local runtime calls the policy once for each case and returns structured findings. At the third arrow, the result
+      folder preserves a human report and, only when requested, a machine-readable summary. Open <a href="eval/eval1/index.html">Eval 1</a> to inspect the source,
+      generated code, and result side by side.</p>
+
+    <h2>Two CLI modes</h2>
+    <p>Learning and analysis are selected by directory arguments, not by a separate learn switch:</p>
+    <pre><code># Learn reusable knowledge from kb/input/
+node src/cli.mjs -kbdir ./kb -agent codex
+
+# Analyze one task from work/case-17/input/
+node src/cli.mjs -kbdir ./kb -workdir ./work/case-17 -agent codex</code></pre>
+    <p>The first command runs in the KB and may write proposals under <code>candidates/</code>. The second runs in the task
+      folder and may write <code>sop/</code> and <code>results/</code>; it reads reviewed KB circuits without modifying them.
+      Use <code>--dry-run</code> to inspect the prepared process and prompt without starting Codex.</p>
+
+    <h2>What a successful current run proves</h2>
+    <p>A successful current run proves that the generated SOP was syntactically valid, package and wire references resolved,
+      required graph nodes completed, and declared local checks or goals passed. Its receipt identifies the graph execution
+      behind the public values. This is already useful for rerunning calculations and exposing agent assumptions as code.</p>
+    <p>It does not yet prove that Codex found every applicable rule in a large KB. Semantic rule discovery, mandatory closure,
+      trust profiles, persistent evidence, and final acceptance certificates remain planned. The documentation labels those
+      features explicitly so a future design is not confused with the current executable release.</p>
+
+    <h2>Choose the next page</h2>
+    <table>
+      <thead><tr><th>Your question</th><th>Continue with</th></tr></thead>
+      <tbody>
+        <tr><td>I want to run the system now.</td><td><a href="tutorial.html">Manual CLI tutorial</a></td></tr>
+        <tr><td>I need to prepare good source files and tasks.</td><td><a href="input-guide.html">Input guide</a></td></tr>
+        <tr><td>I need exact folder and option behavior.</td><td><a href="cli.html">CLI and workspaces</a></td></tr>
+        <tr><td>I need to decide whether a file belongs to knowledge or the current task.</td><td><a href="workspace-conventions.html">KB and task convention</a></td></tr>
+        <tr><td>I want to understand generated <code>.sop</code> files.</td><td><a href="sop-runtime.html">SOP compiler and runtime</a></td></tr>
+        <tr><td>I want a complete task walkthrough.</td><td><a href="lifecycle.html">One analysis from start to finish</a></td></tr>
+        <tr><td>I want to inspect committed examples.</td><td><a href="eval/index.html">Evaluation catalog</a></td></tr>
+        <tr><td>I need normative requirements.</td><td><a href="specsLoader.html?spec=matrix.md">DS specification matrix</a></td></tr>
+      </tbody>
+    </table>
+    <p>The HTML pages explain behavior through examples. The DS files define the durable contract used for implementation and
+      review. When a page and a DS appear inconsistent, the active DS is normative and both should be corrected together.</p>
+  </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="partials-loader.js"></script>
+</body>
+</html>

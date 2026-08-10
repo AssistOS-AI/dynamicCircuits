@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "kbDir": "/home/salboaie/work/dynamicCircuits/docs/eval/eval2/kb",
+  "workDir": null,
+  "mode": "learn",
+  "paths": {
+    "input": "input",
+    "trustedCircuits": "circuits",
+    "candidates": "candidates",
+    "results": "results",
+    "skills": "circuitSkills",
+    "agentSkillDiscovery": ".agents/skills"
+  }
+}

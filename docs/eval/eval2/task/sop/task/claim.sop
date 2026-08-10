@@ -1,0 +1,21 @@
+@input
+@output claim
+
+# Executable adaptation of input/claim.md. This package records the submitted
+# reasoning without deciding whether the universal conclusion follows.
+@loadClaim define
+    async function run() {
+      return {
+        source: {
+          path: "claim.md",
+          locator: "Submitted claim",
+        },
+        premise: "observations_have_a_positive_mean",
+        conclusion: "all_observations_are_strictly_positive",
+        assertedRelation: "therefore",
+      }
+    }
+
+    return { run }
+
+@claim loadClaim

@@ -1,0 +1,119 @@
+@output analysis coverage
+@goal coverageGoal covers request caseA caseB caseC findingA findingB findingC coverage
+@invariant analysisConsistent covers analysis coverage
+
+@buildCoverage define request caseA caseB caseC findingA findingB findingC
+    function run({ request, caseA, caseB, caseC, findingA, findingB, findingC }) {
+      const expectedCaseIds = request.expectedCaseIds.slice()
+      const evaluatedCaseIds = [caseA.caseId, caseB.caseId, caseC.caseId]
+      const findingsPresent = [findingA, findingB, findingC]
+        .every((finding) => finding !== null && typeof finding === "object")
+      const missingCaseIds = expectedCaseIds.filter((id) => !evaluatedCaseIds.includes(id))
+      const unexpectedCaseIds = evaluatedCaseIds.filter((id) => !expectedCaseIds.includes(id))
+      const uniqueEvaluatedCount = new Set(evaluatedCaseIds).size
+      const allCasesCovered = findingsPresent
+        && missingCaseIds.length === 0
+        && unexpectedCaseIds.length === 0
+        && uniqueEvaluatedCount === expectedCaseIds.length
+        && evaluatedCaseIds.length === expectedCaseIds.length
+
+      return {
+        expectedCaseIds,
+        evaluatedCaseIds,
+        missingCaseIds,
+        unexpectedCaseIds,
+        allCasesCovered,
+        expectedCount: expectedCaseIds.length,
+        evaluatedCount: evaluatedCaseIds.length
+      }
+    }
+    return { run }
+
+@buildAnalysis define request caseA caseB caseC findingA findingB findingC coverage
+    function run({ request, caseA, caseB, caseC, findingA, findingB, findingC, coverage }) {
+      const conciseReason = (finding) => {
+        if (finding.status === "COMPLIANT" && finding.exceptionEligible) {
+          return "Notice meets the applicable minimum through the expedited exception."
+        }
+        if (finding.status === "COMPLIANT") {
+          return "Notice meets the applicable ordinary minimum."
+        }
+        return "Notice is below the applicable minimum and the expedited exception was not eligible."
+      }
+
+      const row = (caseValue, finding) => ({
+        caseId: caseValue.caseId,
+        noticeProvidedDays: caseValue.reviewDays,
+        applicableMinimumDays: finding.applicableMinimumDays,
+        exceptionUsed: finding.exceptionEligible,
+        compliant: finding.status === "COMPLIANT",
+        status: finding.status,
+        reason: conciseReason(finding),
+        ruleReasonCode: finding.reason,
+        reviewPath: finding.reviewPath,
+        evidence: finding.evidence,
+        sourceLocators: {
+          case: caseValue.sourceLocator,
+          rule: finding.sourceLocator,
+          request: request.sourceLocator
+        }
+      })
+
+      const findings = [
+        row(caseA, findingA),
+        row(caseB, findingB),
+        row(caseC, findingC)
+      ]
+      const compliant = findings.filter((finding) => finding.compliant).length
+      const exceptionUsed = findings.filter((finding) => finding.exceptionUsed).length
+
+      return {
+        findings,
+        counts: {
+          total: findings.length,
+          compliant,
+          nonCompliant: findings.length - compliant,
+          exceptionUsed
+        },
+        coverage,
+        requestSourceLocator: request.sourceLocator
+      }
+    }
+
+    function check(inputs, output) {
+      return output.findings.length === output.counts.total
+        && output.counts.compliant + output.counts.nonCompliant === output.counts.total
+        && output.coverage.allCasesCovered === true
+    }
+
+    return { run, check }
+
+@coverageSatisfied define coverage request caseA caseB caseC findingA findingB findingC
+    function run({ coverage, request, caseA, caseB, caseC, findingA, findingB, findingC }) {
+      const expected = request.expectedCaseIds
+      const cases = [caseA, caseB, caseC]
+      const findings = [findingA, findingB, findingC]
+      return coverage.allCasesCovered === true
+        && cases.length === expected.length
+        && cases.every((caseValue) => expected.includes(caseValue.caseId))
+        && findings.every((finding) => finding !== null && typeof finding === "object")
+    }
+    return { run }
+
+@validateAnalysis define analysis coverage
+    function run({ analysis, coverage }) {
+      return coverage.allCasesCovered === true
+        && analysis.coverage.allCasesCovered === true
+        && analysis.counts.total === coverage.evaluatedCount
+    }
+    return { run }
+
+@caseA @caseB @caseC task.cases
+@request task.request
+@findingA kb.notice_review.evaluate $caseA
+@findingB kb.notice_review.evaluate $caseB
+@findingC kb.notice_review.evaluate $caseC
+@coverage buildCoverage $request $caseA $caseB $caseC $findingA $findingB $findingC
+@analysis buildAnalysis $request $caseA $caseB $caseC $findingA $findingB $findingC $coverage
+@coverageGoal coverageSatisfied $coverage $request $caseA $caseB $caseC $findingA $findingB $findingC
+@analysisConsistent validateAnalysis $analysis $coverage

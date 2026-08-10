@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { writeFile } from "node:fs/promises";
+import { unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildAgentInvocation } from "./agents/registry.mjs";
@@ -9,6 +9,8 @@ import { compilePackage } from "./sop/compiler.mjs";
 import { SopError } from "./sop/errors.mjs";
 import { PackageRegistry } from "./sop/registry.mjs";
 import { SopRuntime } from "./sop/runtime.mjs";
+import { executeWorkspaceCircuit } from "./runtime-report.mjs";
+import { planAnalysisRun } from "./incremental.mjs";
 import {
   buildAnalysisPrompt,
   buildLearningPrompt,
@@ -89,6 +91,45 @@ async function handleWorkspace(command, options) {
     process.stdout.write(`${JSON.stringify(workspace.workspaceManifest, null, 2)}\n`);
     return;
   }
+  const incrementalPlan = workspace.mode === "analyze"
+    ? await planAnalysisRun(workspace)
+    : { action: "agent-and-executor", reason: "KB learning is explicitly requested" };
+  if (incrementalPlan.action === "skip" && !options["dry-run"]) {
+    process.stdout.write(`Up to date: ${incrementalPlan.reportPath}\nCoding agent and executor skipped.\n`);
+    return;
+  }
+  if (incrementalPlan.action === "executor-only" && !options["dry-run"]) {
+    const startedAt = new Date().toISOString();
+    const execution = await executeWorkspaceCircuit(workspace);
+    const finishedAt = new Date().toISOString();
+    await writeFile(path.join(workspace.agentWorkDir, ".dynamic-circuits", "last-run.json"), `${JSON.stringify({
+      schemaVersion: 3,
+      agent: options.agent ?? "codex",
+      mode: workspace.mode,
+      command: null,
+      cwd: workspace.agentWorkDir,
+      promptSha256: null,
+      startedAt,
+      finishedAt,
+      exitCode: null,
+      signal: null,
+      incremental: {
+        action: incrementalPlan.action,
+        reason: incrementalPlan.reason,
+        dependency: incrementalPlan.dependencyPath,
+        codingAgentSkipped: true,
+      },
+      runtime: {
+        entrypoint: execution.packageName,
+        outcome: execution.result.outcome,
+        packageHash: execution.result.receipt.packageHash,
+        receiptHash: execution.result.receipt.receiptHash,
+        report: path.relative(workspace.workDir, execution.reportPath).split(path.sep).join("/"),
+      },
+    }, null, 2)}\n`, "utf8");
+    process.stdout.write(`Generated SOP changed; coding agent skipped.\nRuntime result: ${execution.reportPath}\n`);
+    return;
+  }
   const invocation = buildAgentInvocation({
     agent: options.agent ?? "codex",
     agentCommand: options["agent-command"],
@@ -99,14 +140,28 @@ async function handleWorkspace(command, options) {
     ? buildLearningPrompt(workspace)
     : buildAnalysisPrompt(workspace);
   if (options["dry-run"]) {
-    process.stdout.write(`${JSON.stringify({ ...invocation, prompt }, null, 2)}\n`);
+    process.stdout.write(`${JSON.stringify({ ...invocation, prompt, incrementalPlan }, null, 2)}\n`);
     return;
+  }
+  if (workspace.mode === "analyze") {
+    await unlink(path.join(workspace.workDir, "results", "runtime-result.md")).catch((error) => {
+      if (error.code !== "ENOENT") throw error;
+    });
   }
   const startedAt = new Date().toISOString();
   const result = await runChild(invocation, prompt);
   const finishedAt = new Date().toISOString();
+  let execution = null;
+  let executionError = null;
+  if (result.code === 0 && workspace.mode === "analyze") {
+    try {
+      execution = await executeWorkspaceCircuit(workspace);
+    } catch (error) {
+      executionError = error;
+    }
+  }
   await writeFile(path.join(workspace.agentWorkDir, ".dynamic-circuits", "last-run.json"), `${JSON.stringify({
-    schemaVersion: 1,
+    schemaVersion: 3,
     agent: options.agent ?? "codex",
     mode: workspace.mode,
     command: invocation.command,
@@ -116,8 +171,29 @@ async function handleWorkspace(command, options) {
     finishedAt,
     exitCode: result.code,
     signal: result.signal,
+    incremental: {
+      action: incrementalPlan.action,
+      reason: incrementalPlan.reason,
+      dependency: incrementalPlan.dependencyPath ?? null,
+      codingAgentSkipped: false,
+    },
+    runtime: workspace.mode === "analyze" ? (execution ? {
+      entrypoint: execution.packageName,
+      outcome: execution.result.outcome,
+      packageHash: execution.result.receipt.packageHash,
+      receiptHash: execution.result.receipt.receiptHash,
+      report: path.relative(workspace.workDir, execution.reportPath).split(path.sep).join("/"),
+    } : {
+      outcome: "NOT_COMPLETED",
+      error: executionError ? {
+        code: executionError.code ?? "UNEXPECTED",
+        message: executionError.message,
+      } : null,
+    }) : null,
   }, null, 2)}\n`, "utf8");
   if (result.code !== 0) throw new SopError("AGENT_FAILED", `Coding agent exited with code ${result.code}`, result);
+  if (executionError) throw executionError;
+  if (execution) process.stdout.write(`Runtime result: ${execution.reportPath}\n`);
 }
 
 async function handleSop(sopCommand, options) {

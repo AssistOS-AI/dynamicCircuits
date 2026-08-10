@@ -2,57 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dynamic Circuits Documentation</title><link rel="stylesheet" href="../../styles.css">
-  <script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script>
+  <title>Eval 3: Document consistency — Dynamic Circuits</title>
+  <link rel="stylesheet" href="../../styles.css">
 </head>
 <body>
-  <header class="site-header"><a class="brand" href="../../index.html">Dynamic Circuits Documentation</a>
-    <nav><a href="../index.html">All evaluations</a><a href="../../evaluation.html">Testing guide</a><a href="../../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a></nav>
-  </header>
+  <div data-include="partials/header.html"></div>
   <main class="page">
     <p class="breadcrumbs"><a href="../index.html">Evaluation catalog</a> / Eval 3</p>
-    <h1>Eval 3: cross-document consistency</h1>
-    <p class="lead">This case checks whether repeated document interpretation preserves source identity and whether synthesis reports every conflicting launch date and definition without inventing a precedence rule.</p>
-    <h2>How the evaluation works</h2>
-    <p>The coding agent receives three prose chapters, one review-policy document, and one task document. The generated
-      <code>interpretation.sop</code> extracts dates and the definition of “Node” from one chapter while retaining its source
-      label. <code>root.sop</code> creates three independent child instances and sends their outputs to
-      <code>consistency.sop</code>. The final goal requires both expected conflict classes.</p>
-    <p>Unlike eval 1 and eval 2, this runtime case still supplies chapter text through circuit inputs because the reusable
-      interpretation circuit is the behavior under test. The inputs are source text, not JSON. The result keeps both
-      alternatives and their source labels because the documents contain no supersession rule.</p>
+    <h1>Eval 3: Document consistency</h1>
+    <p class="lead">Three current chapters are encoded independently and passed to a reviewed consistency circuit that retains timeline and terminology conflicts.</p>
+    <h2>What this page lets you inspect</h2>
+    <p>The executor reports two active launch dates and incompatible meanings of Node without selecting a preferred version. Use the menu below to compare each human source with its generated executable representation and with the exact executor output. Each selected file has a role-specific explanation above it.</p>
+    <p>The menu deliberately separates source text from SOP. <strong>KB source texts</strong> are what the learning agent read; <strong>KB reviewed SOP circuits</strong> are executable artifacts promoted after tests. <strong>Task input texts</strong> contain only current material; <strong>Task generated SOP circuits</strong> show Codex's explicit interpretation. The final group distinguishes the executor-owned result from the agent's provenance journal.</p>
+    <p><code>expected.md</code> is outside both input trees. It is used only after execution to compare expectations with observed output; Eval 6 demonstrates how a correct verifier can force an expectation correction. Read <a href="../../evaluation.html">the evaluation method</a> and <a href="../../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a> for the common contract.</p>
     <div class="eval-browser">
       <aside class="eval-menu"><h2>Files by purpose</h2><div id="eval-menu"></div></aside>
-      <section class="eval-viewer"><div class="eval-case-summary"><h2 id="file-title">File</h2><p id="file-explanation"></p><span id="file-role" class="status"></span></div><pre class="file-view"><code id="file-content">Loading…</code></pre></section>
+      <section class="eval-viewer">
+        <div class="eval-case-summary"><h2 id="file-title">File</h2><p id="file-explanation"></p><span id="file-role" class="status"></span></div>
+        <pre class="file-view"><code id="file-content">Loading…</code></pre>
+      </section>
     </div>
   </main>
   <script>
     window.evalPage = {
-      caseRoot: "eval3", defaultFile: "README.md", groups: [
-        { title: "Evaluation contract", files: [
-          { file: "README.md", role: "Scope and reproduction", explanation: "Defines the cross-document obligations, circuit composition, observed conflicts, reproduction command, complexity, and unresolved-precedence limit." }
-        ]},
-        { title: "Policy and task", files: [
-          { file: "input/review-rules.md", role: "Consistency policy", explanation: "Defines when multiple dates or definitions constitute a conflict and requires source attribution and preservation of uncertainty." },
-          { file: "input/task.md", role: "Requested synthesis", explanation: "Requires independent interpretation of each chapter followed by a consolidated conflict report." }
-        ]},
-        { title: "Source chapters", files: [
-          { file: "input/chapter-01.md", role: "Schedule source", explanation: "Supplies launch date 2026-06-15 and the executable-circuit definition of Node." },
-          { file: "input/chapter-02.md", role: "Operations source", explanation: "Supplies launch date 2026-07-01 and explicitly lacks a supersession statement." },
-          { file: "input/chapter-03.md", role: "Data-model source", explanation: "Supplies the mutable-database-row definition of Node and no launch date." }
-        ]},
-        { title: "Generated SOP code", files: [
-          { file: "sop/interpretation.sop", role: "Reusable chapter interpreter", explanation: "Extracts the fact families needed by this task from one text input and attaches the supplied source label." },
-          { file: "sop/consistency.sop", role: "Cross-document comparison", explanation: "Aggregates three interpretations, retains each source claim, and sets timeline and terminology conflict flags." },
-          { file: "sop/root.sop", role: "Task root circuit", explanation: "Creates three child interpretation instances, invokes comparison, and verifies both requested conflict classes." }
-        ]},
-        { title: "Observed results", files: [
-          { file: "results/result.json", role: "Checked machine summary", explanation: "Expected report object used by the automated runtime test, including both values and their source labels." },
-          { file: "results/report.md", role: "Human report", explanation: "Presents both conflict classes and explains why the analysis leaves them unresolved." }
-        ]}
+      caseRoot: "eval3",
+      defaultFile: "task/results/runtime-result.md",
+      groups: [
+        { title: "Evaluation contract and provenance", files: [
+            { file: "README.md", role: "Evaluation walkthrough", explanation: "Explains the question, real coding-agent stages, scale, observed result, reproduction commands, and limitations." },
+            { file: "run-provenance.md", role: "Recorded process evidence", explanation: "Records both Codex commands, timestamps, prompt hashes, exit codes, and the executor receipt hash." },
+            { file: "expected.md", role: "Expectation and comparison", explanation: "Keeps the source-derived expectation separate from all inputs and compares it explicitly with the observed executor result." }
+          ] },
+        { title: "KB source texts", files: [
+            { file: "kb/input/review-rules.md", role: "Reusable human source", explanation: "Human-readable reusable knowledge supplied to the learning agent; this is not executable SOP." }
+          ] },
+        { title: "KB reviewed SOP circuits", files: [
+            { file: "kb/circuits/release_plan_consistency/review.sop", role: "Reviewed KB circuit", explanation: "Executable SOP generated during learning and separately promoted for task reuse." }
+          ] },
+        { title: "Task input texts", files: [
+            { file: "task/input/chapter-01.md", role: "Current human input", explanation: "Current evidence, brief, or request read by the task coding agent; it contains no generated SOP." },
+            { file: "task/input/chapter-02.md", role: "Current human input", explanation: "Current evidence, brief, or request read by the task coding agent; it contains no generated SOP." },
+            { file: "task/input/chapter-03.md", role: "Current human input", explanation: "Current evidence, brief, or request read by the task coding agent; it contains no generated SOP." },
+            { file: "task/input/task.md", role: "Current human input", explanation: "Current evidence, brief, or request read by the task coding agent; it contains no generated SOP." }
+          ] },
+        { title: "Task generated SOP circuits", files: [
+            { file: "task/sop/task/chapter_01.sop", role: "Generated task adaptation", explanation: "Coding-agent executable encoding of current task content, kept separate from human input." },
+            { file: "task/sop/task/chapter_02.sop", role: "Generated task adaptation", explanation: "Coding-agent executable encoding of current task content, kept separate from human input." },
+            { file: "task/sop/task/chapter_03.sop", role: "Generated task adaptation", explanation: "Coding-agent executable encoding of current task content, kept separate from human input." },
+            { file: "task/sop/task/request.sop", role: "Generated task adaptation", explanation: "Coding-agent executable encoding of current task content, kept separate from human input." },
+            { file: "task/sop/task/analysis.sop", role: "Generated task root", explanation: "The fixed no-input task.analysis root composes current task packages with reviewed kb.* circuits." }
+          ] },
+        { title: "Task observed executor result", files: [
+            { file: "task/results/runtime-result.md", role: "Authoritative runtime result", explanation: "Rendered directly by the CLI from task.analysis public outputs, assurance checks, and receipt evidence." },
+            { file: "task/results/agent-summary.md", role: "Coding-agent provenance only", explanation: "Records input coverage and authoring attempts. It is not a result and does not override runtime-result.md." }
+          ] }
       ]
     };
   </script>
   <script src="../eval-browser.js"></script>
+  <div data-include="partials/footer.html"></div>
+  <script src="../../partials-loader.js"></script>
 </body>
 </html>

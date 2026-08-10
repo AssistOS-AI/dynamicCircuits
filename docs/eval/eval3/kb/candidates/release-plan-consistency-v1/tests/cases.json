@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "name": "uniform dates and compatible term meanings",
+      "category": "positive",
+      "inputs": [{
+        "planId": "alpha",
+        "chapters": [
+          {"chapterId":"overview","launchDate":{"assertionId":"d1","value":"1 Sep 2026","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"GA","termKey":"ga","text":"general availability","meaningKey":"general-availability"}]},
+          {"chapterId":"rollout","launchDate":{"assertionId":"d2","value":"2026-09-01","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"GA","termKey":"ga","text":"availability to all customers","meaningKey":"general-availability"}]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"CONSISTENT","launchDateStatus":"CONSISTENT","conflictingTermKeys":[],"unknownTermKeys":[],"activeDateKeys":["2026-09-01"]}
+    },
+    {
+      "name": "multiple unsuperseded launch dates conflict",
+      "category": "negative",
+      "inputs": [{
+        "planId": "beta",
+        "chapters": [
+          {"chapterId":"one","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[]},
+          {"chapterId":"two","launchDate":{"assertionId":"d2","value":"Sep 8","dateKey":"2026-09-08","supersedes":[]},"definitions":[]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"CONFLICT","launchDateStatus":"CONFLICT","launchDateReason":"multiple_unsuperseded_launch_dates","activeDateKeys":["2026-09-01","2026-09-08"]}
+    },
+    {
+      "name": "explicit later supersession removes earlier date conflict",
+      "category": "exception",
+      "inputs": [{
+        "planId": "gamma",
+        "chapters": [
+          {"chapterId":"one","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[]},
+          {"chapterId":"two","launchDate":{"assertionId":"d2","value":"Sep 8","dateKey":"2026-09-08","supersedes":["d1"]},"definitions":[]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"CONSISTENT","launchDateStatus":"CONSISTENT","activeDateKeys":["2026-09-08"],"supersessionCount":1}
+    },
+    {
+      "name": "partial supersession leaves another active conflict",
+      "category": "exception",
+      "inputs": [{
+        "planId": "delta",
+        "chapters": [
+          {"chapterId":"one","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[]},
+          {"chapterId":"two","launchDate":{"assertionId":"d2","value":"Sep 3","dateKey":"2026-09-03","supersedes":[]},"definitions":[]},
+          {"chapterId":"three","launchDate":{"assertionId":"d3","value":"Sep 8","dateKey":"2026-09-08","supersedes":["d1"]},"definitions":[]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"CONFLICT","launchDateStatus":"CONFLICT","activeDateKeys":["2026-09-03","2026-09-08"],"supersessionCount":1}
+    },
+    {
+      "name": "incompatible term meanings report both source chapters",
+      "category": "negative",
+      "inputs": [{
+        "planId": "epsilon",
+        "chapters": [
+          {"chapterId":"scope","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"cohort","termKey":"cohort","text":"invited customers","meaningKey":"invited"}]},
+          {"chapterId":"metrics","launchDate":{"assertionId":"d2","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"cohort","termKey":"cohort","text":"active customers","meaningKey":"active"}]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"CONFLICT","launchDateStatus":"CONSISTENT","conflictingTermKeys":["cohort"],"termSources":{"termKey":"cohort","sourceChapters":["scope","metrics"]}}
+    },
+    {
+      "name": "differing unclassified definitions preserve uncertainty",
+      "category": "ambiguity",
+      "inputs": [{
+        "planId": "zeta",
+        "chapters": [
+          {"chapterId":"scope","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"cohort","termKey":"cohort","text":"invited customers","meaningKey":null}]},
+          {"chapterId":"metrics","launchDate":{"assertionId":"d2","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"cohort","termKey":"cohort","text":"active customers","meaningKey":null}]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"UNKNOWN","launchDateStatus":"CONSISTENT","unknownTermKeys":["cohort"],"uncertaintyPreserved":true}
+    },
+    {
+      "name": "identical unclassified definition text is consistent",
+      "category": "boundary",
+      "inputs": [{
+        "planId": "eta",
+        "chapters": [
+          {"chapterId":"scope","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"cohort","termKey":"cohort","text":"invited customers","meaningKey":null}]},
+          {"chapterId":"metrics","launchDate":{"assertionId":"d2","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"cohort","termKey":"cohort","text":"invited customers","meaningKey":null}]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"CONSISTENT","launchDateStatus":"CONSISTENT","unknownTermKeys":[]}
+    },
+    {
+      "name": "missing chapter date is unknown",
+      "category": "ambiguity",
+      "inputs": [{
+        "planId": "theta",
+        "chapters": [
+          {"chapterId":"one","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[]},
+          {"chapterId":"two","launchDate":null,"definitions":[]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"UNKNOWN","launchDateStatus":"UNKNOWN","chaptersWithoutDate":["two"],"uncertaintyPreserved":true}
+    },
+    {
+      "name": "empty plan is unknown",
+      "category": "boundary",
+      "inputs": [{"planId":"empty","chapters":[]}],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"UNKNOWN","launchDateStatus":"UNKNOWN","activeDateKeys":[],"uncertaintyPreserved":true}
+    },
+    {
+      "name": "known date conflict outranks but retains term uncertainty",
+      "category": "priority",
+      "inputs": [{
+        "planId": "iota",
+        "chapters": [
+          {"chapterId":"one","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"wave","termKey":"wave","text":"regional group","meaningKey":null}]},
+          {"chapterId":"two","launchDate":{"assertionId":"d2","value":"Sep 2","dateKey":"2026-09-02","supersedes":[]},"definitions":[{"term":"wave","termKey":"wave","text":"customer segment","meaningKey":null}]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"CONFLICT","launchDateStatus":"CONFLICT","unknownTermKeys":["wave"],"uncertaintyPreserved":true}
+    },
+    {
+      "name": "known term conflict retains an unclassified third definition",
+      "category": "ambiguity",
+      "inputs": [{
+        "planId": "kappa",
+        "chapters": [
+          {"chapterId":"one","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"wave","termKey":"wave","text":"regional group","meaningKey":"regional"}]},
+          {"chapterId":"two","launchDate":{"assertionId":"d2","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"wave","termKey":"wave","text":"customer segment","meaningKey":"segment"}]},
+          {"chapterId":"three","launchDate":{"assertionId":"d3","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[{"term":"wave","termKey":"wave","text":"unspecified grouping","meaningKey":null}]}
+        ]
+      }],
+      "expect": {"outcome":"SUCCEEDED","reviewVerdict":"CONFLICT","launchDateStatus":"CONSISTENT","conflictingTermKeys":["wave"],"unknownTermKeys":["wave"],"uncertaintyPreserved":true}
+    },
+    {
+      "name": "non-object plan refuses",
+      "category": "malformed-input",
+      "inputs": ["not-a-plan"],
+      "expect": {"outcome":"REFUSED"}
+    },
+    {
+      "name": "duplicate chapter IDs refuse",
+      "category": "refusal",
+      "inputs": [{
+        "planId":"duplicate-chapter",
+        "chapters":[
+          {"chapterId":"same","launchDate":null,"definitions":[]},
+          {"chapterId":"same","launchDate":null,"definitions":[]}
+        ]
+      }],
+      "expect": {"outcome":"REFUSED"}
+    },
+    {
+      "name": "duplicate assertion IDs refuse",
+      "category": "refusal",
+      "inputs": [{
+        "planId":"duplicate-assertion",
+        "chapters":[
+          {"chapterId":"one","launchDate":{"assertionId":"same","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[]},
+          {"chapterId":"two","launchDate":{"assertionId":"same","value":"Sep 1","dateKey":"2026-09-01","supersedes":[]},"definitions":[]}
+        ]
+      }],
+      "expect": {"outcome":"REFUSED"}
+    },
+    {
+      "name": "future supersession target refuses",
+      "category": "refusal",
+      "inputs": [{
+        "planId":"future-target",
+        "chapters":[
+          {"chapterId":"one","launchDate":{"assertionId":"d1","value":"Sep 1","dateKey":"2026-09-01","supersedes":["d2"]},"definitions":[]},
+          {"chapterId":"two","launchDate":{"assertionId":"d2","value":"Sep 2","dateKey":"2026-09-02","supersedes":[]},"definitions":[]}
+        ]
+      }],
+      "expect": {"outcome":"REFUSED"}
+    },
+    {
+      "name": "missing compatibility classification field refuses",
+      "category": "malformed-input",
+      "inputs": [{
+        "planId":"bad-definition",
+        "chapters":[
+          {"chapterId":"one","launchDate":null,"definitions":[{"term":"wave","termKey":"wave","text":"regional group"}]}
+        ]
+      }],
+      "expect": {"outcome":"REFUSED"}
+    },
+    {
+      "name": "duplicate term key within one chapter refuses",
+      "category": "refusal",
+      "inputs": [{
+        "planId":"duplicate-term",
+        "chapters":[
+          {"chapterId":"one","launchDate":null,"definitions":[
+            {"term":"wave","termKey":"wave","text":"regional group","meaningKey":"regional"},
+            {"term":"Wave","termKey":"wave","text":"customer segment","meaningKey":"segment"}
+          ]}
+        ]
+      }],
+      "expect": {"outcome":"REFUSED"}
+    }
+  ]
+}

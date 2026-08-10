@@ -1,0 +1,89 @@
+@output analysis
+@invariant completeTaskAnalysis covers analysis request small01 small02 small01Report small02Report
+
+@small01 @small02 task.records
+@request task.request
+
+@small01Report kb.data_release_governance.review $small01
+@small02Report kb.data_release_governance.review $small02
+
+@assembleAnalysis define request small01 small02 small01Report small02Report
+    function run({ request, small01, small02, small01Report, small02Report }, ctx) {
+      const reports = [small01Report, small02Report]
+      const expectedRuleIds = request.requestedRuleIdentifiers
+      const expectedRecordIds = request.requestedRecordIdentifiers
+      const evaluatedRecordIds = reports.map((report) => report.releaseIdentifier)
+      const ruleIdentifiersByRecord = reports.map((report) => ({
+        releaseIdentifier: report.releaseIdentifier,
+        ruleIdentifiers: report.findings.map((finding) => finding.ruleId)
+      }))
+      const findingCountByRecord = reports.map((report) => ({
+        releaseIdentifier: report.releaseIdentifier,
+        findingCount: report.findings.length
+      }))
+      const totalFindings = reports.reduce((sum, report) => sum + report.findings.length, 0)
+      const passCount = reports.reduce((sum, report) => sum + report.passCount, 0)
+      const failCount = reports.reduce((sum, report) => sum + report.failCount, 0)
+      const requestedEvaluationCount = expectedRuleIds.length * expectedRecordIds.length
+      const coverageComplete = evaluatedRecordIds.join(",") === expectedRecordIds.join(",")
+        && reports.every((report) => report.findings.length === expectedRuleIds.length
+          && report.findings.every((finding, index) => finding.ruleId === expectedRuleIds[index]))
+        && totalFindings === requestedEvaluationCount
+
+      if (!request.retainEveryFinding || !request.includeAggregate || !request.includeCoverage) {
+        return ctx.reject("unsupported_task_request_shape")
+      }
+
+      return {
+        task: request,
+        recordReports: reports,
+        aggregate: {
+          recordCount: reports.length,
+          totalFindings,
+          passCount,
+          failCount,
+          compliantRecordCount: reports.filter((report) => report.compliant).length,
+          nonCompliantRecordCount: reports.filter((report) => !report.compliant).length
+        },
+        coverage: {
+          requestedRecordIdentifiers: expectedRecordIds,
+          evaluatedRecordIdentifiers: evaluatedRecordIds,
+          requestedRuleIdentifiers: expectedRuleIds,
+          ruleIdentifiersByRecord,
+          findingCountByRecord,
+          requestedEvaluationCount,
+          completedEvaluationCount: totalFindings,
+          complete: coverageComplete
+        },
+        sourceRecords: [
+          { identifier: small01.identifier, sourceLocator: small01.sourceLocator },
+          { identifier: small02.identifier, sourceLocator: small02.sourceLocator }
+        ]
+      }
+    }
+    function check(inputs, output) {
+      return output.recordReports.length === 2
+        && output.aggregate.recordCount === 2
+        && output.aggregate.totalFindings === 20
+        && output.aggregate.passCount + output.aggregate.failCount === 20
+        && output.coverage.requestedEvaluationCount === 20
+        && output.coverage.completedEvaluationCount === 20
+        && output.coverage.complete === true
+    }
+    return { run, check }
+
+@analysis assembleAnalysis $request $small01 $small02 $small01Report $small02Report
+
+@validateCompleteAnalysis define analysis request small01 small02 small01Report small02Report
+    function run({ analysis, request, small01, small02, small01Report, small02Report }) {
+      return analysis.task.sourceLocator === request.sourceLocator
+        && analysis.recordReports[0].releaseIdentifier === small01Report.releaseIdentifier
+        && analysis.recordReports[1].releaseIdentifier === small02Report.releaseIdentifier
+        && analysis.sourceRecords[0].identifier === small01.identifier
+        && analysis.sourceRecords[1].identifier === small02.identifier
+        && analysis.coverage.complete === true
+    }
+    return { run }
+
+@analysisComplete validateCompleteAnalysis $analysis $request $small01 $small02 $small01Report $small02Report
+@completeTaskAnalysis assertInvariant $analysisComplete "analysis must retain both reviewed reports, aggregate data, and complete coverage"

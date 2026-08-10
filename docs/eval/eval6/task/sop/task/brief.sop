@@ -1,0 +1,64 @@
+@input
+@output brief
+
+@assembleBrief define sourceLocator requestedAction requestedReturn title protagonist setting object immediateGoal obstacle choice consequence closingImage motifOne motifTwo motifThree
+    function run(inputs) {
+      return {
+        sourceLocator: inputs.sourceLocator,
+        request: {
+          action: inputs.requestedAction,
+          return: inputs.requestedReturn,
+        },
+        title: inputs.title,
+        protagonist: inputs.protagonist,
+        setting: inputs.setting,
+        object: inputs.object,
+        immediateGoal: inputs.immediateGoal,
+        obstacle: inputs.obstacle,
+        choice: inputs.choice,
+        consequence: inputs.consequence,
+        closingImage: inputs.closingImage,
+        motifs: [inputs.motifOne, inputs.motifTwo, inputs.motifThree],
+      }
+    }
+
+    function check(inputs, output) {
+      return output !== null
+        && typeof output === "object"
+        && output.sourceLocator === inputs.sourceLocator
+        && output.request.action === inputs.requestedAction
+        && output.request.return === inputs.requestedReturn
+        && output.title === inputs.title
+        && output.protagonist === inputs.protagonist
+        && output.setting === inputs.setting
+        && output.object === inputs.object
+        && output.immediateGoal === inputs.immediateGoal
+        && output.obstacle === inputs.obstacle
+        && output.choice === inputs.choice
+        && output.consequence === inputs.consequence
+        && output.closingImage === inputs.closingImage
+        && Array.isArray(output.motifs)
+        && output.motifs.length === 3
+        && output.motifs[0] === inputs.motifOne
+        && output.motifs[1] === inputs.motifTwo
+        && output.motifs[2] === inputs.motifThree
+    }
+
+    return { run, check }
+
+@sourceLocator value "input/brief.md"
+@requestedAction value "generate the vignette and run the independent verifier"
+@requestedReturn value "the Markdown document and the complete verification"
+@title value "The Brass Observatory"
+@protagonist value "Mara Ionescu"
+@setting value "an abandoned hilltop observatory during the first winter storm"
+@object value "a brass compass that points toward remembered places"
+@immediateGoal value "recover her brother's final notebook before the roof collapses"
+@obstacle value "the frozen dome mechanism will open only if she releases the compass into its gears"
+@choice value "Mara sacrifices the compass and turns the dome by hand"
+@consequence value "the notebook is saved, but every route home becomes unfamiliar"
+@closingImage value "snow settling inside the open dome like a new map"
+@motifOne value "red thread"
+@motifTwo value "clockwork breath"
+@motifThree value "unmarked north"
+@brief assembleBrief $sourceLocator $requestedAction $requestedReturn $title $protagonist $setting $object $immediateGoal $obstacle $choice $consequence $closingImage $motifOne $motifTwo $motifThree

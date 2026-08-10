@@ -23,6 +23,10 @@ test("accepts the agent -kbdir/-workdir/-agent invocation form", async (context)
   assert.equal(invocation.command, "codex");
   assert.equal(invocation.cwd, path.join(root, "work"));
   assert.match(invocation.prompt, /Process all 0 files/);
+  assert.match(invocation.prompt, /Encode the task request and current facts as task-local SOP/);
+  assert.match(invocation.prompt, /root package task\.analysis/);
+  assert.match(invocation.prompt, /Never create result\.json/);
+  assert.match(invocation.prompt, /CLI will execute it/);
 });
 
 test("infers KB learning when --workdir is absent", async (context) => {

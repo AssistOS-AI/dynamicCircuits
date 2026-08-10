@@ -1,0 +1,37 @@
+@output notice verification
+@goal requestSatisfied covers requestSatisfied request notice verification generatorVerification validatedBrief brief
+
+@brief @request task.notice_input
+@validatedBrief kb.breach_notice.brief $brief
+@notice @generatorVerification kb.breach_notice.generate $validatedBrief
+@verification kb.breach_notice.verify $validatedBrief $notice
+@requestSatisfied confirmRequestedAnalysis $request $notice $verification $generatorVerification $validatedBrief $brief
+
+@confirmRequestedAnalysis define request notice verification generatorVerification validatedBrief brief
+    async function run({ request, notice, verification, generatorVerification, validatedBrief, brief }) {
+      const verifierResultsMatch = JSON.stringify(verification) === JSON.stringify(generatorVerification)
+      return {
+        ok: request.operation === "generate_fact_bounded_notice_and_run_independent_verifier"
+          && JSON.stringify(request.requiredOutputs) === JSON.stringify(["full_markdown", "verification"])
+          && request.prohibitedAdditions.length === 5
+          && request.sourceLocator === "input/brief.md"
+          && typeof notice === "string"
+          && notice.length > 0
+          && verification.ok === true
+          && generatorVerification.ok === true
+          && verifierResultsMatch
+          && JSON.stringify(validatedBrief) === JSON.stringify(brief),
+        independentVerifierRun: true,
+        verifierResultsMatch,
+        sourceLocator: request.sourceLocator
+      }
+    }
+
+    async function check(inputs, output) {
+      return output.ok === true
+        && output.independentVerifierRun === true
+        && output.verifierResultsMatch === true
+        && output.sourceLocator === inputs.request.sourceLocator
+    }
+
+    return { run, check }

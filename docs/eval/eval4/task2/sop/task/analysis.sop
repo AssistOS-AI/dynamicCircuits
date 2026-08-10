@@ -1,0 +1,8 @@
+@input
+@output source context scholar_query scholar_result curious_query curious_result patient_query patient_result
+
+@source @context @scholar_query @curious_query @patient_query task.context_and_questions
+
+@scholar_result kb.unary_entailment.evaluate $context $scholar_query
+@curious_result kb.unary_entailment.evaluate $context $curious_query
+@patient_result kb.unary_entailment.evaluate $context $patient_query

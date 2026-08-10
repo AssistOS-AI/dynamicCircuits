@@ -34,6 +34,18 @@ already displays the active DS title. Documentation prose must begin with the co
 explained. Slogans, rhetorical contrasts, and claims framed mainly as what the system is not should be replaced with direct
 operational descriptions.
 
+The primary site navigation must have one maintained source under `docs/partials/`. Reader pages at every nesting level,
+including evaluation catalogs and individual evaluation browsers, must load that partial through the shared loader instead
+of copying header markup. The top-level navigation must group related destinations into compact submenus with three or four
+vertical choices where the available pages permit it. The loader must resolve partial links from the documentation root so
+the same source works beneath an arbitrary static mount prefix.
+
+Each durable HTML page must restate enough project context to be understandable without an earlier page, define local terms,
+give at least one concrete file or execution example, and link to the relevant runnable guide and normative DS. Every diagram
+must have a reader-facing title and subtitle, be centered, contain no more than five focused nodes, and be followed by prose
+that explains every node and relationship. Long explanatory prose uses justified alignment through the shared stylesheet.
+Entry pages must route readers toward input guidance, a runnable tutorial, implementation details, evaluations, and DS files.
+
 `docs/tutorial.html` is the maintained manual verification path. Any change to CLI modes, generated workspace structure,
 agent invocation, supported SOP commands, evaluation fixtures, or expected outputs must update the corresponding tutorial
 step and expected observation in the same change.
@@ -54,6 +66,11 @@ Response: The historical roadmap selected Node.js `.mjs` without dependencies fo
 ### Question #2: How are large modules handled?
 
 Response: File size is a review signal rather than an invitation to mechanical fragmentation. Split along parser, compiler, runtime, workspace, and adapter contracts, and verify repository limits with `fileSizesCheck.sh`.
+
+### Question #3: Why is navigation loaded from one partial?
+
+Response: A single source keeps new pages discoverable across overview, tutorial, specification, and nested evaluation
+views. Mount-aware link resolution avoids maintaining a different copied menu for each directory depth.
 
 ## Conclusion
 

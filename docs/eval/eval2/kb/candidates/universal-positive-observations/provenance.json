@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "manifestPath": "rule.md",
+      "workspacePath": "input/rule.md",
+      "bytes": 423,
+      "sha256": "f370ceb2bcd7ca0a7d3723c1616a70fc502d5dcb960083ae99990ab927b4573c",
+      "readStatus": "complete",
+      "spans": [
+        {
+          "lines": "3-4",
+          "supports": ["non-positive refutation rule", "finite-observation context"],
+          "excerpt": "The claim ... is refuted when any finite observation is less than or equal to zero."
+        },
+        {
+          "lines": "4-4",
+          "supports": ["source observation witness requirement"],
+          "excerpt": "A refutation must expose at least one source observation as a witness."
+        },
+        {
+          "lines": "4-5",
+          "supports": ["mean and universal claim separation"],
+          "excerpt": "A positive mean establishes only the aggregate claim, not the universal claim."
+        },
+        {
+          "lines": "5-6",
+          "supports": ["unavailable rather than false conditions"],
+          "excerpt": "An empty dataset, a missing value, or a non-numeric observation makes the computation unavailable rather than false."
+        }
+      ]
+    }
+  ],
+  "corpusFacts": [],
+  "notes": [
+    "The input is a reusable review rule and contains no task observation values.",
+    "Source locator schema, duplicate identifier behavior, positive verdict label, and witness ordering are candidate policy choices."
+  ]
+}

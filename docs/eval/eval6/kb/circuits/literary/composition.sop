@@ -1,0 +1,17 @@
+@input brief
+@output markdown verification
+@invariant compositionValid covers markdown verification
+
+@validateComposition define markdown verification
+    function run({ markdown, verification }) {
+      return typeof markdown === "string"
+        && verification !== null
+        && typeof verification === "object"
+        && typeof verification.ok === "boolean"
+        && Array.isArray(verification.checks)
+    }
+    return { run }
+
+@markdown kb.literary.generator $brief
+@verification kb.literary.verifier $brief $markdown
+@compositionValid validateComposition $markdown $verification

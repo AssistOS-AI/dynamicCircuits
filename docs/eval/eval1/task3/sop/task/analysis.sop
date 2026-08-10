@@ -1,0 +1,124 @@
+@input
+@output findings totals coverage
+@goal analysisComplete covers findings totals coverage
+
+@rows @request task.cases
+
+@rowG get $rows "0"
+@rowH get $rows "1"
+@rowI get $rows "2"
+@rowJ get $rows "3"
+
+@noticeG get $rowG "notice"
+@noticeH get $rowH "notice"
+@noticeI get $rowI "notice"
+@noticeJ get $rowJ "notice"
+
+@findingG kb.notice_review.evaluate $noticeG
+@findingH kb.notice_review.evaluate $noticeH
+@findingI kb.notice_review.evaluate $noticeI
+@findingJ kb.notice_review.evaluate $noticeJ
+
+@assembleFindings define rowG findingG rowH findingH rowI findingI rowJ findingJ
+    function run({ rowG, findingG, rowH, findingH, rowI, findingI, rowJ, findingJ }) {
+      const combine = (row, finding) => ({
+        caseId: row.caseId,
+        sourceLocator: row.sourceLocator,
+        noticeProvidedDays: finding.reviewDays,
+        applicableMinimumDays: finding.applicableMinimumDays,
+        exceptionUsed: finding.exceptionEligible,
+        reviewPath: finding.reviewPath,
+        compliance: finding.status,
+        reason: finding.reason,
+        evidence: finding.evidence,
+        reviewedRuleSourceLocator: finding.sourceLocator
+      })
+      return [
+        combine(rowG, findingG),
+        combine(rowH, findingH),
+        combine(rowI, findingI),
+        combine(rowJ, findingJ)
+      ]
+    }
+
+    function check(inputs, output) {
+      return Array.isArray(output)
+        && output.length === 4
+        && output.every((item) => ["COMPLIANT", "NON_COMPLIANT"].includes(item.compliance)
+          && typeof item.applicableMinimumDays === "number"
+          && typeof item.exceptionUsed === "boolean"
+          && Object.prototype.hasOwnProperty.call(item, "reason"))
+    }
+
+    return { run, check }
+
+@findings assembleFindings $rowG $findingG $rowH $findingH $rowI $findingI $rowJ $findingJ
+
+@summarize define findings
+    function run({ findings }) {
+      return {
+        total: findings.length,
+        compliant: findings.filter((finding) => finding.compliance === "COMPLIANT").length,
+        nonCompliant: findings.filter((finding) => finding.compliance === "NON_COMPLIANT").length,
+        exceptionUsed: findings.filter((finding) => finding.exceptionUsed).length,
+        ordinaryMinimum: findings.filter((finding) => finding.reviewPath === "ORDINARY_MINIMUM").length,
+        expeditedException: findings.filter((finding) => finding.reviewPath === "EXPEDITED_EXCEPTION").length
+      }
+    }
+
+    function check(inputs, output) {
+      return output.total === output.compliant + output.nonCompliant
+        && output.total === output.ordinaryMinimum + output.expeditedException
+        && output.exceptionUsed === output.expeditedException
+    }
+
+    return { run, check }
+
+@totals summarize $findings
+
+@buildCoverage define rows request findings totals
+    function run({ rows, request, findings, totals }) {
+      const requestedCaseIds = request.requestedCaseIds
+      const evaluatedCaseIds = findings.map((finding) => finding.caseId)
+      return {
+        inputSource: request.inputSource,
+        inputSha256: request.inputSha256,
+        requestLocator: request.requestLocator,
+        evidenceBoundaryLocator: request.evidenceBoundaryLocator,
+        rowSourceLocators: rows.map((row) => row.sourceLocator),
+        requestedOutputs: request.requestedOutputs,
+        requestedCaseIds,
+        evaluatedCaseIds,
+        requestedCaseCount: requestedCaseIds.length,
+        evaluatedCaseCount: findings.length,
+        allRequestedCasesEvaluated: requestedCaseIds.length === evaluatedCaseIds.length
+          && requestedCaseIds.every((caseId, index) => caseId === evaluatedCaseIds[index]),
+        reviewedCircuit: "kb.notice_review.evaluate",
+        reviewedRuleSourceLocators: [...new Set(findings.map((finding) => finding.reviewedRuleSourceLocator))],
+        normalization: request.normalization,
+        totalsAgreeWithEvaluatedCount: totals.total === findings.length
+      }
+    }
+
+    function check(inputs, output) {
+      return output.allRequestedCasesEvaluated
+        && output.totalsAgreeWithEvaluatedCount
+        && output.rowSourceLocators.length === output.requestedCaseCount
+        && output.reviewedCircuit === "kb.notice_review.evaluate"
+    }
+
+    return { run, check }
+
+@coverage buildCoverage $rows $request $findings $totals
+
+@validateAnalysis define findings totals coverage
+    function run({ findings, totals, coverage }) {
+      return findings.length === totals.total
+        && coverage.allRequestedCasesEvaluated
+        && coverage.totalsAgreeWithEvaluatedCount
+        && findings.every((finding) => finding.sourceLocator.startsWith("input/cases-and-request.md:"))
+    }
+    return { run }
+
+@analysisValid validateAnalysis $findings $totals $coverage
+@analysisComplete assertInvariant $analysisValid "analysis must cover all requested cases and reconcile totals"

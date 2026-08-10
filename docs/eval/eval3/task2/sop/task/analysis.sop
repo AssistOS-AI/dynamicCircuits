@@ -1,0 +1,15 @@
+@output review evidence
+@goal analysisGrounded covers review evidence
+
+@plan @evidence task.release_plan
+@review kb.release_plan_consistency.review $plan
+
+@ground define review evidence
+    function run({ review, evidence }) {
+      return review.planId === "consistent-release-plan"
+        && evidence.sourceDocument === "input/plan.md"
+        && evidence.taskRequest.preferredValueAuthorized === false
+    }
+    return { run }
+
+@analysisGrounded ground $review $evidence

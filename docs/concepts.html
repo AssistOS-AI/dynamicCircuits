@@ -18,19 +18,23 @@
     <p class="lead">The coding agent reads human documents and writes SOP files. The compiler checks the SOP files, the runtime executes them, and the result folder preserves both the report and the execution evidence.</p>
 
     <h2>A concrete example</h2>
-    <p><a href="eval/eval1/index.html">Eval 1</a> asks whether three notice cases comply with a policy. Its input folder has
-      three Markdown files: <code>rule.md</code> states the 30-day rule and the 10-day exception,
-      <code>cases.md</code> supplies the facts for cases A–C, and <code>task.md</code> states the requested output. These are
-      ordinary documents. They contain no JSON payload and no hidden runtime instruction.</p>
+    <p><a href="eval/eval1/index.html">Eval 1</a> asks whether three notice cases comply with a policy. Its reusable KB input
+      <code>rule.md</code> states the 30-day rule and the 10-day exception. Its current task inputs are
+      <code>cases.md</code>, which supplies facts for cases A–C, and <code>task.md</code>, which states the requested output.
+      These are ordinary Markdown documents. They contain no JSON payload and no hidden runtime instruction.</p>
+    <figure class="diagram">
+      <figcaption><strong>Implemented source-to-result path</strong>The agent interprets; local code validates and executes</figcaption>
     <pre class="mermaid">flowchart LR
-      D[Three Markdown files] --> A[Agent writes SOP]
-      A --> C[Compiler checks graph]
-      C --> R[Runtime returns findings]</pre>
+      D[/Three Markdown files/] --> A[Agent writes SOP]
+      A --> C{Compiler accepts graph?}
+      C -->|yes| R([Runtime findings])
+      C -->|no| X([Diagnostic and repair])</pre></figure>
     <p>This diagram is the complete implemented path. The first arrow is an interpretation step performed by the coding
       agent: prose rules and case facts become explicit commands and values in <code>sop/</code>. The second arrow is a
       mechanical check performed by local code: package names, arguments, wires, dependencies, outputs, and cycles are
       validated. The third arrow is deterministic execution: the same accepted SOP and inputs produce the same findings
-      and receipt.</p>
+      and receipt. The diagnostic branch preserves a precise compile error so the agent or reviewer can repair the SOP before
+      any node executes.</p>
 
     <h2>What each file contributes</h2>
     <p>The following table traces the example instead of assigning vague architectural labels. Each row names a real file,
@@ -38,16 +42,17 @@
     <table>
       <thead><tr><th>File</th><th>Information used</th><th>Executable representation</th></tr></thead>
       <tbody>
-        <tr><td><code>input/rule.md</code></td><td>Ordinary minimum is 30 days. The minimum becomes 10 days only when expedited treatment is requested and written consent is recorded.</td><td><code>sop/policy.sop</code> validates one case, selects 30 or 10, and returns one finding.</td></tr>
-        <tr><td><code>input/cases.md</code></td><td>Case identifiers, notice days, expedited request, and consent evidence.</td><td><code>sop/analysis.sop</code> calls the policy circuit once for each committed case.</td></tr>
-        <tr><td><code>input/task.md</code></td><td>Required per-case fields, totals, and coverage expectation.</td><td><code>@output</code> ports expose findings and statistics; a goal checks that all three cases were classified.</td></tr>
-        <tr><td><code>sop/*.sop</code></td><td>Agent's explicit interpretation of all three source files.</td><td>The compiler produces the dependency graph executed by the runtime.</td></tr>
-        <tr><td><code>results/result.json</code></td><td>Observed verdicts, totals, runtime outcome, and limitations.</td><td>A compact committed summary of a reproducible run; it is output, not source input.</td></tr>
+        <tr><td><code>kb/input/rule.md</code></td><td>Ordinary minimum is 30 days. The minimum becomes 10 days only when expedited treatment is requested and written consent is recorded.</td><td><code>kb/circuits/policy.sop</code>, package <code>kb.policy</code>, validates one case, selects 30 or 10, and returns one finding.</td></tr>
+        <tr><td><code>task/input/cases.md</code></td><td>Case identifiers, notice days, expedited request, and consent evidence.</td><td><code>task/sop/analysis.sop</code> calls the reusable policy once for each committed case.</td></tr>
+        <tr><td><code>task/input/task.md</code></td><td>Required per-case fields, totals, and coverage expectation.</td><td><code>@output</code> ports expose findings and statistics; a goal checks that all three cases were classified.</td></tr>
+        <tr><td><code>kb/circuits/*.sop</code> and <code>task/sop/*.sop</code></td><td>The explicit interpretation, separated by reuse lifetime.</td><td>The compiler resolves both package roots and produces the dependency graph executed by the runtime.</td></tr>
+        <tr><td><code>task/results/result.json</code></td><td>Observed verdicts, totals, runtime outcome, and limitations.</td><td>A compact committed summary of a reproducible run; it is output, not source input.</td></tr>
       </tbody>
     </table>
     <p>The important boundary is visible in the middle column. The agent may misunderstand a document, so its generated SOP
       must remain inspectable. The runtime does not reread the policy and does not silently repair that interpretation. It
-      executes the rule that was actually written, allowing a reviewer to compare source prose, executable rule, and result.</p>
+      executes the rule that was actually written, allowing a reviewer to compare source prose, executable rule, and result.
+      The <a href="workspace-conventions.html">KB/task convention</a> explains why the policy and cases occupy separate roots.</p>
 
     <h2>What the agent writes</h2>
     <p>For one case, the generated rule has five ordered inputs: case identifier, observed notice days, expedited-request
@@ -73,15 +78,17 @@
       <li>package names resolve from file paths without collisions;</li>
       <li>the dependency graph has no cycle.</li>
     </ul>
-    <p>For example, removing the consent argument from a call to <code>eval1.policy</code> stops compilation with
+    <p>For example, removing the consent argument from a call to <code>kb.policy</code> stops compilation with
       <code>CIRCUIT_ARITY_MISMATCH</code>. Misspelling <code>$noticeDays</code> stops with <code>FREE_WIRE</code>. Neither defect
       reaches runtime or becomes a polished report.</p>
 
     <h2>What the runtime does</h2>
+    <figure class="diagram">
+      <figcaption><strong>One runtime execution</strong>Required nodes produce both requested values and auditable evidence</figcaption>
     <pre class="mermaid">flowchart LR
-      I[Explicit input values] --> N[Required nodes]
-      N --> O[Public outputs]
-      N --> E[Receipt evidence]</pre>
+      I[/Explicit input values/] --> N{Required graph nodes}
+      N --> O([Public outputs])
+      N --> E[(Receipt evidence)]</pre></figure>
     <p>The runtime starts from the requested outputs and obligations, walks backward to find the required nodes, and executes
       those nodes in dependency order. Nodes unrelated to an output or goal are marked dead and do not run. Public outputs
       contain the requested findings; the receipt separately records node states, input and output hashes, checks, nested
@@ -100,6 +107,10 @@
       compare outputs, and examine receipts. You cannot infer from one successful run that all rules in an arbitrary corpus
       were discovered. The <a href="assurance.html">assurance page</a> explains how that future coverage check is intended to
       work, using the same notice example rather than a separate vocabulary.</p>
+    <p>The normative language and runtime contracts are <a href="specsLoader.html?spec=DS004-sop-language.md">DS004</a> and
+      <a href="specsLoader.html?spec=DS005-compiler-runtime.md">DS005</a>. Use the
+      <a href="input-guide.html">input guide</a> for source preparation and the
+      <a href="tutorial.html">manual tutorial</a> for a reproducible run.</p>
   </article></main>
   <div data-include="partials/footer.html"></div>
   <script src="partials-loader.js"></script>

@@ -1,0 +1,35 @@
+@output request
+@invariant requestRetained covers request
+
+@makeRequest define
+    function run() {
+      return {
+        requestedRuleIdentifiers: ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10"],
+        requestedRecordIdentifiers: ["SMALL-01", "SMALL-02"],
+        retainEveryFinding: true,
+        includeAggregate: true,
+        includeCoverage: true,
+        sourceLocator: "input/task.md:1-3"
+      }
+    }
+    function check(inputs, output) {
+      return output.requestedRuleIdentifiers.length === 10
+        && output.requestedRecordIdentifiers.length === 2
+        && output.retainEveryFinding === true
+        && output.includeAggregate === true
+        && output.includeCoverage === true
+    }
+    return { run, check }
+
+@request makeRequest
+
+@validateRequest define request
+    function run({ request }) {
+      return request.requestedRuleIdentifiers.join(",") === "R01,R02,R03,R04,R05,R06,R07,R08,R09,R10"
+        && request.requestedRecordIdentifiers.join(",") === "SMALL-01,SMALL-02"
+        && request.sourceLocator === "input/task.md:1-3"
+    }
+    return { run }
+
+@requestComplete validateRequest $request
+@requestRetained assertInvariant $requestComplete "the manifested review request must be retained"

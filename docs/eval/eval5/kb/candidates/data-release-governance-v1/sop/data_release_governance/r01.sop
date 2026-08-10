@@ -1,0 +1,31 @@
+@input release
+@output finding
+@invariant findingIdentified covers finding
+
+@evaluate define release
+    function run({ release }, ctx) {
+      if (release === null || typeof release !== "object" || Array.isArray(release)) {
+        return ctx.reject("release_record_must_be_an_object", { ruleId: "R01" })
+      }
+      if (typeof release.containsPersonalData !== "boolean") {
+        return ctx.reject("contains_personal_data_must_be_boolean", { ruleId: "R01" })
+      }
+      const applicable = release.containsPersonalData
+      const passes = !applicable || release.consentBasis === "documented"
+      return {
+        ruleId: "R01",
+        status: passes ? "PASS" : "FAIL",
+        reason: passes ? null : "personal_data_requires_documented_consent",
+        path: applicable ? "APPLICABLE" : "NOT_APPLICABLE",
+        sourceLocator: "input/knowledge-base.md:15"
+      }
+    }
+    function check(inputs, output) {
+      return output.ruleId === "R01" && ["PASS", "FAIL"].includes(output.status)
+    }
+    return { run, check }
+
+@finding evaluate $release
+@ruleId get $finding "ruleId"
+@ruleIdCorrect equal $ruleId "R01"
+@findingIdentified assertInvariant $ruleIdCorrect "R01 finding must retain its rule identifier"

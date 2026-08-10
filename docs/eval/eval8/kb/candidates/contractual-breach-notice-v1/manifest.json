@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "candidate": {
+    "id": "contractual-breach-notice-v1",
+    "version": "1.0.0-candidate",
+    "status": "REVIEW_REQUIRED",
+    "semanticTrust": false,
+    "automaticApplicability": false
+  },
+  "source": {
+    "path": "input/legal-notice-generation-rules.md",
+    "bytes": 2473,
+    "sha256": "f24be339d485bce52a9d35393dab9d0d48cc5611489dc80e18b5770d314f47c3",
+    "coverage": "36 of 36 lines reviewed"
+  },
+  "sop": {
+    "subset": "implemented-v1",
+    "root": "sop",
+    "packages": [
+      {
+        "name": "breach_notice.brief",
+        "path": "sop/breach_notice/brief.sop",
+        "packageHash": "sha256:d80449a48b45b767124590f7178c019d6dae00e944db5533bfe4eb1eb40fdb51"
+      },
+      {
+        "name": "breach_notice.verify",
+        "path": "sop/breach_notice/verify.sop",
+        "packageHash": "sha256:ae0df9e8407b1875c1e09ca62e489b81590a6d0dbb99e52962edd46ae867f1a8"
+      },
+      {
+        "name": "breach_notice.generate",
+        "path": "sop/breach_notice/generate.sop",
+        "packageHash": "sha256:fc454c6a272b9190b20bf68eb0b6e5760e97a2df2dacf3a6656fd1b12ff8a43e"
+      }
+    ],
+    "recommendedEntrypoints": ["breach_notice.generate", "breach_notice.verify"],
+    "effects": [],
+    "capabilities": [],
+    "directLlmApi": false
+  },
+  "overlap": {
+    "trustedCircuitsDirectoryPresent": false,
+    "trustedPackagesReviewed": 0,
+    "duplicateDetected": false
+  },
+  "tests": {
+    "runner": "tests/run-cases.mjs",
+    "executedCases": 13,
+    "passed": 13,
+    "failed": 0,
+    "unexpectedErrors": 0,
+    "categories": ["positive", "negative", "boundary", "exception", "malformed", "refusal", "rejection"]
+  },
+  "artifacts": [
+    { "path": "applicability.md", "sha256": "0fda8c5428dc2994012031f9662f0494944d8eaf4aed0f0b985201528ec267c7" },
+    { "path": "contract.md", "sha256": "570184910102171a1820beb9972191fbe831325fec2960bdf22b833e0ed58fd3" },
+    { "path": "examples.md", "sha256": "f899369e13e699d17a4fd317f74a4fa444ae36b4a984afa96aea691e36a22952" },
+    { "path": "inventory.md", "sha256": "26b4578a6cb7029db41d9b440747cb8680740f575542d89a635ee3731a4abc1f" },
+    { "path": "provenance.json", "sha256": "746318a407bcf09f45b75f43df1b5ce1278fc2ffa1ba9b3c69734441159d1c07" },
+    { "path": "sop/breach_notice/brief.sop", "sha256": "d80449a48b45b767124590f7178c019d6dae00e944db5533bfe4eb1eb40fdb51" },
+    { "path": "sop/breach_notice/generate.sop", "sha256": "fc454c6a272b9190b20bf68eb0b6e5760e97a2df2dacf3a6656fd1b12ff8a43e" },
+    { "path": "sop/breach_notice/verify.sop", "sha256": "ae0df9e8407b1875c1e09ca62e489b81590a6d0dbb99e52962edd46ae867f1a8" },
+    { "path": "tests/run-cases.mjs", "sha256": "5b0cf01586cb092d3e10babc09e835de61db0c1b9fbd482ea8b83c9598624938" },
+    { "path": "tests/test-plan.md", "sha256": "f2dbde0229ccd6b78c3494a6f1095cca14436df66f096df8bbcba47d22d802c4" },
+    { "path": "tests/test-report.md", "sha256": "d29e8b026f9f84c6b0757f285140093a094161edb038b61887a227cf767bb7de" }
+  ],
+  "review": {
+    "required": true,
+    "roles": ["domain owner", "SOP/runtime reviewer"],
+    "blockingQuestions": [
+      "currency-symbol and case-sensitivity scope",
+      "unknown brief property policy",
+      "Markdown/newline handling while preserving verbatim values",
+      "overlapping or equal party-name occurrence semantics",
+      "multi-line exhibit representation"
+    ]
+  }
+}

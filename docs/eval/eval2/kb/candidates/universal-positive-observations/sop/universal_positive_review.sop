@@ -1,0 +1,128 @@
+@input observations
+@output review
+
+# Reviews one complete, source-located finite observation set.
+@reviewObservations define observations
+    function validateObservations(observations) {
+      if (observations === undefined || observations === null) {
+        return { code: "missing_dataset", details: {} }
+      }
+      if (!Array.isArray(observations)) {
+        return { code: "observations_not_array", details: {} }
+      }
+      if (observations.length === 0) {
+        return { code: "empty_dataset", details: {} }
+      }
+
+      const seenIds = []
+      for (let index = 0; index < observations.length; index += 1) {
+        const observation = observations[index]
+        if (!observation || typeof observation !== "object" || Array.isArray(observation)) {
+          return { code: "malformed_observation", details: { index } }
+        }
+        if (typeof observation.id !== "string" || observation.id.trim().length === 0) {
+          return { code: "missing_observation_id", details: { index } }
+        }
+        if (seenIds.indexOf(observation.id) !== -1) {
+          return { code: "duplicate_observation_id", details: { id: observation.id, index } }
+        }
+        seenIds.push(observation.id)
+        if (observation.value === undefined || observation.value === null) {
+          return { code: "missing_value", details: { id: observation.id, index } }
+        }
+        if (typeof observation.value !== "number" || !Number.isFinite(observation.value)) {
+          return { code: "non_numeric_observation", details: { id: observation.id, index } }
+        }
+        if (!observation.source || typeof observation.source !== "object" || Array.isArray(observation.source)) {
+          return { code: "missing_source_locator", details: { id: observation.id, index } }
+        }
+        if (typeof observation.source.path !== "string" || observation.source.path.trim().length === 0) {
+          return { code: "missing_source_locator", details: { id: observation.id, index } }
+        }
+        if (typeof observation.source.locator !== "string" || observation.source.locator.trim().length === 0) {
+          return { code: "missing_source_locator", details: { id: observation.id, index } }
+        }
+      }
+      return null
+    }
+
+    function updateMean(mean, value, count) {
+      if (count === 1) return value
+      const previousCount = count - 1
+      const sameSign = (mean >= 0 && value >= 0) || (mean <= 0 && value <= 0)
+      if (sameSign) return mean + ((value - mean) / count)
+      return (mean * (previousCount / count)) + (value / count)
+    }
+
+    function expectedReview(observations) {
+      let mean = 0
+      let witness = null
+      for (let index = 0; index < observations.length; index += 1) {
+        const observation = observations[index]
+        mean = updateMean(mean, observation.value, index + 1)
+        if (witness === null && observation.value <= 0) {
+          witness = {
+            id: observation.id,
+            value: observation.value,
+            source: {
+              path: observation.source.path,
+              locator: observation.source.locator,
+            },
+          }
+        }
+      }
+      return {
+        claim: "all_observations_are_strictly_positive",
+        verdict: witness === null ? "SUPPORTED" : "REFUTED",
+        observationCount: observations.length,
+        witness,
+        aggregate: {
+          mean,
+          meanIsStrictlyPositive: mean > 0,
+        },
+      }
+    }
+
+    async function run({ observations }, ctx) {
+      const invalid = validateObservations(observations)
+      if (invalid) return ctx.reject(invalid.code, invalid.details)
+      return expectedReview(observations)
+    }
+
+    async function check({ observations }, output) {
+      if (validateObservations(observations)) return false
+      const expected = expectedReview(observations)
+      return JSON.stringify(output) === JSON.stringify(expected)
+    }
+
+    return { run, check }
+
+@review reviewObservations $observations
+
+# Makes grounding of the verdict and witness an explicit blocking invariant.
+@validateReview define review observations
+    async function run({ review, observations }) {
+      if (!review || !Array.isArray(observations) || observations.length === 0) return false
+      if (review.observationCount !== observations.length) return false
+      if (!review.aggregate || typeof review.aggregate.mean !== "number") return false
+      if (review.aggregate.meanIsStrictlyPositive !== (review.aggregate.mean > 0)) return false
+
+      if (review.verdict === "SUPPORTED") {
+        if (review.witness !== null) return false
+        return observations.every((observation) => observation.value > 0)
+      }
+      if (review.verdict !== "REFUTED" || !review.witness) return false
+
+      const sourceMatch = observations.some((observation) => (
+        observation.id === review.witness.id
+        && observation.value === review.witness.value
+        && observation.source.path === review.witness.source.path
+        && observation.source.locator === review.witness.source.locator
+      ))
+      return sourceMatch && review.witness.value <= 0
+    }
+
+    return { run }
+
+@reviewValid validateReview $review $observations
+@invariant reviewValid covers review observations

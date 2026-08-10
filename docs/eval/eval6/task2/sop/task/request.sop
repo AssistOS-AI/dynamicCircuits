@@ -1,0 +1,25 @@
+@input
+@output request
+
+@provideRequest define
+    function expectedRequest() {
+      return {
+        deliverables: ["markdown-vignette", "complete-independent-verification"],
+        source: {
+          path: "input/brief.md",
+          locator: "final paragraph",
+        },
+      }
+    }
+
+    function run() {
+      return expectedRequest()
+    }
+
+    function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(expectedRequest())
+    }
+
+    return { run, check }
+
+@request provideRequest

@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "package": "notice_review.evaluate",
+  "cases": [
+    {
+      "name": "ordinary notice above minimum",
+      "category": "positive",
+      "inputs": [{ "reviewDays": 45, "expedited": false }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "COMPLIANT",
+        "applicableMinimumDays": 30,
+        "reviewPath": "ORDINARY_MINIMUM",
+        "exceptionEligible": false
+      }
+    },
+    {
+      "name": "ordinary notice at 30-day boundary",
+      "category": "boundary",
+      "inputs": [{ "reviewDays": 30, "expedited": false }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "COMPLIANT",
+        "applicableMinimumDays": 30,
+        "reviewPath": "ORDINARY_MINIMUM"
+      }
+    },
+    {
+      "name": "ordinary notice below minimum",
+      "category": "negative",
+      "inputs": [{ "reviewDays": 29, "expedited": false }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "NON_COMPLIANT",
+        "reason": "notice_below_applicable_minimum",
+        "applicableMinimumDays": 30
+      }
+    },
+    {
+      "name": "eligible expedited notice at 10-day boundary",
+      "category": "exception",
+      "inputs": [{
+        "reviewDays": 10,
+        "expedited": true,
+        "subjectExplicitlyRequestedExpedited": true,
+        "writtenConsentRecorded": true
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "COMPLIANT",
+        "applicableMinimumDays": 10,
+        "reviewPath": "EXPEDITED_EXCEPTION",
+        "exceptionEligible": true,
+        "writtenConsentState": "RECORDED"
+      }
+    },
+    {
+      "name": "eligible expedited notice above minimum",
+      "category": "positive",
+      "inputs": [{
+        "reviewDays": 18,
+        "expedited": true,
+        "subjectExplicitlyRequestedExpedited": true,
+        "writtenConsentRecorded": true
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "COMPLIANT",
+        "applicableMinimumDays": 10,
+        "reviewPath": "EXPEDITED_EXCEPTION"
+      }
+    },
+    {
+      "name": "eligible expedited notice below minimum",
+      "category": "negative",
+      "inputs": [{
+        "reviewDays": 9,
+        "expedited": true,
+        "subjectExplicitlyRequestedExpedited": true,
+        "writtenConsentRecorded": true
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "NON_COMPLIANT",
+        "reason": "notice_below_applicable_minimum",
+        "applicableMinimumDays": 10,
+        "reviewPath": "EXPEDITED_EXCEPTION"
+      }
+    },
+    {
+      "name": "expedited flag does not infer missing consent",
+      "category": "exception",
+      "inputs": [{
+        "reviewDays": 10,
+        "expedited": true,
+        "subjectExplicitlyRequestedExpedited": true
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "NON_COMPLIANT",
+        "applicableMinimumDays": 30,
+        "reviewPath": "ORDINARY_MINIMUM",
+        "exceptionEligible": false,
+        "writtenConsentState": "MISSING"
+      }
+    },
+    {
+      "name": "30 days remains compliant when expedited consent is missing",
+      "category": "boundary",
+      "inputs": [{
+        "reviewDays": 30,
+        "expedited": true,
+        "subjectExplicitlyRequestedExpedited": true
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "COMPLIANT",
+        "applicableMinimumDays": 30,
+        "reviewPath": "ORDINARY_MINIMUM",
+        "writtenConsentState": "MISSING"
+      }
+    },
+    {
+      "name": "explicit false consent does not qualify",
+      "category": "negative",
+      "inputs": [{
+        "reviewDays": 10,
+        "expedited": true,
+        "subjectExplicitlyRequestedExpedited": true,
+        "writtenConsentRecorded": false
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "NON_COMPLIANT",
+        "applicableMinimumDays": 30,
+        "writtenConsentState": "NOT_RECORDED"
+      }
+    },
+    {
+      "name": "consent without explicit request does not qualify",
+      "category": "negative",
+      "inputs": [{
+        "reviewDays": 10,
+        "expedited": true,
+        "subjectExplicitlyRequestedExpedited": false,
+        "writtenConsentRecorded": true
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "NON_COMPLIANT",
+        "applicableMinimumDays": 30,
+        "exceptionEligible": false
+      }
+    },
+    {
+      "name": "request and consent without expedited flag do not qualify",
+      "category": "negative",
+      "inputs": [{
+        "reviewDays": 10,
+        "expedited": false,
+        "subjectExplicitlyRequestedExpedited": true,
+        "writtenConsentRecorded": true
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "NON_COMPLIANT",
+        "applicableMinimumDays": 30,
+        "reviewPath": "ORDINARY_MINIMUM"
+      }
+    },
+    {
+      "name": "omitted optional evidence uses ordinary minimum",
+      "category": "boundary",
+      "inputs": [{ "reviewDays": 30 }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "status": "COMPLIANT",
+        "applicableMinimumDays": 30,
+        "writtenConsentState": "MISSING"
+      }
+    },
+    {
+      "name": "non-object notice refuses",
+      "category": "malformed-input",
+      "inputs": ["notice"],
+      "expect": { "outcome": "REFUSED", "refusalCode": "notice_must_be_an_object" }
+    },
+    {
+      "name": "missing positional notice fails interface arity",
+      "category": "refusal",
+      "inputs": [],
+      "expect": { "outcome": "INVOCATION_ERROR", "errorCode": "CIRCUIT_ARITY_MISMATCH" }
+    },
+    {
+      "name": "missing review days refuses",
+      "category": "refusal",
+      "inputs": [{}],
+      "expect": { "outcome": "REFUSED", "refusalCode": "review_days_required" }
+    },
+    {
+      "name": "string review days refuse",
+      "category": "malformed-input",
+      "inputs": [{ "reviewDays": "30" }],
+      "expect": { "outcome": "REFUSED", "refusalCode": "review_days_must_be_a_nonnegative_integer" }
+    },
+    {
+      "name": "negative review days refuse",
+      "category": "malformed-input",
+      "inputs": [{ "reviewDays": -1 }],
+      "expect": { "outcome": "REFUSED", "refusalCode": "review_days_must_be_a_nonnegative_integer" }
+    },
+    {
+      "name": "fractional review days refuse",
+      "category": "malformed-input",
+      "inputs": [{ "reviewDays": 29.5 }],
+      "expect": { "outcome": "REFUSED", "refusalCode": "review_days_must_be_a_nonnegative_integer" }
+    },
+    {
+      "name": "non-boolean expedited flag refuses",
+      "category": "refusal",
+      "inputs": [{ "reviewDays": 30, "expedited": "yes" }],
+      "expect": {
+        "outcome": "REFUSED",
+        "refusalCode": "notice_evidence_flag_must_be_boolean",
+        "refusalField": "expedited"
+      }
+    },
+    {
+      "name": "non-boolean explicit request refuses",
+      "category": "malformed-input",
+      "inputs": [{
+        "reviewDays": 30,
+        "expedited": true,
+        "subjectExplicitlyRequestedExpedited": "yes"
+      }],
+      "expect": {
+        "outcome": "REFUSED",
+        "refusalCode": "notice_evidence_flag_must_be_boolean",
+        "refusalField": "subjectExplicitlyRequestedExpedited"
+      }
+    },
+    {
+      "name": "non-boolean consent refuses",
+      "category": "malformed-input",
+      "inputs": [{
+        "reviewDays": 30,
+        "expedited": true,
+        "subjectExplicitlyRequestedExpedited": true,
+        "writtenConsentRecorded": "yes"
+      }],
+      "expect": {
+        "outcome": "REFUSED",
+        "refusalCode": "notice_evidence_flag_must_be_boolean",
+        "refusalField": "writtenConsentRecorded"
+      }
+    }
+  ]
+}

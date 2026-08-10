@@ -1,0 +1,22 @@
+@output chapter
+
+@build define
+    function run() {
+      return {
+        chapterId: "chapter-03",
+        sourceLocator: "input/chapter-03.md:3",
+        launchDate: null,
+        definitions: [
+          {
+            term: "Node",
+            termKey: "node",
+            text: "a single mutable database row in the operational registry",
+            meaningKey: "single-mutable-database-row-in-operational-registry",
+            sourceLocator: "input/chapter-03.md:3"
+          }
+        ]
+      }
+    }
+    return { run }
+
+@chapter build

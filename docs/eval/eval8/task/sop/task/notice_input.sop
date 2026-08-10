@@ -1,0 +1,73 @@
+@output brief request
+@invariant taskInputValid covers taskInputValid taskInput brief request
+
+@taskInput encodeTaskInput
+@brief get $taskInput "brief"
+@request get $taskInput "request"
+@taskInputValid validateTaskInput $taskInput $brief $request
+
+@encodeTaskInput define
+    const TASK_INPUT = {
+      brief: {
+        sender: "Northbridge Archive Services SRL",
+        recipient: "Meridian Indexing Ltd",
+        agreementTitle: "Digital Preservation Services Agreement",
+        agreementDate: "14 February 2026",
+        noticeDate: "10 August 2026",
+        contractClause: "Section 7.3, Service Continuity",
+        eventStatement: "The indexing endpoint was unavailable from 08:20 UTC to 11:05 UTC on 8 August 2026.",
+        cureAction: "provide the incident report and continuity remediation plan",
+        cureDeadlineDate: "17 August 2026",
+        permittedDeliveryMethod: "encrypted email to the contractual notice addresses",
+        reservationText: "Northbridge reserves all rights and remedies available under the Agreement.",
+        governingLawStatement: "The Agreement states that Romanian law governs.",
+        factualExhibits: [
+          "Exhibit A — availability export",
+          "Exhibit B — request failure log",
+          "Exhibit C — correspondence index"
+        ]
+      },
+      request: {
+        operation: "generate_fact_bounded_notice_and_run_independent_verifier",
+        requiredOutputs: ["full_markdown", "verification"],
+        prohibitedAdditions: [
+          "legal_conclusion",
+          "damages_figure",
+          "statute",
+          "unstated_delivery_method",
+          "unstated_event"
+        ],
+        sourceLocator: "input/brief.md",
+        manifestBytes: 1089,
+        manifestSha256: "419bd69c499b74586267997d6f921d3a474b5402bfbaf9e740c281f2324d26b6"
+      }
+    }
+
+    async function run() {
+      return TASK_INPUT
+    }
+
+    async function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(TASK_INPUT)
+    }
+
+    return { run, check }
+
+@validateTaskInput define taskInput brief request
+    async function run({ taskInput, brief, request }) {
+      return {
+        ok: taskInput !== null
+          && typeof taskInput === "object"
+          && JSON.stringify(brief) === JSON.stringify(taskInput.brief)
+          && JSON.stringify(request) === JSON.stringify(taskInput.request)
+          && request.sourceLocator === "input/brief.md"
+          && request.requiredOutputs.length === 2
+          && request.prohibitedAdditions.length === 5
+      }
+    }
+
+    async function check(inputs, output) {
+      return output.ok === true
+    }
+
+    return { run, check }

@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "universal-positive-observations",
+  "status": "review_required",
+  "sourcePackage": "candidate.universal_positive_review",
+  "proposedTrustedPackage": "kb.universal_positive_review",
+  "interfaceVersion": 1,
+  "sopVersion": "implemented-v1-subset",
+  "entrypoint": "sop/universal_positive_review.sop",
+  "inputs": [
+    {
+      "position": 0,
+      "name": "observations",
+      "schema": "non-empty array of unique {id, value, source:{path, locator}} records"
+    }
+  ],
+  "outputs": [
+    {
+      "position": 0,
+      "name": "review",
+      "schema": "{claim, verdict, observationCount, witness, aggregate:{mean, meanIsStrictlyPositive}}"
+    }
+  ],
+  "applicability": [
+    "complete finite datasets",
+    "universal claim that every numeric observation is greater than zero"
+  ],
+  "nonApplicability": [
+    "partial or streaming datasets",
+    "population inference from samples",
+    "weighted or thresholded claims other than strict positivity",
+    "non-numeric observations"
+  ],
+  "effects": ["pure"],
+  "capabilities": [],
+  "refusalCodes": [
+    "missing_dataset",
+    "observations_not_array",
+    "empty_dataset",
+    "malformed_observation",
+    "missing_observation_id",
+    "duplicate_observation_id",
+    "missing_value",
+    "non_numeric_observation",
+    "missing_source_locator"
+  ],
+  "provenance": "provenance.json",
+  "examplesAndTests": {
+    "cases": "tests/cases.json",
+    "runner": "tests/run-tests.mjs",
+    "recordedResults": "tests/execution-results.json"
+  },
+  "artifactHashes": {
+    "README.md": "sha256:6ec6bcff81ad0d8182539ee7ea5b274f6f70e4d2a04f961fb75621339357d26a",
+    "provenance.json": "sha256:970845048e40e538d22c7d607c817f18762ef98e5bf9243f71597affccccfe38",
+    "sop/universal_positive_review.sop": "sha256:3880135211c7db486c756c826f5b655fe97e69baff9f881bc99d999d00bf615d",
+    "tests/cases.json": "sha256:971f0f698879802056f31c83970fbe9628d1276e3190887a49c49ca97d2005ac",
+    "tests/run-tests.mjs": "sha256:54e840a9aad65ddb157d6142a42521d456febff9c6ece2c71b4b08ef5a132f48",
+    "tests/execution-results.json": "sha256:184a30ebb36458d9fdcdb404369b981bf84e8bfd3ff217e44a7ea46e06b2bdc2"
+  },
+  "overlap": {
+    "trustedInventory": "empty",
+    "assessment": "no trusted package overlap detected"
+  },
+  "requiredReviewers": [
+    "domain or scientific-method reviewer",
+    "SOP runtime reviewer"
+  ]
+}

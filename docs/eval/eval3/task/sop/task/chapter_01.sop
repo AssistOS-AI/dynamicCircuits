@@ -1,0 +1,28 @@
+@output chapter
+
+@build define
+    function run() {
+      return {
+        chapterId: "chapter-01",
+        sourceLocator: "input/chapter-01.md:3",
+        launchDate: {
+          assertionId: "chapter-01.launch-date",
+          value: "2026-06-15",
+          dateKey: "2026-06-15",
+          supersedes: [],
+          sourceLocator: "input/chapter-01.md:3"
+        },
+        definitions: [
+          {
+            term: "Node",
+            termKey: "node",
+            text: "an executable semantic circuit package with explicit input and output ports",
+            meaningKey: "executable-semantic-circuit-package-with-explicit-ports",
+            sourceLocator: "input/chapter-01.md:3"
+          }
+        ]
+      }
+    }
+    return { run }
+
+@chapter build

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "unary-entailment-v1",
+  "package": "unary_entailment.evaluate",
+  "version": "1.0.0-candidate",
+  "status": "REVIEW_REQUIRED",
+  "source": {
+    "path": "input/context.md",
+    "sha256": "6be1713157fa8459942ffbadbc075dda54e1a88a218573485d2d0fb34bd7fd02",
+    "spans": ["L3-L4", "L6-L10"]
+  },
+  "interface": {
+    "inputs": ["context", "query"],
+    "outputs": ["result"]
+  },
+  "effects": [],
+  "capabilities": [],
+  "semanticVerdicts": ["SUPPORTED", "CONTRADICTED", "CONFLICT", "UNKNOWN"],
+  "runtimeOutcomes": ["SUCCEEDED", "REFUSED", "REJECTED", "ERROR"],
+  "artifacts": [
+    "README.md",
+    "applicability.md",
+    "contract.md",
+    "examples.md",
+    "manifest.json",
+    "provenance.md",
+    "sop/unary_entailment/evaluate.sop",
+    "tests/cases.json",
+    "tests/execution-report.md",
+    "tests/run-tests.mjs"
+  ],
+  "validation": {
+    "compilerPackageHash": "sha256:5e2aa67c3fa74ad73cb1dc50fa19a9240637f680c1c5cc4cfbdb364d36750a60",
+    "testCasesSha256": "5b9470939e0828d2f9912d41ddcd7f713609cf0187fe57c698901cb6252415df",
+    "caseCount": 12,
+    "passed": 12,
+    "failed": 0
+  },
+  "reviewRequired": ["semantic", "runtime-security", "provenance"],
+  "promotion": "NOT_PROMOTED"
+}

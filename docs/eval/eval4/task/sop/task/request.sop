@@ -1,0 +1,81 @@
+@output request manQuery mortalQuery philosopherQuery
+@invariant requestNormalized covers request manQuery mortalQuery philosopherQuery
+
+@loadRequest define
+    async function run() {
+      return {
+        sourceConstraint: "Use only context.md",
+        sourceConstraintLocator: "task.md:3",
+        contextCompletenessLocator: "context.md:9",
+        openWorld: true,
+        requestedLabels: ["SUPPORTED", "UNKNOWN"],
+        includeEvidenceForSupported: true,
+        requirementsLocator: "task.md:9-10",
+        questions: [
+          {
+            id: 1,
+            locator: "task.md:5",
+            query: { kind: "proposition", subject: "Socrate", predicate: "man", polarity: "POSITIVE" },
+          },
+          {
+            id: 2,
+            locator: "task.md:6",
+            query: { kind: "proposition", subject: "Socrate", predicate: "mortal", polarity: "POSITIVE" },
+          },
+          {
+            id: 3,
+            locator: "task.md:7",
+            query: { kind: "proposition", subject: "Socrate", predicate: "philosopher", polarity: "POSITIVE" },
+          },
+        ],
+      }
+    }
+
+    async function check(inputs, output) {
+      return output !== null
+        && typeof output === "object"
+        && output.openWorld === true
+        && Array.isArray(output.questions)
+        && output.questions.length === 3
+    }
+
+    return { run, check }
+
+@request loadRequest
+
+@selectQuery define request index
+    async function run({ request, index }, ctx) {
+      const numericIndex = Number(index)
+      if (!Number.isInteger(numericIndex) || numericIndex < 0 || numericIndex >= request.questions.length) {
+        return ctx.reject("question_index_out_of_range", { index })
+      }
+      return request.questions[numericIndex].query
+    }
+
+    async function check(inputs, output) {
+      return output !== null
+        && typeof output === "object"
+        && output.kind === "proposition"
+        && output.subject === "Socrate"
+        && output.polarity === "POSITIVE"
+    }
+
+    return { run, check }
+
+@manQuery selectQuery $request "0"
+@mortalQuery selectQuery $request "1"
+@philosopherQuery selectQuery $request "2"
+
+@verifyRequest define request manQuery mortalQuery philosopherQuery
+    async function run({ request, manQuery, mortalQuery, philosopherQuery }) {
+      const selected = [manQuery, mortalQuery, philosopherQuery]
+      return selected.every((query, index) => query.predicate === request.questions[index].query.predicate)
+    }
+
+    async function check(inputs, output) {
+      return output === true
+    }
+
+    return { run, check }
+
+@requestNormalized verifyRequest $request $manQuery $mortalQuery $philosopherQuery

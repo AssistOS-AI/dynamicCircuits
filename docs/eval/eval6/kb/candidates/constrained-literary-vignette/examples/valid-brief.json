@@ -1,0 +1,16 @@
+{
+  "title": "The Last Lantern",
+  "protagonist": "Mara",
+  "setting": "the winter station",
+  "object": "a brass key",
+  "immediateGoal": "board the final train",
+  "obstacle": "the platform gate is locked",
+  "choice": "Mara gives the key to the stranded porter",
+  "consequence": "the porter opens the gate for everyone",
+  "closingImage": "snow whitening the silent rails",
+  "motifs": [
+    "a dim lantern",
+    "the station clock",
+    "a red thread"
+  ]
+}

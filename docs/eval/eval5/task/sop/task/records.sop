@@ -1,0 +1,208 @@
+@output records
+@goal recordsAccepted covers records
+
+@makeRecords define
+    function run() {
+      return [
+        {
+          identifier: "REL-01",
+          sourceLocator: "input/task.md:16-35",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "public",
+          encryptionAtRest: false,
+          retentionDays: 180,
+          deletionOwner: "Data Lifecycle Team",
+          accessLogging: false,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Security Operations",
+          license: "CC-BY-4.0"
+        },
+        {
+          identifier: "REL-02",
+          sourceLocator: "input/task.md:37-56",
+          containsPersonalData: true,
+          consentBasis: "missing",
+          sensitivity: "confidential",
+          encryptionAtRest: true,
+          retentionDays: 90,
+          deletionOwner: "Research Data Team",
+          accessLogging: true,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Privacy Response Team",
+          license: "internal-only"
+        },
+        {
+          identifier: "REL-03",
+          sourceLocator: "input/task.md:58-77",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "restricted",
+          encryptionAtRest: false,
+          retentionDays: 120,
+          deletionOwner: "Clinical Data Team",
+          accessLogging: true,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Clinical Security Team",
+          license: "internal-only"
+        },
+        {
+          identifier: "REL-04",
+          sourceLocator: "input/task.md:79-98",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "internal",
+          encryptionAtRest: true,
+          retentionDays: 730,
+          deletionOwner: "Archive Operations",
+          accessLogging: true,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Platform Security",
+          license: "internal-only"
+        },
+        {
+          identifier: "REL-05",
+          sourceLocator: "input/task.md:100-119",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "internal",
+          encryptionAtRest: true,
+          retentionDays: 30,
+          deletionOwner: "missing",
+          accessLogging: true,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Quality Security Lead",
+          license: "internal-only"
+        },
+        {
+          identifier: "REL-06",
+          sourceLocator: "input/task.md:121-140",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "internal",
+          encryptionAtRest: true,
+          retentionDays: 60,
+          deletionOwner: "Engineering Operations",
+          accessLogging: false,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Product Security",
+          license: "internal-only"
+        },
+        {
+          identifier: "REL-07",
+          sourceLocator: "input/task.md:142-161",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "confidential",
+          encryptionAtRest: true,
+          retentionDays: 45,
+          deletionOwner: "Analytics Operations",
+          accessLogging: true,
+          externalProcessors: true,
+          dpaStatus: "missing",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Vendor Security Lead",
+          license: "internal-only"
+        },
+        {
+          identifier: "REL-08",
+          sourceLocator: "input/task.md:163-182",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "confidential",
+          encryptionAtRest: true,
+          retentionDays: 75,
+          deletionOwner: "Benchmark Operations",
+          accessLogging: true,
+          externalProcessors: true,
+          dpaStatus: "signed",
+          residency: "US",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "Cloud Security Lead",
+          license: "internal-only"
+        },
+        {
+          identifier: "REL-09",
+          sourceLocator: "input/task.md:184-203",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "public",
+          encryptionAtRest: false,
+          retentionDays: 365,
+          deletionOwner: "Open Data Team",
+          accessLogging: false,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "missing",
+          license: "ODC-BY-1.0"
+        },
+        {
+          identifier: "REL-10",
+          sourceLocator: "input/task.md:205-224",
+          containsPersonalData: false,
+          consentBasis: "not-required",
+          sensitivity: "internal",
+          encryptionAtRest: true,
+          retentionDays: 120,
+          deletionOwner: "Model Operations",
+          accessLogging: true,
+          externalProcessors: false,
+          dpaStatus: "not-required",
+          residency: "EU",
+          residencyApproval: false,
+          anonymized: false,
+          incidentOwner: "AI Security Team",
+          license: "missing"
+        }
+      ]
+    }
+    function check(inputs, output) {
+      const identifiers = output.map((record) => record.identifier)
+      return output.length === 10
+        && new Set(identifiers).size === 10
+        && identifiers.join(",") === "REL-01,REL-02,REL-03,REL-04,REL-05,REL-06,REL-07,REL-08,REL-09,REL-10"
+    }
+    return { run, check }
+
+@records makeRecords
+
+@validateRecords define records
+    function run({ records }) {
+      return Array.isArray(records)
+        && records.length === 10
+        && records.every((record) => typeof record.sourceLocator === "string")
+    }
+    return { run }
+
+@recordsValid validateRecords $records
+@recordsAccepted assertInvariant $recordsValid "all ten manifest-sourced release records must be present"

@@ -77,8 +77,9 @@ async function verifyHtmlFile(filePath) {
 
     const [rawPath, rawQuery = ''] = stripHashAndQuery(target).split('?');
     const query = new URLSearchParams(rawQuery);
+    const targetResolutionBase = html.includes(`data-include="${target}"`) ? docsDir : resolutionBase;
     const resolvedPath = rawPath
-      ? resolve(resolutionBase, rawPath.startsWith('/') ? rawPath.slice(1) : rawPath)
+      ? resolve(targetResolutionBase, rawPath.startsWith('/') ? rawPath.slice(1) : rawPath)
       : filePath;
 
     if (rawPath && !(await fileExists(resolvedPath))) {

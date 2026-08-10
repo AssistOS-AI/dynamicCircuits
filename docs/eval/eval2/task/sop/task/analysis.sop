@@ -1,0 +1,28 @@
+@input
+@output review observations claim request
+
+# Obtain every task value from source-adaptation packages.
+@observations task.dataset
+@claim task.claim
+@request task.request
+
+# Delegate universal-claim policy, mean calculation, ordered witness selection,
+# and witness membership assurance to the reviewed KB package.
+@review kb.universal_positive_review $observations
+
+# Check only the task-to-KB composition contract. Domain review and witness
+# grounding remain owned by kb.universal_positive_review.
+@validateComposition define review observations claim request
+    async function run({ review, observations, claim, request }) {
+      if (!review || !claim || !request || !Array.isArray(observations)) return false
+      if (review.claim !== claim.conclusion) return false
+      if (review.observationCount !== observations.length) return false
+      if (request.targetClaim !== claim.conclusion) return false
+      if (!Array.isArray(request.requiredResults)) return false
+      return request.requiredResults.length === 4
+    }
+
+    return { run }
+
+@analysisComplete validateComposition $review $observations $claim $request
+@goal analysisComplete covers review observations claim request

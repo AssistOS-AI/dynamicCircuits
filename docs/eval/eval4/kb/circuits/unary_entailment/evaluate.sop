@@ -1,0 +1,309 @@
+@input context query
+@output result
+@invariant resultWellFormed covers result context query
+
+@evaluate define context query
+    function isRecord(value) {
+      return value !== null && typeof value === "object" && !Array.isArray(value)
+    }
+
+    function isNonEmptyString(value) {
+      return typeof value === "string" && value.trim().length > 0
+    }
+
+    function hasExactKeys(value, keys) {
+      const actual = Object.keys(value).sort()
+      const expected = [...keys].sort()
+      return actual.length === expected.length && actual.every((key, index) => key === expected[index])
+    }
+
+    function isPolarity(value) {
+      return value === "POSITIVE" || value === "NEGATIVE"
+    }
+
+    function literalKey(literal) {
+      return `${literal.predicate}\u0000${literal.polarity}`
+    }
+
+    function copyLiteral(literal) {
+      return { predicate: literal.predicate, polarity: literal.polarity }
+    }
+
+    function opposite(literal) {
+      return {
+        predicate: literal.predicate,
+        polarity: literal.polarity === "POSITIVE" ? "NEGATIVE" : "POSITIVE",
+      }
+    }
+
+    function validateLiteral(literal, path, ctx) {
+      if (!isRecord(literal)) return ctx.reject("literal_must_be_an_object", { path })
+      if (!hasExactKeys(literal, ["predicate", "polarity"])) {
+        return ctx.reject("unsupported_logical_form", { path, reason: "literal_fields" })
+      }
+      if (!isNonEmptyString(literal.predicate)) return ctx.reject("predicate_required", { path })
+      if (!isPolarity(literal.polarity)) return ctx.reject("polarity_unsupported", { path })
+      return null
+    }
+
+    function validate(context, query, ctx) {
+      if (!isRecord(context)) return ctx.reject("context_must_be_an_object")
+      if (!hasExactKeys(context, ["facts", "rules"])) {
+        return ctx.reject("unsupported_logical_form", { path: "context", reason: "context_fields" })
+      }
+      if (!Array.isArray(context.facts)) return ctx.reject("facts_must_be_an_array")
+      if (!Array.isArray(context.rules)) return ctx.reject("rules_must_be_an_array")
+
+      for (let index = 0; index < context.facts.length; index += 1) {
+        const fact = context.facts[index]
+        const path = `context.facts[${index}]`
+        if (!isRecord(fact)) return ctx.reject("fact_must_be_an_object", { path })
+        if (fact.kind !== "fact") {
+          return ctx.reject("unsupported_logical_form", { path, reason: "fact_kind" })
+        }
+        if (!hasExactKeys(fact, ["kind", "subject", "predicate", "polarity", "locator"])) {
+          return ctx.reject("unsupported_logical_form", { path, reason: "fact_fields" })
+        }
+        if (!isNonEmptyString(fact.subject)) return ctx.reject("subject_required", { path })
+        if (!isNonEmptyString(fact.predicate)) return ctx.reject("predicate_required", { path })
+        if (!isPolarity(fact.polarity)) return ctx.reject("polarity_unsupported", { path })
+        if (!isNonEmptyString(fact.locator)) return ctx.reject("source_locator_required", { path })
+      }
+
+      for (let index = 0; index < context.rules.length; index += 1) {
+        const rule = context.rules[index]
+        const path = `context.rules[${index}]`
+        if (!isRecord(rule)) return ctx.reject("rule_must_be_an_object", { path })
+        if (rule.kind !== "implication") {
+          return ctx.reject("unsupported_logical_form", { path, reason: "rule_kind" })
+        }
+        if (!hasExactKeys(rule, ["kind", "antecedent", "consequent", "locator"])) {
+          return ctx.reject("unsupported_logical_form", { path, reason: "rule_fields" })
+        }
+        const antecedentError = validateLiteral(rule.antecedent, `${path}.antecedent`, ctx)
+        if (antecedentError) return antecedentError
+        const consequentError = validateLiteral(rule.consequent, `${path}.consequent`, ctx)
+        if (consequentError) return consequentError
+        if (!isNonEmptyString(rule.locator)) return ctx.reject("source_locator_required", { path })
+      }
+
+      if (!isRecord(query)) return ctx.reject("query_must_be_an_object")
+      if (query.kind !== "proposition") {
+        return ctx.reject("unsupported_logical_form", { path: "query", reason: "query_kind" })
+      }
+      if (!hasExactKeys(query, ["kind", "subject", "predicate", "polarity"])) {
+        return ctx.reject("unsupported_logical_form", { path: "query", reason: "query_fields" })
+      }
+      if (!isNonEmptyString(query.subject)) return ctx.reject("subject_required", { path: "query" })
+      if (!isNonEmptyString(query.predicate)) return ctx.reject("predicate_required", { path: "query" })
+      if (!isPolarity(query.polarity)) return ctx.reject("polarity_unsupported", { path: "query" })
+      return null
+    }
+
+    function evaluate(context, query) {
+      const directByLiteral = new Map()
+      let duplicateEvidenceSuppressed = 0
+      let factsForSubject = 0
+
+      for (const fact of context.facts) {
+        if (fact.subject !== query.subject) continue
+        factsForSubject += 1
+        const literal = { predicate: fact.predicate, polarity: fact.polarity }
+        const key = literalKey(literal)
+        if (!directByLiteral.has(key)) directByLiteral.set(key, { literal, locators: new Set() })
+        const locators = directByLiteral.get(key).locators
+        if (locators.has(fact.locator)) duplicateEvidenceSuppressed += 1
+        locators.add(fact.locator)
+      }
+
+      const supported = new Set(directByLiteral.keys())
+      let iterations = 0
+      let changed = true
+      while (changed) {
+        changed = false
+        iterations += 1
+        for (const rule of context.rules) {
+          const antecedentKey = literalKey(rule.antecedent)
+          const consequentKey = literalKey(rule.consequent)
+          if (supported.has(antecedentKey) && !supported.has(consequentKey)) {
+            supported.add(consequentKey)
+            changed = true
+          }
+        }
+      }
+
+      const depths = new Map()
+      for (const key of directByLiteral.keys()) depths.set(key, 0)
+      let depthChanged = true
+      while (depthChanged) {
+        depthChanged = false
+        for (const rule of context.rules) {
+          const antecedentKey = literalKey(rule.antecedent)
+          const consequentKey = literalKey(rule.consequent)
+          if (!depths.has(antecedentKey)) continue
+          const proposed = depths.get(antecedentKey) + 1
+          if (!depths.has(consequentKey) || proposed < depths.get(consequentKey)) {
+            depths.set(consequentKey, proposed)
+            depthChanged = true
+          }
+        }
+      }
+
+      const closure = []
+      for (const key of supported) {
+        const separator = key.lastIndexOf("\u0000")
+        const literal = { predicate: key.slice(0, separator), polarity: key.slice(separator + 1) }
+        const evidence = []
+        const evidenceKeys = new Set()
+        const direct = directByLiteral.get(key)
+        if (direct) {
+          for (const locator of [...direct.locators].sort()) {
+            const evidenceKey = `DIRECT\u0000${locator}`
+            evidenceKeys.add(evidenceKey)
+            evidence.push({ type: "DIRECT", locator })
+          }
+        }
+        for (const rule of context.rules) {
+          if (literalKey(rule.consequent) !== key) continue
+          const antecedentKey = literalKey(rule.antecedent)
+          if (!supported.has(antecedentKey)) continue
+          const evidenceKey = `DERIVED\u0000${rule.locator}\u0000${antecedentKey}`
+          if (evidenceKeys.has(evidenceKey)) {
+            duplicateEvidenceSuppressed += 1
+            continue
+          }
+          evidenceKeys.add(evidenceKey)
+          evidence.push({
+            type: "DERIVED",
+            locator: rule.locator,
+            from: copyLiteral(rule.antecedent),
+            depth: depths.get(antecedentKey) + 1,
+          })
+        }
+        evidence.sort((left, right) => {
+          if (left.type !== right.type) return left.type === "DIRECT" ? -1 : 1
+          const locatorOrder = left.locator.localeCompare(right.locator)
+          if (locatorOrder !== 0) return locatorOrder
+          return JSON.stringify(left).localeCompare(JSON.stringify(right))
+        })
+        closure.push({
+          literal,
+          supportMode: direct ? "DIRECT" : "DERIVED",
+          minimumDepth: depths.get(key),
+          evidence,
+        })
+      }
+      closure.sort((left, right) => {
+        const predicateOrder = left.literal.predicate.localeCompare(right.literal.predicate)
+        if (predicateOrder !== 0) return predicateOrder
+        return left.literal.polarity.localeCompare(right.literal.polarity)
+      })
+
+      const queryLiteral = { predicate: query.predicate, polarity: query.polarity }
+      const oppositeLiteral = opposite(queryLiteral)
+      const queryKey = literalKey(queryLiteral)
+      const oppositeKey = literalKey(oppositeLiteral)
+      const querySupport = closure.find((entry) => literalKey(entry.literal) === queryKey) ?? null
+      const oppositeSupport = closure.find((entry) => literalKey(entry.literal) === oppositeKey) ?? null
+      let status = "UNKNOWN"
+      if (querySupport && oppositeSupport) status = "CONFLICT"
+      else if (querySupport) status = "SUPPORTED"
+      else if (oppositeSupport) status = "CONTRADICTED"
+
+      return {
+        schemaVersion: 1,
+        status,
+        query: { subject: query.subject, predicate: query.predicate, polarity: query.polarity },
+        opposite: { subject: query.subject, ...oppositeLiteral },
+        querySupport,
+        oppositeSupport,
+        closure,
+        metrics: {
+          inputFactCount: context.facts.length,
+          factsForSubject,
+          inputRuleCount: context.rules.length,
+          supportedLiteralCount: closure.length,
+          iterations,
+          duplicateEvidenceSuppressed,
+        },
+      }
+    }
+
+    async function run({ context, query }, ctx) {
+      const error = validate(context, query, ctx)
+      if (error) return error
+      return evaluate(context, query)
+    }
+
+    async function check(inputs, output) {
+      if (!isRecord(output) || output.schemaVersion !== 1) return false
+      if (!["SUPPORTED", "CONTRADICTED", "CONFLICT", "UNKNOWN"].includes(output.status)) return false
+      if (!Array.isArray(output.closure) || !isRecord(output.metrics)) return false
+      const keys = new Set()
+      for (const entry of output.closure) {
+        if (!isRecord(entry) || !isRecord(entry.literal) || !Array.isArray(entry.evidence)) return false
+        const key = literalKey(entry.literal)
+        if (keys.has(key) || entry.evidence.length === 0) return false
+        keys.add(key)
+        if (!Number.isInteger(entry.minimumDepth) || entry.minimumDepth < 0) return false
+        if (entry.supportMode !== "DIRECT" && entry.supportMode !== "DERIVED") return false
+      }
+      const requestedKey = literalKey(inputs.query)
+      const oppositeKey = literalKey(opposite(inputs.query))
+      const hasRequested = keys.has(requestedKey)
+      const hasOpposite = keys.has(oppositeKey)
+      const expected = hasRequested && hasOpposite
+        ? "CONFLICT"
+        : hasRequested
+          ? "SUPPORTED"
+          : hasOpposite
+            ? "CONTRADICTED"
+            : "UNKNOWN"
+      return output.status === expected
+    }
+
+    return { run, check }
+
+@result evaluate $context $query
+
+@verify define context query result
+    function isRecord(value) {
+      return value !== null && typeof value === "object" && !Array.isArray(value)
+    }
+
+    function key(literal) {
+      return `${literal.predicate}\u0000${literal.polarity}`
+    }
+
+    function opposite(literal) {
+      return {
+        predicate: literal.predicate,
+        polarity: literal.polarity === "POSITIVE" ? "NEGATIVE" : "POSITIVE",
+      }
+    }
+
+    async function run({ context, query, result }) {
+      if (!isRecord(context) || !isRecord(query) || !isRecord(result)) return false
+      if (!Array.isArray(context.facts) || !Array.isArray(context.rules) || !Array.isArray(result.closure)) return false
+      if (!isRecord(result.query) || result.query.subject !== query.subject) return false
+      if (result.query.predicate !== query.predicate || result.query.polarity !== query.polarity) return false
+      const closureKeys = new Set(result.closure.map((entry) => key(entry.literal)))
+      const hasQuery = closureKeys.has(key(query))
+      const hasOpposite = closureKeys.has(key(opposite(query)))
+      const expected = hasQuery && hasOpposite
+        ? "CONFLICT"
+        : hasQuery
+          ? "SUPPORTED"
+          : hasOpposite
+            ? "CONTRADICTED"
+            : "UNKNOWN"
+      return result.status === expected
+    }
+
+    async function check(inputs, output) {
+      return output === true
+    }
+
+    return { run, check }
+
+@resultWellFormed verify $context $query $result

@@ -1,0 +1,84 @@
+@input notice
+@output finding
+@invariant findingConsistent covers finding
+
+@evaluate define notice
+    function run({ notice }, ctx) {
+      if (notice === null || typeof notice !== "object" || Array.isArray(notice)) {
+        return ctx.reject("notice_must_be_an_object")
+      }
+
+      const has = (name) => Object.prototype.hasOwnProperty.call(notice, name)
+      if (!has("reviewDays")) {
+        return ctx.reject("review_days_required")
+      }
+      if (typeof notice.reviewDays !== "number"
+        || !Number.isFinite(notice.reviewDays)
+        || !Number.isInteger(notice.reviewDays)
+        || notice.reviewDays < 0) {
+        return ctx.reject("review_days_must_be_a_nonnegative_integer")
+      }
+
+      for (const field of ["expedited", "subjectExplicitlyRequestedExpedited", "writtenConsentRecorded"]) {
+        if (has(field) && typeof notice[field] !== "boolean") {
+          return ctx.reject("notice_evidence_flag_must_be_boolean", { field })
+        }
+      }
+
+      const expedited = notice.expedited === true
+      const explicitRequest = notice.subjectExplicitlyRequestedExpedited === true
+      const writtenConsent = notice.writtenConsentRecorded === true
+      const exceptionEligible = expedited && explicitRequest && writtenConsent
+      const applicableMinimumDays = exceptionEligible ? 10 : 30
+      const compliant = notice.reviewDays >= applicableMinimumDays
+
+      return {
+        status: compliant ? "COMPLIANT" : "NON_COMPLIANT",
+        reason: compliant ? null : "notice_below_applicable_minimum",
+        reviewDays: notice.reviewDays,
+        applicableMinimumDays,
+        reviewPath: exceptionEligible ? "EXPEDITED_EXCEPTION" : "ORDINARY_MINIMUM",
+        exceptionEligible,
+        evidence: {
+          expedited,
+          explicitRequest,
+          writtenConsent,
+          writtenConsentState: !has("writtenConsentRecorded")
+            ? "MISSING"
+            : (writtenConsent ? "RECORDED" : "NOT_RECORDED")
+        },
+        sourceLocator: "input/rule.md:3"
+      }
+    }
+
+    function check(inputs, output) {
+      const expeditedPath = output.reviewPath === "EXPEDITED_EXCEPTION"
+      const evidenceSupportsException = output.evidence.expedited
+        && output.evidence.explicitRequest
+        && output.evidence.writtenConsent
+      return ["COMPLIANT", "NON_COMPLIANT"].includes(output.status)
+        && [10, 30].includes(output.applicableMinimumDays)
+        && output.exceptionEligible === expeditedPath
+        && (!expeditedPath || evidenceSupportsException)
+        && (expeditedPath || output.applicableMinimumDays === 30)
+        && output.status === (output.reviewDays >= output.applicableMinimumDays
+          ? "COMPLIANT"
+          : "NON_COMPLIANT")
+    }
+
+    return { run, check }
+
+@finding evaluate $notice
+
+@validateFinding define finding
+    function run({ finding }) {
+      return finding.sourceLocator === "input/rule.md:3"
+        && finding.reason === (finding.status === "COMPLIANT"
+          ? null
+          : "notice_below_applicable_minimum")
+        && !(finding.evidence.writtenConsentState === "MISSING" && finding.exceptionEligible)
+    }
+    return { run }
+
+@findingValid validateFinding $finding
+@findingConsistent assertInvariant $findingValid "notice finding must preserve its threshold, evidence, and source"

@@ -1,0 +1,78 @@
+@input
+@output source context scholar_query curious_query patient_query
+
+@caseData define
+    async function run() {
+      return {
+        source: {
+          path: "input/context-and-questions.md",
+          manifestSha256: "eabd0a7080f2f70939fe2687e411215282c6f6a456954bbd4cca1ebac774f4cc",
+          completeness: "COMPLETE_CONTEXT",
+          negationSemantics: "OPEN_WORLD",
+          requestLocator: "input/context-and-questions.md:11",
+        },
+        context: {
+          facts: [
+            {
+              kind: "fact",
+              subject: "Ada",
+              predicate: "scholar",
+              polarity: "POSITIVE",
+              locator: "input/context-and-questions.md:3",
+            },
+          ],
+          rules: [
+            {
+              kind: "implication",
+              antecedent: { predicate: "scholar", polarity: "POSITIVE" },
+              consequent: { predicate: "reader", polarity: "POSITIVE" },
+              locator: "input/context-and-questions.md:5",
+            },
+            {
+              kind: "implication",
+              antecedent: { predicate: "reader", polarity: "POSITIVE" },
+              consequent: { predicate: "curious", polarity: "POSITIVE" },
+              locator: "input/context-and-questions.md:7",
+            },
+          ],
+        },
+        scholar_query: {
+          kind: "proposition",
+          subject: "Ada",
+          predicate: "scholar",
+          polarity: "POSITIVE",
+        },
+        curious_query: {
+          kind: "proposition",
+          subject: "Ada",
+          predicate: "curious",
+          polarity: "POSITIVE",
+        },
+        patient_query: {
+          kind: "proposition",
+          subject: "Ada",
+          predicate: "patient",
+          polarity: "POSITIVE",
+        },
+      }
+    }
+
+    async function check(inputs, output) {
+      return output !== null
+        && typeof output === "object"
+        && output.source?.path === "input/context-and-questions.md"
+        && Array.isArray(output.context?.facts)
+        && Array.isArray(output.context?.rules)
+        && output.scholar_query?.subject === "Ada"
+        && output.curious_query?.subject === "Ada"
+        && output.patient_query?.subject === "Ada"
+    }
+
+    return { run, check }
+
+@case caseData
+@source get $case "source"
+@context get $case "context"
+@scholar_query get $case "scholar_query"
+@curious_query get $case "curious_query"
+@patient_query get $case "patient_query"

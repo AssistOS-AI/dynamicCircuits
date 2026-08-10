@@ -1,0 +1,83 @@
+@input
+@output brief sourceContext
+@invariant sourceEncodingValid covers sourceEncodingValid brief sourceContext
+
+@brief encodeBrief
+@sourceContext encodeSourceContext
+@sourceEncodingValid verifySourceEncoding $brief $sourceContext
+
+@encodeBrief define
+    const BRIEF = {
+      sender: "Alpine Records GmbH",
+      recipient: "Delta Conversion SA",
+      agreementTitle: "Archive Conversion Agreement",
+      agreementDate: "2 March 2026",
+      noticeDate: "11 August 2026",
+      contractClause: "Clause 5.2, Delivery Integrity",
+      eventStatement: "Batch 44 contained 312 files whose checksums did not match the delivery manifest.",
+      cureAction: "repeat conversion and provide a signed checksum manifest",
+      cureDeadlineDate: "20 August 2026",
+      permittedDeliveryMethod: "registered electronic notice through the contract portal",
+      reservationText: "Alpine Records reserves the rights stated in the Agreement.",
+      governingLawStatement: "The Agreement states that Austrian law governs.",
+      factualExhibits: [
+        "Exhibit A — checksum comparison",
+        "Exhibit B — Batch 44 manifest"
+      ]
+    }
+
+    async function run() {
+      return BRIEF
+    }
+
+    async function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(BRIEF)
+    }
+
+    return { run, check }
+
+@encodeSourceContext define
+    const SOURCE_CONTEXT = {
+      sourceLocator: "input/brief.md",
+      sourceSha256: "d1d6852f64808cb09d2558db9f9cd1a830ec9a5dfebe8d1e45155cdca5a80861",
+      support: "direct",
+      requestedOutputs: [
+        "notice",
+        "independent verification"
+      ],
+      constraints: [
+        "do not add legal conclusions",
+        "do not add unsupported facts"
+      ]
+    }
+
+    async function run() {
+      return SOURCE_CONTEXT
+    }
+
+    async function check(inputs, output) {
+      return JSON.stringify(output) === JSON.stringify(SOURCE_CONTEXT)
+    }
+
+    return { run, check }
+
+@verifySourceEncoding define brief sourceContext
+    async function run({ brief, sourceContext }) {
+      return brief !== null
+        && typeof brief === "object"
+        && Object.keys(brief).length === 13
+        && Array.isArray(brief.factualExhibits)
+        && brief.factualExhibits.length === 2
+        && sourceContext.sourceLocator === "input/brief.md"
+        && sourceContext.support === "direct"
+        && Array.isArray(sourceContext.requestedOutputs)
+        && sourceContext.requestedOutputs.length === 2
+        && Array.isArray(sourceContext.constraints)
+        && sourceContext.constraints.length === 2
+    }
+
+    async function check(inputs, output) {
+      return output === true
+    }
+
+    return { run, check }

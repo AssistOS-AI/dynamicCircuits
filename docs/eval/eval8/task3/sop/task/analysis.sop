@@ -1,0 +1,6 @@
+@input
+@output notice generationReport independentVerification
+
+@brief task.brief
+@notice @generationReport kb.breach_notice.generate $brief
+@independentVerification kb.breach_notice.verify $brief $notice

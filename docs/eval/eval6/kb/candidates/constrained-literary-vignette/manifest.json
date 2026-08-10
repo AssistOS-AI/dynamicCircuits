@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "candidateId": "constrained-literary-vignette",
+  "candidateVersion": "0.1.0",
+  "status": "REVIEW_REQUIRED",
+  "semanticSources": [
+    {
+      "path": "input/literary-generation-rules.md",
+      "bytes": 2162,
+      "sha256": "7f5b738c2620ef5496935f3d730dca8346201ef59c0a9786a18c7a795e95200a",
+      "manifestMatched": true
+    }
+  ],
+  "trustedCircuitOverlap": {
+    "filesInspected": 0,
+    "finding": "No trusted packages were present under circuits/."
+  },
+  "packages": [
+    {
+      "name": "literary.generator",
+      "path": "sop/literary/generator.sop",
+      "packageHash": "sha256:ab0d20b7f7654e93bdf37a1d0223090124b01da28f6b412bfb5f9ab44d2f44b0",
+      "inputs": ["brief"],
+      "outputs": ["markdown"]
+    },
+    {
+      "name": "literary.verifier",
+      "path": "sop/literary/verifier.sop",
+      "packageHash": "sha256:111125917bc168264d7be679c2ee1dda22d72baa5801d1f4b4523e6e39a5c7ce",
+      "inputs": ["brief", "markdown"],
+      "outputs": ["verification"]
+    },
+    {
+      "name": "literary.composition",
+      "path": "sop/literary/composition.sop",
+      "packageHash": "sha256:398832ea7681626f486c67afe5ca80d5c1f5b563958d43f0c795eb65b0535e82",
+      "inputs": ["brief"],
+      "outputs": ["markdown", "verification"]
+    }
+  ],
+  "effects": ["pure"],
+  "capabilities": [],
+  "runtimeCompatibility": {
+    "language": "implemented SOP Lang subset",
+    "node": ">=20",
+    "directLlmApi": false,
+    "filesystem": false,
+    "process": false,
+    "network": false,
+    "clock": false,
+    "random": false,
+    "oracle": false
+  },
+  "refusalCodes": [
+    "BRIEF_NOT_OBJECT",
+    "MISSING_FIELD",
+    "NON_STRING_FIELD",
+    "EMPTY_FIELD",
+    "MOTIFS_NOT_ARRAY",
+    "INVALID_MOTIF_COUNT",
+    "NON_STRING_MOTIF",
+    "EMPTY_MOTIF",
+    "TITLE_CONTAINS_NEWLINE",
+    "MARKDOWN_NOT_STRING"
+  ],
+  "artifacts": {
+    "contract": "contract.md",
+    "provenance": "provenance.md",
+    "applicability": "applicability.md",
+    "testSource": "tests/candidate.test.mjs",
+    "testReport": "evidence/test-report.md",
+    "examples": ["examples/valid-brief.json", "examples/tampered-markdown.md"]
+  },
+  "testMetrics": {
+    "compiledPackagesPassed": 3,
+    "compiledPackagesTotal": 3,
+    "topLevelTestsPassed": 6,
+    "topLevelTestsTotal": 6,
+    "runtimeExecutions": 18,
+    "runtimeSucceeded": 8,
+    "runtimeRefused": 10,
+    "runtimeRejected": 0,
+    "runtimeErrored": 0
+  },
+  "promotion": {
+    "recommendation": "HOLD_FOR_SEMANTIC_REVIEW",
+    "requiredReviewers": [
+      "domain/editorial reviewer",
+      "SOP/runtime reviewer",
+      "security reviewer for generated JavaScript"
+    ]
+  }
+}

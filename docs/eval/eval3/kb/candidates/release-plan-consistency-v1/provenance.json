@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "path": "input/review-rules.md",
+    "bytes": 422,
+    "sha256": "d37915155d2ffd2065714f525bcd3107112ca71941c8b5f89b4face55e6c100a",
+    "mediaType": "text/markdown; charset=utf-8"
+  },
+  "coverage": [
+    {
+      "artifact": "candidate identity and source title",
+      "lines": "1",
+      "evidence": "Review rules"
+    },
+    {
+      "artifact": "release_plan_consistency.review",
+      "lines": "3",
+      "evidence": "One launch date unless explicitly superseded; report remaining date and definition conflicts; preserve uncertainty without preference."
+    }
+  ],
+  "transformations": [
+    "Chapter array order operationalizes later and earlier without using clocks.",
+    "Caller-supplied dateKey, termKey, and meaningKey values bound semantic identity decisions the source leaves unspecified.",
+    "Unclassified differing definition text becomes UNKNOWN rather than an inferred incompatibility.",
+    "All evidence is returned; no preferred date or definition is selected."
+  ],
+  "reviewRequired": true
+}

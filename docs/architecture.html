@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture quick reference — Dynamic Circuits</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs"><a href="index.html">Documentation</a> / Architecture quick reference</p>
+    <h1>Architecture quick reference</h1>
+    <p class="lead">Dynamic Circuits analyzes a folder of documents by combining a coding agent with executable SOP circuits. The coding agent reads and structures the documents; the local compiler and runtime validate and execute the circuits; reports and receipts are written to a separate results directory.</p>
+
+    <h2>Problem</h2>
+    <p>A document-analysis task has source files, reusable rules, task-specific logic, intermediate calculations, and final conclusions. These elements need separate storage and explicit provenance so another run can determine which files were read, which rules were reused, which circuit produced each value, and whether execution succeeded.</p>
+    <p>Dynamic Circuits provides five concrete mechanisms:</p>
+    <table>
+      <thead><tr><th>Requirement</th><th>Mechanism</th></tr></thead>
+      <tbody>
+        <tr><td>Identify all source files</td><td>The CLI scans <code>input/</code> and records relative paths, sizes, and SHA-256 hashes in an input manifest.</td></tr>
+        <tr><td>Reuse established analysis rules</td><td>Reviewed SOP packages are stored in the knowledge base under <code>circuits/</code>.</td></tr>
+        <tr><td>Keep one task isolated</td><td>Task-specific circuits go to <code>sop/</code>; reports and machine-readable outputs go to <code>results/</code>.</td></tr>
+        <tr><td>Execute calculations reproducibly</td><td>The SOP compiler resolves dependencies and the runtime executes the required graph nodes.</td></tr>
+        <tr><td>Inspect what happened</td><td>Runtime receipts record package identities, node states, input/output hashes, checks, child executions, and the final outcome.</td></tr>
+      </tbody>
+    </table>
+    <p>Together, these mechanisms create a traceable path from a source file to a report. For example, a policy document is
+      registered in the input manifest, a reviewed circuit represents its notice-period rule, a task circuit supplies the
+      dates for one case, and the receipt identifies the rule package and values used to classify that case.</p>
+
+    <h2>Five terms</h2>
+    <table>
+      <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>Knowledge base (KB)</td><td>A persistent directory containing source material for learning, reviewed circuits, proposed candidates, and learning reports.</td></tr>
+        <tr><td>Task workspace</td><td>A directory for one analysis, containing its input documents, task-specific SOP files, and results.</td></tr>
+        <tr><td>SOP circuit</td><td>A text file that declares inputs, commands, immutable intermediate wires, outputs, goals, and invariants.</td></tr>
+        <tr><td>Coding agent</td><td>An external CLI program—Codex by default—that reads documents and authors or reuses SOP files.</td></tr>
+        <tr><td>Receipt</td><td>A structured runtime record showing which circuit nodes executed and how the outcome was produced.</td></tr>
+      </tbody>
+    </table>
+    <p>The KB and task workspace are filesystem scopes. SOP circuits are the executable units stored in those scopes. The
+      coding agent creates or selects those units, while the runtime executes them and creates receipts. The separation lets
+      an agent change its interpretation or task-specific source without silently changing a reviewed KB rule.</p>
+
+    <h2>Learn into the KB</h2>
+    <p>Use this workflow when the source documents describe rules or procedures that should be available to later tasks.</p>
+    <ol>
+      <li>Create a KB directory and place the source documents in <code>./kb/input/</code>.</li>
+      <li>Run <code>agent -kbdir ./kb</code>. The missing <code>--workdir</code> selects learning mode.</li>
+      <li>The CLI creates the KB folders, input manifest, coding-agent instructions, and links to <code>circuitSkills</code>.</li>
+      <li>The coding agent reads every manifest entry and the existing reviewed packages in <code>circuits/</code>.</li>
+      <li>New SOP packages, contracts, provenance, and tests are written to <code>candidates/</code>.</li>
+      <li>Compilation and tests check mechanical behavior. A separate review decides whether a candidate is promoted to <code>circuits/</code>.</li>
+    </ol>
+    <figure class="diagram">
+      <figcaption><strong>Learning flow</strong>From reusable source material to a reviewed KB candidate</figcaption>
+    <pre class="mermaid">flowchart LR
+      I[/KB source documents/] --> A[Coding agent]
+      A --> C{Candidate compiles and passes tests?}
+      C -->|yes| R([Ready for human review])
+      C -->|no| F([Repair required])</pre></figure>
+    <p>The diagram follows one candidate from source documents to review. “KB input” is the evidence being learned. The coding
+      agent extracts a reusable rule and packages it under <code>candidates/</code>. Compilation and tests validate syntax,
+      dependencies, positive cases, negative cases, and refusal cases. A failing candidate returns to repair instead of
+      entering review. A passing candidate becomes ready for a separate human review; only reviewed material can later move
+      into <code>circuits/</code>.</p>
+
+    <h2>Analyze one task</h2>
+    <p>Use this workflow when a specific set of documents must produce a report.</p>
+    <ol>
+      <li>Create a task directory and place all source files in <code>./work/task-001/input/</code>.</li>
+      <li>Run <code>agent -kbdir ./kb -workdir ./work/task-001</code>. The presence of <code>--workdir</code> selects analysis mode.</li>
+      <li>The CLI inventories the task inputs and prepares <code>sop/</code>, <code>results/</code>, instructions, and skill links.</li>
+      <li>The coding agent accounts for every input file, writes task-value SOP for the current request and facts, and keeps reusable policy in reviewed KB circuits.</li>
+      <li>The agent writes a larger task root that consumes the task-value packages and calls the applicable KB packages.</li>
+      <li>The agent compiles and runs that root. The runtime returns outputs and receipts or a classified refusal, rejection, or error.</li>
+      <li>The agent writes the analysis and coverage summary under <code>results/</code>. The KB remains read-only during this workflow.</li>
+    </ol>
+    <figure class="diagram">
+      <figcaption><strong>Analysis construction</strong>Task values and reviewed KB rules meet in an explicit root circuit</figcaption>
+    <pre class="mermaid">flowchart LR
+      I[/Task documents/] --> T[Task-value SOP]
+      T --> R[Task root circuit]
+      K[(Reviewed KB circuits)] --> R
+      R --> X([Compiler and runtime])</pre></figure>
+    <p>The first analysis diagram separates two kinds of executable knowledge. Task documents become task-value packages that
+      preserve the current request, facts, and source locators. Reviewed KB packages already contain reusable rules. The
+      generated root circuit calls both explicitly; the compiler validates this combined dependency graph before execution.</p>
+    <figure class="diagram">
+      <figcaption><strong>Result publication</strong>Runtime values and execution evidence support the report</figcaption>
+    <pre class="mermaid">flowchart LR
+      X{Runtime outcome} --> R[(Receipts)]
+      X --> O([Public outputs])
+      R --> P[Grounded results report]
+      O --> P</pre></figure>
+    <p>The second diagram shows publication. Public outputs contain the values requested by the circuit interface. Receipts
+      contain the execution evidence behind those values. The coding agent uses both to write the report, so the report can
+      distinguish a computed conclusion from a refusal, failed check, runtime error, or unresolved source conflict.</p>
+
+    <h2>Current status</h2>
+    <p>The current implementation provides workspace preparation, Codex and generic agent adapters, the SOP parser, package discovery, static graph compilation, nested circuit execution, canonical values, local goals and invariants, and structured receipts.</p>
+    <p>The maintained specifications also define later components: semantic fact indexes, automatic template matching, mandatory fixed-point closure, assurance profiles, trust registries, persistent caches, artifact stores, acceptance certificates, hardened isolation, and distributed execution. Those components are marked as planned in the relevant DS files.</p>
+
+    <h2>Where to continue</h2>
+    <p>New readers should begin with <a href="getting-started.html">Start here</a>, which explains the repository using one
+      complete task and recommends a reading order. The <a href="workspace-conventions.html">KB/task convention</a> defines
+      which files are reusable knowledge and which belong to the current analysis. The <a href="tutorial.html">CLI tutorial</a> provides a complete manual
+      test using committed source documents, while the <a href="input-guide.html">input guide</a> shows how to write useful
+      policy, dataset, document-review, and technical-review tasks. The
+      <a href="cli.html">CLI guide</a> documents both directory modes, and the <a href="sop-runtime.html">SOP runtime
+      guide</a> explains circuit syntax and execution. The <a href="concepts.html">concept model</a>,
+      <a href="assurance.html">assurance model</a>, <a href="operations.html">operations guide</a>, and
+      <a href="lifecycle.html">lifecycle</a> describe the complete architecture.</p>
+    <p>The <a href="specsLoader.html?spec=matrix.md">DS specification matrix</a> is the maintained contract. The immutable first design remains under <a href="../sop_lang_circuits_design_specs_v1/README.md">sop_lang_circuits_design_specs_v1</a>, and the <a href="specsLoader.html?spec=historical-coverage.md">coverage index</a> maps it to the current DS set.</p>
+    <table>
+      <thead><tr><th>Path</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><code>src/sop/</code></td><td>Parser, package registry, compiler, core commands, canonical values, and runtime.</td></tr>
+        <tr><td><code>src/agents/</code></td><td>External coding-agent adapter construction.</td></tr>
+        <tr><td><code>circuitSkills/</code></td><td>Project-owned skills linked into analysis and evaluation workspaces.</td></tr>
+        <tr><td><code>tests/</code></td><td>Deterministic unit suites organized by module boundary.</td></tr>
+        <tr><td><code>docs/eval/evalN/</code></td><td>Statically browsable reproductions with reusable rules and circuits under <code>kb/</code>, plus current inputs, SOP, and results under <code>task/</code>.</td></tr>
+      </tbody>
+    </table>
+    <p>The table maps documentation concepts back to repository code. Language behavior is under <code>src/sop/</code>, process
+      invocation is under <code>src/agents/</code>, agent workflows are in <code>circuitSkills/</code>, and executable examples
+      are under <code>docs/eval/</code>. This division is also enforced by <a href="specsLoader.html?spec=DS001-coding-style.md">DS001</a>.</p>
+    <p>Run <code>npm test</code> for implementation tests. Run <code>npm run check</code> for implementation tests, DS matrix regeneration, and documentation-link validation. Open the <a href="eval/index.html">evaluation catalog</a> to inspect complete input, circuit, and result fixtures.</p>
+  </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="partials-loader.js"></script>
+</body>
+</html>

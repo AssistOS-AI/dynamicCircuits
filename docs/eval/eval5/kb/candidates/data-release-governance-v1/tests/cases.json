@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "name": "R01 personal data with documented consent",
+      "category": "positive",
+      "package": "data_release_governance.r01",
+      "inputs": [{ "containsPersonalData": true, "consentBasis": "documented" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R01", "status": "PASS", "reason": null, "path": "APPLICABLE" }
+    },
+    {
+      "name": "R01 personal data with unknown consent value",
+      "category": "negative",
+      "package": "data_release_governance.r01",
+      "inputs": [{ "containsPersonalData": true, "consentBasis": "unknown" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R01", "status": "FAIL", "reason": "personal_data_requires_documented_consent" }
+    },
+    {
+      "name": "R01 non-personal bypass",
+      "category": "exception",
+      "package": "data_release_governance.r01",
+      "inputs": [{ "containsPersonalData": false }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R01", "status": "PASS", "path": "NOT_APPLICABLE" }
+    },
+    {
+      "name": "R01 malformed trigger refuses",
+      "category": "refusal",
+      "package": "data_release_governance.r01",
+      "inputs": [{ "containsPersonalData": "true" }],
+      "expect": { "outcome": "REFUSED" }
+    },
+
+    {
+      "name": "R02 confidential encrypted",
+      "category": "positive",
+      "package": "data_release_governance.r02",
+      "inputs": [{ "sensitivity": "confidential", "encryptionAtRest": true }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R02", "status": "PASS", "path": "APPLICABLE" }
+    },
+    {
+      "name": "R02 restricted unencrypted",
+      "category": "negative",
+      "package": "data_release_governance.r02",
+      "inputs": [{ "sensitivity": "restricted", "encryptionAtRest": false }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R02", "status": "FAIL", "reason": "sensitive_release_requires_encryption" }
+    },
+    {
+      "name": "R02 public bypass",
+      "category": "exception",
+      "package": "data_release_governance.r02",
+      "inputs": [{ "sensitivity": "public" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R02", "status": "PASS", "path": "NOT_APPLICABLE" }
+    },
+    {
+      "name": "R02 internal bypass",
+      "category": "exception",
+      "package": "data_release_governance.r02",
+      "inputs": [{ "sensitivity": "internal" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R02", "status": "PASS", "path": "NOT_APPLICABLE" }
+    },
+    {
+      "name": "R02 unsupported sensitivity refuses",
+      "category": "refusal",
+      "package": "data_release_governance.r02",
+      "inputs": [{ "sensitivity": "secret", "encryptionAtRest": true }],
+      "expect": { "outcome": "REFUSED" }
+    },
+
+    {
+      "name": "R03 lower boundary",
+      "category": "boundary",
+      "package": "data_release_governance.r03",
+      "inputs": [{ "retentionDays": 1 }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R03", "status": "PASS", "reason": null }
+    },
+    {
+      "name": "R03 upper boundary",
+      "category": "boundary",
+      "package": "data_release_governance.r03",
+      "inputs": [{ "retentionDays": 365 }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R03", "status": "PASS", "reason": null }
+    },
+    {
+      "name": "R03 zero",
+      "category": "boundary",
+      "package": "data_release_governance.r03",
+      "inputs": [{ "retentionDays": 0 }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R03", "status": "FAIL", "reason": "retention_must_be_between_1_and_365_days" }
+    },
+    {
+      "name": "R03 above upper boundary",
+      "category": "boundary",
+      "package": "data_release_governance.r03",
+      "inputs": [{ "retentionDays": 366 }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R03", "status": "FAIL", "reason": "retention_must_be_between_1_and_365_days" }
+    },
+    {
+      "name": "R03 fractional",
+      "category": "negative",
+      "package": "data_release_governance.r03",
+      "inputs": [{ "retentionDays": 1.5 }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R03", "status": "FAIL", "reason": "retention_must_be_between_1_and_365_days" }
+    },
+    {
+      "name": "R03 numeric string",
+      "category": "malformed-input",
+      "package": "data_release_governance.r03",
+      "inputs": [{ "retentionDays": "30" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R03", "status": "FAIL", "reason": "retention_must_be_between_1_and_365_days" }
+    },
+    {
+      "name": "R03 missing value",
+      "category": "malformed-input",
+      "package": "data_release_governance.r03",
+      "inputs": [{}],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R03", "status": "FAIL", "reason": "retention_must_be_between_1_and_365_days" }
+    },
+
+    {
+      "name": "R04 named deletion owner",
+      "category": "positive",
+      "package": "data_release_governance.r04",
+      "inputs": [{ "deletionOwner": "Data Lifecycle Team" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R04", "status": "PASS" }
+    },
+    {
+      "name": "R04 surrounding whitespace is trimmed",
+      "category": "boundary",
+      "package": "data_release_governance.r04",
+      "inputs": [{ "deletionOwner": "  Data Lifecycle Team  " }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R04", "status": "PASS" }
+    },
+    {
+      "name": "R04 whitespace-only owner",
+      "category": "negative",
+      "package": "data_release_governance.r04",
+      "inputs": [{ "deletionOwner": "   " }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R04", "status": "FAIL", "reason": "deletion_owner_required" }
+    },
+    {
+      "name": "R04 literal missing marker",
+      "category": "negative",
+      "package": "data_release_governance.r04",
+      "inputs": [{ "deletionOwner": "missing" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R04", "status": "FAIL", "reason": "deletion_owner_required" }
+    },
+    {
+      "name": "R04 null owner",
+      "category": "malformed-input",
+      "package": "data_release_governance.r04",
+      "inputs": [{ "deletionOwner": null }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R04", "status": "FAIL", "reason": "deletion_owner_required" }
+    },
+
+    {
+      "name": "R05 internal with logging",
+      "category": "positive",
+      "package": "data_release_governance.r05",
+      "inputs": [{ "sensitivity": "internal", "accessLogging": true }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R05", "status": "PASS", "path": "APPLICABLE" }
+    },
+    {
+      "name": "R05 restricted without logging",
+      "category": "negative",
+      "package": "data_release_governance.r05",
+      "inputs": [{ "sensitivity": "restricted", "accessLogging": false }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R05", "status": "FAIL", "reason": "non_public_release_requires_access_logging" }
+    },
+    {
+      "name": "R05 public bypass",
+      "category": "exception",
+      "package": "data_release_governance.r05",
+      "inputs": [{ "sensitivity": "public" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R05", "status": "PASS", "path": "NOT_APPLICABLE" }
+    },
+    {
+      "name": "R05 unsupported sensitivity refuses",
+      "category": "refusal",
+      "package": "data_release_governance.r05",
+      "inputs": [{ "sensitivity": "unknown", "accessLogging": true }],
+      "expect": { "outcome": "REFUSED" }
+    },
+
+    {
+      "name": "R06 processor with signed DPA",
+      "category": "positive",
+      "package": "data_release_governance.r06",
+      "inputs": [{ "externalProcessors": true, "dpaStatus": "signed" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R06", "status": "PASS", "path": "APPLICABLE" }
+    },
+    {
+      "name": "R06 processor with missing DPA",
+      "category": "negative",
+      "package": "data_release_governance.r06",
+      "inputs": [{ "externalProcessors": true, "dpaStatus": "missing" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R06", "status": "FAIL", "reason": "external_processor_requires_signed_dpa" }
+    },
+    {
+      "name": "R06 no-processor bypass",
+      "category": "exception",
+      "package": "data_release_governance.r06",
+      "inputs": [{ "externalProcessors": false }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R06", "status": "PASS", "path": "NOT_APPLICABLE" }
+    },
+    {
+      "name": "R06 malformed trigger refuses",
+      "category": "refusal",
+      "package": "data_release_governance.r06",
+      "inputs": [{ "externalProcessors": null }],
+      "expect": { "outcome": "REFUSED" }
+    },
+
+    {
+      "name": "R07 EU direct path",
+      "category": "positive",
+      "package": "data_release_governance.r07",
+      "inputs": [{ "residency": "EU" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R07", "status": "PASS", "path": "EU_DIRECT" }
+    },
+    {
+      "name": "R07 US approved exception",
+      "category": "exception",
+      "package": "data_release_governance.r07",
+      "inputs": [{ "residency": "US", "residencyApproval": true }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R07", "status": "PASS" }
+    },
+    {
+      "name": "R07 mixed approved exception",
+      "category": "exception",
+      "package": "data_release_governance.r07",
+      "inputs": [{ "residency": "mixed", "residencyApproval": true }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R07", "status": "PASS" }
+    },
+    {
+      "name": "R07 US without approval",
+      "category": "negative",
+      "package": "data_release_governance.r07",
+      "inputs": [{ "residency": "US", "residencyApproval": false }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R07", "status": "FAIL", "reason": "non_eu_residency_requires_approval" }
+    },
+    {
+      "name": "R07 unknown residency",
+      "category": "negative",
+      "package": "data_release_governance.r07",
+      "inputs": [{ "residency": "unknown", "residencyApproval": true }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R07", "status": "FAIL", "reason": "non_eu_residency_requires_approval" }
+    },
+
+    {
+      "name": "R08 personal data anonymized",
+      "category": "positive",
+      "package": "data_release_governance.r08",
+      "inputs": [{ "containsPersonalData": true, "anonymized": true }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R08", "status": "PASS", "path": "APPLICABLE" }
+    },
+    {
+      "name": "R08 personal data not anonymized",
+      "category": "negative",
+      "package": "data_release_governance.r08",
+      "inputs": [{ "containsPersonalData": true, "anonymized": false }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R08", "status": "FAIL", "reason": "personal_data_requires_anonymization" }
+    },
+    {
+      "name": "R08 non-personal bypass",
+      "category": "exception",
+      "package": "data_release_governance.r08",
+      "inputs": [{ "containsPersonalData": false }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R08", "status": "PASS", "path": "NOT_APPLICABLE" }
+    },
+    {
+      "name": "R08 malformed trigger refuses",
+      "category": "refusal",
+      "package": "data_release_governance.r08",
+      "inputs": [{}],
+      "expect": { "outcome": "REFUSED" }
+    },
+
+    {
+      "name": "R09 named incident owner",
+      "category": "positive",
+      "package": "data_release_governance.r09",
+      "inputs": [{ "incidentOwner": "Security Operations" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R09", "status": "PASS" }
+    },
+    {
+      "name": "R09 surrounding whitespace is trimmed",
+      "category": "boundary",
+      "package": "data_release_governance.r09",
+      "inputs": [{ "incidentOwner": " Security Operations " }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R09", "status": "PASS" }
+    },
+    {
+      "name": "R09 empty owner",
+      "category": "negative",
+      "package": "data_release_governance.r09",
+      "inputs": [{ "incidentOwner": "" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R09", "status": "FAIL", "reason": "incident_owner_required" }
+    },
+    {
+      "name": "R09 literal missing marker",
+      "category": "negative",
+      "package": "data_release_governance.r09",
+      "inputs": [{ "incidentOwner": "missing" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R09", "status": "FAIL", "reason": "incident_owner_required" }
+    },
+    {
+      "name": "R09 null owner",
+      "category": "malformed-input",
+      "package": "data_release_governance.r09",
+      "inputs": [{ "incidentOwner": null }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R09", "status": "FAIL", "reason": "incident_owner_required" }
+    },
+
+    {
+      "name": "R10 CC-BY license",
+      "category": "positive",
+      "package": "data_release_governance.r10",
+      "inputs": [{ "license": "CC-BY-4.0" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R10", "status": "PASS" }
+    },
+    {
+      "name": "R10 ODC-BY license",
+      "category": "positive",
+      "package": "data_release_governance.r10",
+      "inputs": [{ "license": "ODC-BY-1.0" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R10", "status": "PASS" }
+    },
+    {
+      "name": "R10 internal-only license",
+      "category": "positive",
+      "package": "data_release_governance.r10",
+      "inputs": [{ "license": "internal-only" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R10", "status": "PASS" }
+    },
+    {
+      "name": "R10 literal missing marker",
+      "category": "negative",
+      "package": "data_release_governance.r10",
+      "inputs": [{ "license": "missing" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R10", "status": "FAIL", "reason": "recognized_license_required" }
+    },
+    {
+      "name": "R10 empty license",
+      "category": "negative",
+      "package": "data_release_governance.r10",
+      "inputs": [{ "license": "" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R10", "status": "FAIL", "reason": "recognized_license_required" }
+    },
+    {
+      "name": "R10 unrecognized license",
+      "category": "negative",
+      "package": "data_release_governance.r10",
+      "inputs": [{ "license": "MIT" }],
+      "expect": { "outcome": "SUCCEEDED", "ruleId": "R10", "status": "FAIL", "reason": "recognized_license_required" }
+    },
+
+    {
+      "name": "Review all obligations pass",
+      "category": "composition-positive",
+      "package": "data_release_governance.review",
+      "inputs": [{
+        "identifier": "release-compliant",
+        "containsPersonalData": true,
+        "consentBasis": "documented",
+        "sensitivity": "restricted",
+        "encryptionAtRest": true,
+        "retentionDays": 365,
+        "deletionOwner": "Data Lifecycle Team",
+        "accessLogging": true,
+        "externalProcessors": true,
+        "dpaStatus": "signed",
+        "residency": "US",
+        "residencyApproval": true,
+        "anonymized": true,
+        "incidentOwner": "Security Operations",
+        "license": "CC-BY-4.0"
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "passCount": 10,
+        "failCount": 0,
+        "compliant": true,
+        "failedRuleIdentifiers": []
+      }
+    },
+    {
+      "name": "Review all ten failures are retained",
+      "category": "composition-negative",
+      "package": "data_release_governance.review",
+      "inputs": [{
+        "identifier": "release-noncompliant",
+        "containsPersonalData": true,
+        "consentBasis": "missing",
+        "sensitivity": "restricted",
+        "encryptionAtRest": false,
+        "retentionDays": 0,
+        "deletionOwner": "missing",
+        "accessLogging": false,
+        "externalProcessors": true,
+        "dpaStatus": "missing",
+        "residency": "unknown",
+        "residencyApproval": false,
+        "anonymized": false,
+        "incidentOwner": "missing",
+        "license": "missing"
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "passCount": 0,
+        "failCount": 10,
+        "compliant": false,
+        "failedRuleIdentifiers": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10"]
+      }
+    },
+    {
+      "name": "Review bypass paths do not require unrelated controls",
+      "category": "composition-exception",
+      "package": "data_release_governance.review",
+      "inputs": [{
+        "identifier": "release-bypass",
+        "containsPersonalData": false,
+        "sensitivity": "public",
+        "retentionDays": 30,
+        "deletionOwner": "Data Lifecycle Team",
+        "externalProcessors": false,
+        "residency": "EU",
+        "incidentOwner": "Security Operations",
+        "license": "ODC-BY-1.0"
+      }],
+      "expect": {
+        "outcome": "SUCCEEDED",
+        "passCount": 10,
+        "failCount": 0,
+        "compliant": true,
+        "failedRuleIdentifiers": []
+      }
+    },
+    {
+      "name": "Review missing identifier refuses",
+      "category": "refusal",
+      "package": "data_release_governance.review",
+      "inputs": [{
+        "containsPersonalData": false,
+        "sensitivity": "public",
+        "retentionDays": 30,
+        "deletionOwner": "Owner",
+        "externalProcessors": false,
+        "residency": "EU",
+        "incidentOwner": "Owner",
+        "license": "internal-only"
+      }],
+      "expect": { "outcome": "REFUSED" }
+    },
+    {
+      "name": "Review non-object input refuses",
+      "category": "malformed-input",
+      "package": "data_release_governance.review",
+      "inputs": ["not-a-release-record"],
+      "expect": { "outcome": "REFUSED" }
+    },
+    {
+      "name": "Review unsupported sensitivity propagates child refusal",
+      "category": "refusal",
+      "package": "data_release_governance.review",
+      "inputs": [{
+        "identifier": "release-unsupported",
+        "containsPersonalData": false,
+        "sensitivity": "secret",
+        "retentionDays": 30,
+        "deletionOwner": "Owner",
+        "externalProcessors": false,
+        "residency": "EU",
+        "incidentOwner": "Owner",
+        "license": "internal-only"
+      }],
+      "expect": { "outcome": "REFUSED" }
+    }
+  ]
+}

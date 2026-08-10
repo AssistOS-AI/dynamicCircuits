@@ -1,0 +1,80 @@
+@input brief
+@output notice report
+@goal noticeVerified covers noticeVerified report notice validatedBrief brief
+
+@validatedBrief kb.breach_notice.brief $brief
+@notice assembleNotice $validatedBrief
+@report kb.breach_notice.verify $validatedBrief $notice
+@noticeVerified requireVerified $report $validatedBrief $notice
+
+@assembleNotice define brief
+    const LIMITATIONS = "This generated document is not legal advice and does not independently determine breach, liability, damages, or enforceability."
+
+    async function run({ brief }) {
+      const exhibitLines = brief.factualExhibits.map((value, index) => `${index + 1}. ${value}`).join("\n")
+      return [
+        "# Contractual Breach Notice",
+        "",
+        "## Parties and Agreement",
+        `Sender: ${brief.sender}`,
+        `Recipient: ${brief.recipient}`,
+        `Agreement title: ${brief.agreementTitle}`,
+        `Agreement date: ${brief.agreementDate}`,
+        `Notice date: ${brief.noticeDate}`,
+        "",
+        "## Notice Purpose",
+        "This notice communicates supplied facts and a requested cure under the cited agreement; it does not independently determine that a breach occurred.",
+        "",
+        "## Supplied Facts",
+        `Supplied factual statement: ${brief.eventStatement}`,
+        "",
+        "## Contract Reference",
+        `Contract clause: ${brief.contractClause}`,
+        `Governing-law statement: ${brief.governingLawStatement}`,
+        "This notice cites, but does not independently interpret, the supplied clause.",
+        "",
+        "## Requested Cure",
+        `Requested cure action: ${brief.cureAction}`,
+        `Supplied cure deadline (not calculated): ${brief.cureDeadlineDate}`,
+        "",
+        "## Delivery",
+        `Permitted delivery method: ${brief.permittedDeliveryMethod}`,
+        "",
+        "## Reservation of Rights",
+        brief.reservationText,
+        "",
+        "## Exhibits",
+        exhibitLines,
+        "",
+        "## Limitations",
+        LIMITATIONS
+      ].join("\n")
+    }
+
+    async function check(inputs, output) {
+      return typeof output === "string"
+        && output.includes(inputs.brief.eventStatement)
+        && output.includes(inputs.brief.cureDeadlineDate)
+        && output.includes(LIMITATIONS)
+    }
+
+    return { run, check }
+
+@requireVerified define report brief notice
+    async function run({ report, brief, notice }) {
+      return {
+        ok: report.ok === true,
+        briefFieldCount: Object.keys(brief).length,
+        noticeLength: notice.length,
+        failedCheckCount: Object.values(report.checks).filter((value) => value !== true).length
+      }
+    }
+
+    async function check(inputs, output) {
+      return output.ok === (inputs.report.ok === true)
+        && output.briefFieldCount === Object.keys(inputs.brief).length
+        && output.noticeLength === inputs.notice.length
+        && output.failedCheckCount === Object.values(inputs.report.checks).filter((value) => value !== true).length
+    }
+
+    return { run, check }
