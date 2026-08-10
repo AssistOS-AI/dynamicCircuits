@@ -1,0 +1,18 @@
+@input firstClaim secondClaim
+@output conflict
+
+@detectConflict define firstClaim secondClaim
+    function run({ firstClaim, secondClaim }, ctx) {
+      if (typeof firstClaim !== "string" || typeof secondClaim !== "string") {
+        return ctx.reject("claims_must_be_strings")
+      }
+      return {
+        conflict: firstClaim !== secondClaim,
+        firstClaim,
+        secondClaim
+      }
+    }
+
+    return { run }
+
+@conflict detectConflict $firstClaim $secondClaim

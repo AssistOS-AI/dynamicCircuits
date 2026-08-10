@@ -17,8 +17,8 @@ function usage() {
   dc-agent [-kbdir PATH] [-workdir PATH] [-agent codex] [--learn] [--prepare-only]
   dc-agent run --kbdir PATH --workdir PATH [--agent codex|generic]
   dc-agent prepare --kbdir PATH --workdir PATH
-  dc-agent sop compile --root PATH --package NAME [--prefix NAME]
-  dc-agent sop run --root PATH --package NAME [--inputs JSON] [--prefix NAME]
+  dc-agent sop compile --root PATH --package NAME [--prefix NAME] [--kb-root PATH]
+  dc-agent sop run --root PATH --package NAME [--inputs JSON] [--prefix NAME] [--kb-root PATH]
 
 Options accept both the requested single-dash form (-kbdir) and conventional long form (--kbdir).
 The generic adapter also requires --agent-command PATH.`;
@@ -96,7 +96,10 @@ async function handleWorkspace(command, options) {
 
 async function handleSop(sopCommand, options) {
   if (!["compile", "run"].includes(sopCommand)) throw new SopError("CLI_ARGUMENT", "sop requires compile or run");
-  const registry = await PackageRegistry.fromRoots([{ path: requireOption(options, "root"), prefix: options.prefix ?? "" }]);
+  const roots = [];
+  if (options["kb-root"]) roots.push({ path: options["kb-root"], prefix: "kb" });
+  roots.push({ path: requireOption(options, "root"), prefix: options.prefix ?? "" });
+  const registry = await PackageRegistry.fromRoots(roots);
   const packageName = requireOption(options, "package");
   if (sopCommand === "compile") {
     const compiled = compilePackage(registry, packageName);

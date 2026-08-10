@@ -1,0 +1,18 @@
+@input left right
+@output total
+
+@add define left right
+    function run({ left, right }, ctx) {
+      if (typeof left !== "number" || typeof right !== "number") {
+        return ctx.reject("numbers_required")
+      }
+      return left + right
+    }
+
+    function check({ left, right }, output) {
+      return output === left + right
+    }
+
+    return { run, check }
+
+@total add $left $right

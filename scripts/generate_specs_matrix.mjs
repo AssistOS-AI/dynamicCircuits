@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(scriptDir, '../../..');
+const repoRoot = resolve(scriptDir, '..');
 const specsDir = resolve(repoRoot, 'docs/specs');
 const matrixPath = resolve(specsDir, 'matrix.md');
 
@@ -104,13 +104,13 @@ function renderMatrix(specs) {
   const rows = specs
     .map(
       (spec) =>
-        `| [${spec.id}](specsLoader.html?spec=${spec.fileName}) | ${spec.title} | [[status:${spec.status}]] | ${spec.owner} | ${spec.summary.replace(/\|/g, '\\|')} |`
+        `| [${spec.id}](/specsLoader.html?spec=${spec.fileName}) | ${spec.title} | [[status:${spec.status}]] | ${spec.owner} | ${spec.summary.replace(/\|/g, '\\|')} |`
     )
     .join('\n');
 
   return `# Specification Matrix
 
-Generated from DS frontmatter by \`skills/gamp-specs/scripts/generate_specs_matrix.mjs\`. Edit the DS files and rerun the generator instead of editing this file manually.
+Generated from DS frontmatter by \`scripts/generate_specs_matrix.mjs\`. Edit the DS files and rerun the generator instead of editing this file manually.
 
 | Specification | Title | Status | Owner | Summary |
 | --- | --- | --- | --- | --- |
