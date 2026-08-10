@@ -1,0 +1,4 @@
+interface:
+  display_name: "Circuit Learner"
+  short_description: "Learn reusable SOP circuits from documents"
+  default_prompt: "Use $circuit-learner to extract reusable knowledge into candidate SOP circuits."

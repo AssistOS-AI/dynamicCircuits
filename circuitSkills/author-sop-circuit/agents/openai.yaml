@@ -1,0 +1,4 @@
+interface:
+  display_name: "SOP Circuit Author"
+  short_description: "Author and verify SOP Lang circuits"
+  default_prompt: "Use $author-sop-circuit to create and validate a SOP Lang circuit for this analysis."

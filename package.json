@@ -1,0 +1,21 @@
+{
+  "name": "dynamic-circuits",
+  "version": "0.1.0",
+  "description": "Coding-agent orchestration and a reference SOP Lang circuit runtime",
+  "type": "module",
+  "bin": {
+    "dynamic-circuits": "./src/cli.mjs",
+    "dc-agent": "./src/cli.mjs"
+  },
+  "exports": "./src/index.mjs",
+  "scripts": {
+    "test": "node --test",
+    "docs:matrix": "node scripts/generate_specs_matrix.mjs docs/specs",
+    "docs:check": "node scripts/verify_docs_links.mjs docs",
+    "check": "npm test && npm run docs:matrix && npm run docs:check"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

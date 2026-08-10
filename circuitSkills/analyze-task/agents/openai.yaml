@@ -1,0 +1,4 @@
+interface:
+  display_name: "Task Analysis"
+  short_description: "Analyze workspace inputs with SOP circuits"
+  default_prompt: "Use $analyze-task to analyze every input file and produce grounded reports and SOP circuits."
