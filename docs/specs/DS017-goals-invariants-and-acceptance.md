@@ -13,6 +13,9 @@ summary: Defines local checks, blocking invariants, task goals, assurance profil
 Technical execution and task acceptance are separate decisions. Checks validate local command output, invariants protect
 circuit-wide conditions, goals state requested outcomes, and an assurance profile decides which evidence is sufficient.
 
+This specification evaluates execution evidence from DS013 and closure evidence from DS016 under the trust model in DS018.
+Its accepted or classified outcome becomes part of the final receipt specified by DS019.
+
 ## Core Content
 
 ### Obligations
@@ -47,6 +50,12 @@ success is `ACCEPTED`.
 The current runtime supports local node checks, circuit invariants, typed result categories, and receipts. It does not yet
 implement first-class profiles, goal verifier packages, closure, trust policy, or final acceptance certificates. Eval cases
 therefore report both technical runtime outcome and their explicit semantic verdict instead of overstating assurance.
+
+### Operational example
+
+A scientific circuit executes successfully and returns verdict `REFUTED`. Its local goal verifies that witness `-2` occurs
+in the dataset and is non-positive. A future strict profile would additionally require complete observation coverage, a
+trusted verifier package, permitted resources, and a complete final receipt before accepting the task result.
 
 ## Decisions & Questions
 

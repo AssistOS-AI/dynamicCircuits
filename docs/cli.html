@@ -17,7 +17,7 @@
     <h1>CLI workspaces</h1>
     <p class="lead">The presence of <code>--workdir</code> selects task analysis; its absence selects KB learning. Workspace preparation creates the required directories, manifests, instructions, and skill links before launching a coding agent.</p>
 
-    <h2>Purpose and relationship to the runtime</h2>
+    <h2>What this command controls</h2>
     <p>This page explains how a filesystem location becomes a coding-agent workspace. The CLI owns directory creation,
       input inventory, generated guidance, skill discovery, and external process invocation. The coding agent owns document
       interpretation and SOP authoring. The compiler and runtime described in the <a href="sop-runtime.html">SOP runtime
@@ -25,7 +25,7 @@
     <p>There are two modes because reusable knowledge and one task have different lifetimes. Learning produces reviewable KB
       candidates for future tasks. Analysis produces task-local circuits and reports for the current input set.</p>
 
-    <h2>Learn reusable circuits</h2>
+    <h2>Learning mode</h2>
     <p>Start with a KB containing documents under <code>input/</code>. The following commands prepare the directory, run Codex,
       or inspect the invocation without starting Codex:</p>
     <pre><code>agent prepare -kbdir ./kb
@@ -39,7 +39,7 @@ agent -kbdir ./kb -agent codex --dry-run</code></pre>
       <li>A reviewer decides whether a tested candidate is suitable for promotion.</li>
     </ol>
 
-    <h2>Analyze a current task</h2>
+    <h2>Analysis mode</h2>
     <p>Start with task documents under <code>./work/task-001/input</code>. The KB path identifies reusable reviewed circuits;
       the workdir identifies the only task directory where generated SOP files and reports belong:</p>
     <pre><code>agent prepare -kbdir ./kb -workdir ./work/task-001
@@ -55,7 +55,7 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
       would make read/write authority and input discovery ambiguous. Existing user guidance is preserved, and conflicting
       skill-link paths produce a structured error.</p>
 
-    <h3>Knowledge-base directories</h3>
+    <h3>KB folders</h3>
     <pre class="mermaid">flowchart LR
       K[KB] --> I[input]
       K --> C[circuits]
@@ -64,7 +64,7 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
     <p>The KB diagram shows the learning data lifecycle. <code>input/</code> contains evidence to extract; <code>circuits/</code>
       contains reviewed reusable packages; <code>candidates/</code> contains generated proposals awaiting review; and
       <code>results/</code> contains learning coverage and validation reports.</p>
-    <h3>Task-workspace directories</h3>
+    <h3>Task folders</h3>
     <pre class="mermaid">flowchart LR
       W[Task workspace] --> I[input]
       W --> S[sop]
@@ -74,11 +74,11 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
       remains under <code>sop/</code>, and reports remain under <code>results/</code>. The manifest and skill links under the same
       workspace tell the coding agent what to process and how to author supported SOP Lang.</p>
 
-    <h2>Agent authority</h2>
+    <h2>Who can write where</h2>
     <p>Analysis treats the KB as read-only. Learning uses the KB as the coding agent's current directory, while generated instructions restrict reusable output to <code>candidates/</code>. This restriction is currently instructional rather than a host-mediated filesystem capability; <a href="specsLoader.html?spec=DS008-security-and-trust.md">DS008</a> records the limitation. The former explicit learn flag is rejected because mode is now inferred unambiguously.</p>
     <p><code>--prepare-only</code> stops before adapter construction. <code>--dry-run</code> prints the command, arguments, working directory, and prompt without launching a process. The <code>generic</code> adapter accepts a program through <code>--agent-command</code> and sends the prompt through standard input. Installed compatibility aliases are <code>dc-agent</code> and <code>dynamic-circuits</code>.</p>
 
-    <h2>Workspace skill catalog</h2>
+    <h2>Skills linked into the workspace</h2>
     <p><code>analyze-task</code> enforces complete input coverage and grounded results. <code>author-sop-circuit</code> supplies the implemented syntax and verification loop. <code>circuit-learner</code> separates reusable candidates from task-specific facts. The CLI links the catalog as one directory so the same instructions govern normal tasks and evaluation cases.</p>
     <p>Example: an analysis agent uses <code>analyze-task</code> to enumerate every input, switches to
       <code>author-sop-circuit</code> when it needs a deadline calculation, then returns to <code>analyze-task</code> to connect

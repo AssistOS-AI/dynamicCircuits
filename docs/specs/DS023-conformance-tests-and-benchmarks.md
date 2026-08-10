@@ -13,6 +13,10 @@ summary: Defines language, runtime, assurance, security, agent, domain, and scal
 Conformance tests exercise observable language, runtime, workspace, assurance, and security contracts. Benchmarks report
 execution throughput together with provenance, closure, receipt, storage, and verification costs.
 
+This specification extends the implemented repository suite defined by DS007. DS007 records tests and evals that must pass
+now; this document defines the additional methods and measurements required as semantic matching, closure, persistent
+evidence, and distributed execution become executable.
+
 ## Core Content
 
 ### Conformance layers
@@ -45,6 +49,10 @@ must be reported separately.
 
 Current repository coverage and eval results are specified in DS007 and `docs/eval/`; planned cases here are not counted as
 implemented until automated.
+
+Operational example: a graph-order metamorphic test swaps two independent nodes and requires identical public outputs and
+canonical receipt meaning. A closure benchmark for a future release must additionally report candidate count, matcher
+coverage, fixed-point rounds, and receipt bytes; reporting only wall-clock time would hide the cost of completeness.
 
 ## Decisions & Questions
 

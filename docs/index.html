@@ -17,7 +17,7 @@
     <h1>Dynamic Circuits</h1>
     <p class="lead">Dynamic Circuits analyzes a folder of documents by combining a coding agent with executable SOP circuits. The coding agent reads and structures the documents; the local compiler and runtime validate and execute the circuits; reports and receipts are written to a separate results directory.</p>
 
-    <h2>Problem addressed by the project</h2>
+    <h2>Problem</h2>
     <p>A document-analysis task has source files, reusable rules, task-specific logic, intermediate calculations, and final conclusions. These elements need separate storage and explicit provenance so another run can determine which files were read, which rules were reused, which circuit produced each value, and whether execution succeeded.</p>
     <p>Dynamic Circuits provides five concrete mechanisms:</p>
     <table>
@@ -34,7 +34,7 @@
       registered in the input manifest, a reviewed circuit represents its notice-period rule, a task circuit supplies the
       dates for one case, and the receipt identifies the rule package and values used to classify that case.</p>
 
-    <h2>Terms used in this documentation</h2>
+    <h2>Five terms</h2>
     <table>
       <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
       <tbody>
@@ -49,7 +49,7 @@
       coding agent creates or selects those units, while the runtime executes them and creates receipts. The separation lets
       an agent change its interpretation or task-specific source without silently changing a reviewed KB rule.</p>
 
-    <h2>Workflow 1: learn reusable circuits</h2>
+    <h2>Learn into the KB</h2>
     <p>Use this workflow when the source documents describe rules or procedures that should be available to later tasks.</p>
     <ol>
       <li>Create a KB directory and place the source documents in <code>./kb/input/</code>.</li>
@@ -69,7 +69,7 @@
       dependencies, positive cases, negative cases, and refusal cases. Review is the trust boundary: only reviewed material
       can later move into <code>circuits/</code>.</p>
 
-    <h2>Workflow 2: analyze one task</h2>
+    <h2>Analyze one task</h2>
     <p>Use this workflow when a specific set of documents must produce a report.</p>
     <ol>
       <li>Create a task directory and place all source files in <code>./work/task-001/input/</code>.</li>
@@ -96,12 +96,16 @@
       contain the execution evidence behind those values. The coding agent uses both to write the report, so the report can
       distinguish a computed conclusion from a refusal, failed check, runtime error, or unresolved source conflict.</p>
 
-    <h2>Implemented and planned components</h2>
+    <h2>Current status</h2>
     <p>The current implementation provides workspace preparation, Codex and generic agent adapters, the SOP parser, package discovery, static graph compilation, nested circuit execution, canonical values, local goals and invariants, and structured receipts.</p>
     <p>The maintained specifications also define later components: semantic fact indexes, automatic template matching, mandatory fixed-point closure, assurance profiles, trust registries, persistent caches, artifact stores, acceptance certificates, hardened isolation, and distributed execution. Those components are marked as planned in the relevant DS files.</p>
 
-    <h2>Documentation and verification</h2>
-    <p>The <a href="cli.html">CLI guide</a> documents both directory modes. The <a href="sop-runtime.html">SOP runtime guide</a> explains circuit syntax and execution. The <a href="concepts.html">concept model</a>, <a href="assurance.html">assurance model</a>, <a href="operations.html">operations guide</a>, and <a href="lifecycle.html">lifecycle</a> describe the complete architecture.</p>
+    <h2>Where to continue</h2>
+    <p>The <a href="tutorial.html">CLI tutorial</a> provides a complete manual test using committed source documents. The
+      <a href="cli.html">CLI guide</a> documents both directory modes, and the <a href="sop-runtime.html">SOP runtime
+      guide</a> explains circuit syntax and execution. The <a href="concepts.html">concept model</a>,
+      <a href="assurance.html">assurance model</a>, <a href="operations.html">operations guide</a>, and
+      <a href="lifecycle.html">lifecycle</a> describe the complete architecture.</p>
     <p>The <a href="specsLoader.html?spec=matrix.md">DS specification matrix</a> is the maintained contract. The immutable first design remains under <a href="../sop_lang_circuits_design_specs_v1/README.md">sop_lang_circuits_design_specs_v1</a>, and the <a href="specsLoader.html?spec=historical-coverage.md">coverage index</a> maps it to the current DS set.</p>
     <table>
       <thead><tr><th>Path</th><th>Responsibility</th></tr></thead>

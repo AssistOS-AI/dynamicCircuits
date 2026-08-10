@@ -13,6 +13,10 @@ summary: Defines the portable command families, their behavioral contracts, and 
 A small standard library gives circuits portable primitives while keeping domain knowledge in versioned packages. Core
 commands implement deterministic graph mechanics; Assurance Core implements policy and evidence mechanics.
 
+This specification supplies the commands used by the language in DS004 and the runtime in DS005. Domain rules such as a
+30-day notice policy remain generated or reviewed SOP packages; Core supplies only reusable mechanics such as parsing a
+finite number, comparing two values, building a list, and reporting a failed invariant.
+
 ## Core Content
 
 ### Implemented Core
@@ -43,6 +47,10 @@ include or inherit the immutable epoch and profile; their outputs are evidence r
 
 Standard-library evolution is versioned. New commands need positive, negative, refusal, boundary, determinism, canonical,
 security, and receipt tests; semantic changes require a new version rather than silent replacement.
+
+Operational example: a notice circuit passes the source string `"30"` to `parseNumber`, compares the parsed value with the
+observed days, and appends the finding to a result list. Core defines the exact parsing, comparison, and list behavior. The
+notice circuit—not Core—defines why 30 is required and when an exception applies.
 
 ## Decisions & Questions
 

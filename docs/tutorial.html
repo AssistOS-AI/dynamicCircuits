@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Circuits Documentation</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs"><a href="index.html">Documentation</a> / CLI tutorial</p>
+    <h1>Test the CLI manually</h1>
+    <p class="lead">This tutorial verifies the project in increasing order of scope: first the deterministic SOP kernel, then workspace preparation, then a live Codex analysis, and finally KB learning. Every step states its inputs, command, generated files, and expected observation.</p>
+
+    <h2>What you will test</h2>
+    <p>The kernel test proves that committed SOP code compiles and executes. The workspace test proves that the CLI creates
+      the required directory contract and manifest. The live analysis test asks Codex to transform policy and case documents
+      into task-specific SOP code and reports. The learning test asks Codex to transform source rules into reviewable KB
+      candidates.</p>
+    <table>
+      <thead><tr><th>Test</th><th>Needs Codex</th><th>Main evidence</th><th>Useful question answered</th></tr></thead>
+      <tbody>
+        <tr><td>Unit suite</td><td>No</td><td>Passing test report</td><td>Are implementation contracts intact?</td></tr>
+        <tr><td>Committed eval circuit</td><td>No</td><td>Runtime JSON and receipt</td><td>Can the kernel execute a useful analysis circuit?</td></tr>
+        <tr><td>Workspace preparation</td><td>No</td><td>Manifest, folders, skill links</td><td>Will the agent receive the correct filesystem contract?</td></tr>
+        <tr><td>Task analysis</td><td>Yes</td><td>Generated SOP and reports</td><td>Can the agent turn source documents into an analysis?</td></tr>
+        <tr><td>KB learning</td><td>Yes</td><td>Candidate package and learning report</td><td>Can the agent extract reusable executable knowledge?</td></tr>
+      </tbody>
+    </table>
+    <p>The tests are cumulative. If the deterministic tests fail, fix them before interpreting a coding-agent result. Agent
+      output is useful only when the local compiler and runtime used to verify it are working.</p>
+
+    <h2>Prerequisites</h2>
+    <p>Run the commands from the repository root. Node.js 20 or newer is required. A live agent test also requires the
+      <code>codex</code> CLI to be installed and authenticated through its normal local configuration.</p>
+    <pre><code>node --version
+npm test
+node src/cli.mjs help</code></pre>
+    <p>Expected observation: the test suite passes, and the help output shows learning with only <code>-kbdir</code> and analysis
+      with both <code>-kbdir</code> and <code>-workdir</code>. During repository development the examples use
+      <code>node src/cli.mjs</code>; after package installation the equivalent executable is <code>agent</code>.</p>
+
+    <h2>1. Run a committed circuit</h2>
+    <p>Eval 1 contains a human-readable notice rule and three cases. Its committed SOP code is the reviewed executable
+      interpretation. Compile the root package first:</p>
+    <pre><code>node src/cli.mjs sop compile \
+  --root ./docs/eval/eval1/sop \
+  --prefix eval1 \
+  --package eval1.analysis</code></pre>
+    <p>Expected observation: stdout contains compiled package IR with package name <code>eval1.analysis</code>, two public
+      outputs, three nested calls to <code>eval1.policy</code>, dependencies, goals, and dead-node metadata.</p>
+    <p>Execute the same package:</p>
+    <pre><code>node src/cli.mjs sop run \
+  --root ./docs/eval/eval1/sop \
+  --prefix eval1 \
+  --package eval1.analysis</code></pre>
+    <p>Expected observation: outcome <code>SUCCEEDED</code>; case A is non-compliant; case B is compliant through the expedited
+      exception; case C is ordinarily compliant; statistics are total 3, compliant 2, violations 1. The receipt contains one
+      root circuit, three child policy receipts, node input/output hashes, and a passing goal. Compare it with
+      <a href="eval/eval1/index.html?file=results/result.json">the checked result summary</a>.</p>
+
+    <h2>2. Prepare a task</h2>
+    <p>Reuse the eval's Markdown documents as raw agent input, but do not copy its generated <code>sop/</code> or
+      <code>results/</code>. The new task therefore starts with source material only:</p>
+    <pre><code>mkdir -p ./work/manual-notice/input ./kb
+cp ./docs/eval/eval1/input/*.md ./work/manual-notice/input/
+node src/cli.mjs prepare \
+  -kbdir ./kb \
+  -workdir ./work/manual-notice</code></pre>
+    <p>Expected observation: the CLI prints a workspace manifest with mode <code>analyze</code>. Inspect these paths:</p>
+    <ul>
+      <li><code>work/manual-notice/.dynamic-circuits/input-manifest.json</code> lists all three Markdown inputs with hashes.</li>
+      <li><code>work/manual-notice/sop/</code> and <code>results/</code> exist and are initially empty.</li>
+      <li><code>work/manual-notice/circuitSkills</code> and <code>.agents/skills</code> resolve to the maintained project skills.</li>
+      <li><code>work/manual-notice/AGENTS.md</code> explains input coverage, read-only KB access, and output locations.</li>
+    </ul>
+
+    <h2>3. Inspect the agent call</h2>
+    <p>Dry-run prepares the same workspace and prints the external process arguments and prompt without starting Codex:</p>
+    <pre><code>node src/cli.mjs \
+  -kbdir ./kb \
+  -workdir ./work/manual-notice \
+  -agent codex \
+  --dry-run</code></pre>
+    <p>Expected observation: command <code>codex</code>, current directory <code>work/manual-notice</code>, workspace-write
+      sandbox arguments, prompt delivery through standard input, and a prompt that requires all manifest files, SOP output
+      under <code>sop/</code>, reports under <code>results/</code>, and read-only KB use.</p>
+
+    <h2>4. Run Codex</h2>
+    <p>Run the same invocation without <code>--dry-run</code>:</p>
+    <pre><code>node src/cli.mjs \
+  -kbdir ./kb \
+  -workdir ./work/manual-notice \
+  -agent codex</code></pre>
+    <p>After completion, inspect the task in this order:</p>
+    <ol>
+      <li>Open <code>results/agent-summary.md</code>. It should account for every input, list generated and reused circuits,
+        report execution outcomes, and state limitations.</li>
+      <li>Inspect every file under <code>sop/</code>. Policy values and case facts should appear as executable circuit logic or
+        explicit inputs, not as claims that were never compiled.</li>
+      <li>Follow the compile and run commands recorded by the agent. Every conclusion supported by a circuit should have a
+        successful or explicitly classified runtime result.</li>
+      <li>Compare the generated classification with eval 1. Differences should be explained by a different interpretation,
+        a refusal, or an implementation error—not silently ignored.</li>
+      <li>Inspect <code>.dynamic-circuits/last-run.json</code> for adapter, mode, working directory, prompt digest, timestamps,
+        exit status, and signal.</li>
+    </ol>
+    <p>A useful run produces grounded reports plus executable SOP code that can be compiled again. A report with no input
+      coverage, no circuit execution evidence, or hidden source assumptions is incomplete even when the prose sounds plausible.</p>
+
+    <h2>5. Learn a KB rule</h2>
+    <p>Learning uses no workdir. Copy only reusable source material into the KB input directory:</p>
+    <pre><code>mkdir -p ./kb/input
+cp ./docs/eval/eval1/input/rule.md ./kb/input/notice-rule.md
+node src/cli.mjs -kbdir ./kb -agent codex --dry-run
+node src/cli.mjs -kbdir ./kb -agent codex</code></pre>
+    <p>Expected observation: mode <code>learn</code> and KB as the agent current directory. The agent reads
+      <code>input/</code> and reviewed <code>circuits/</code>, writes proposals only under <code>candidates/</code>, and writes
+      <code>results/learning-summary.md</code>. Trusted <code>circuits/</code> remains unchanged. Inspect each candidate for source
+      provenance, applicability, inputs/outputs, exceptions, refusal behavior, tests, assumptions, and review requirements.</p>
+
+    <h2>Useful inputs</h2>
+    <p>The CLI inventories every regular file, but the external coding agent determines which formats it can interpret. Start
+      with UTF-8 Markdown or text because rules, assumptions, and source identity remain easy to review. CSV and source-code
+      files are also practical when their meaning is documented. PDF, image, archive, or proprietary formats depend on the
+      selected agent's local tools and should be recorded as unsupported when they cannot be inspected.</p>
+    <table>
+      <thead><tr><th>Input set</th><th>What to include</th><th>Useful generated circuit</th><th>Result to inspect</th></tr></thead>
+      <tbody>
+        <tr><td>Policy application</td><td>Rule, exceptions, priorities, cases, requested fields</td><td>Rule circuit plus task root</td><td>Per-case findings, aggregate counts, refusal cases</td></tr>
+        <tr><td>Scientific claim</td><td>Claim, observation table, validity rule, requested witness</td><td>Dataset interpretation plus verifier</td><td>Verdict, witness, statistic, grounding goal</td></tr>
+        <tr><td>Document consistency</td><td>Several chapters, term/date rules, source labels</td><td>Per-document interpreter plus synthesis</td><td>Conflicts with source attribution</td></tr>
+        <tr><td>Technical review</td><td>Requirements, configuration, implementation files, acceptance criteria</td><td>Requirement checks and coverage root</td><td>Passed, failed, missing, and unsupported requirements</td></tr>
+      </tbody>
+    </table>
+    <p>The table pairs source structure with an executable output shape. Good tasks state which documents are authoritative,
+      which rules contain exceptions, what counts as missing evidence, and which fields the final report must contain. The
+      coding agent can then encode those decisions explicitly instead of guessing them from an underspecified prompt.</p>
+
+    <h2>Current limits</h2>
+    <p>The current runtime executes explicit circuit calls, local checks and goals, nested packages, canonical values, and
+      receipts. Semantic registry search, automatic matcher wiring, mandatory closure, assurance profiles, trust evaluation,
+      persistent caching, final certificates, and hardened multi-tenant isolation remain planned. A useful current test should
+      evaluate workspace preparation, coding-agent transformation, explicit SOP execution, and report grounding; it should
+      not expect the planned Assurance Core to run automatically.</p>
+
+    <h2>Maintenance checklist</h2>
+    <p>When CLI behavior or the underlying theory changes, update this tutorial together with the implementation:</p>
+    <ul>
+      <li>Keep commands aligned with current option names and inferred modes.</li>
+      <li>Keep copied sample inputs aligned with the evaluation source documents.</li>
+      <li>Update expected folders, manifest fields, runtime outcomes, and result values.</li>
+      <li>Update the input guidance when new document or artifact support becomes executable.</li>
+      <li>Run <code>npm run check</code> and the static-site verifier after every tutorial change.</li>
+    </ul>
+  </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="partials-loader.js"></script>
+</body>
+</html>

@@ -14,6 +14,9 @@ The correctness claim is conditional on identified sources, package code, rules,
 execution environment. An accepted result states that these declared inputs passed the required compilation, execution,
 closure, verification, trust, and receipt checks.
 
+This specification defines the meaning and limits of acceptance from DS017. It scopes trust for templates, commands,
+verifiers, runtime components, external evidence, and receipts used throughout DS014–DS020.
+
 ## Core Content
 
 ### Conditional correctness
@@ -47,6 +50,12 @@ incomplete rules, compromised infrastructure, undecidable properties, and policy
 
 The current runtime offers deterministic execution, isolation via `node:vm`, checks, invariants, canonical output, and
 receipts, but not a hardened sandbox, signature verification, trust registry, or formal certificate checker.
+
+### Operational example
+
+A verified arithmetic package and an unreviewed policy interpretation may produce the same numeric deadline. The arithmetic
+result can inherit the package's verified implementation status, while the policy conclusion remains conditional on the
+unreviewed interpretation and cannot receive a stronger trust label through composition alone.
 
 ## Decisions & Questions
 

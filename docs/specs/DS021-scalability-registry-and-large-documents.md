@@ -13,6 +13,10 @@ summary: Defines layered discovery, sharding, section pipelines, parallel execut
 Large knowledge bases use layered catalogs, metadata indexes, registry shards, and content-addressed stores. Large documents
 use stable sections, per-section interpretation circuits, provenance-linked summaries, and cross-section synthesis circuits.
 
+This specification extends the semantic discovery contract in DS015, the closure contract in DS016, and the cache/epoch
+contract in DS020. It does not change current local execution: it defines how those same identities and receipts must remain
+complete when a future registry or document no longer fits in one process.
+
 ## Core Content
 
 ### Layered registry
@@ -46,6 +50,11 @@ oracle calls, cost, and unresolved obligations.
 
 The current implementation is a local single-process graph runtime; registry layers, artifact sharding, distributed
 scheduling, and document segmentation are planned.
+
+Operational example: a 500-chapter corpus is split at stable chapter locators. One interpretation circuit publishes dates
+and named entities for each chapter. When chapter 208 changes, its digest and dependent synthesis work are invalidated, while
+unchanged chapter interpretations remain reusable. A strict cross-chapter timeline report may be published only after every
+chapter shard in the receipt-bound snapshot has contributed its result.
 
 ## Decisions & Questions
 

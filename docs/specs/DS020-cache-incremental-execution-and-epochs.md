@@ -13,6 +13,9 @@ summary: Defines semantic cache keys, invalidation, epoch snapshots, incremental
 Caching is an assurance-sensitive reuse decision. A result is reusable only when every semantic dependency that could
 change it is represented in the key and the stored receipt remains acceptable under the active profile.
 
+This specification uses canonical identities from DS010–DS012 and receipt evidence from DS019. It supplies incremental
+execution to the scheduler in DS013 and scalable document/registry processing in DS021.
+
 ## Core Content
 
 ### Cache identity
@@ -45,6 +48,12 @@ atomic writes, lock or compare-and-swap publication, checksum verification, and 
 and reuse decisions. Cache reuse never upgrades a prior trust level.
 
 The current implementation computes deterministic canonical values but has no persistent cache or epoch manager.
+
+### Operational example
+
+Editing chapter 2 changes its source digest. The cache invalidates chapter 2 interpretation, facts depending on it, matcher
+outcomes using those facts, cross-chapter synthesis, and the final receipt. Chapter 1 interpretation remains reusable when
+its package, inputs, profile-sensitive dependencies, and trust status are unchanged.
 
 ## Decisions & Questions
 

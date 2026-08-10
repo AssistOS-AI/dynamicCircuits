@@ -26,6 +26,16 @@ a production workspace. Inputs, governing rules, circuits, expected semantic ver
 committed and linked; the README states exactly what was evaluated, complexity, commands, observed outcome, limitations,
 and the distinction between runtime success and semantic success.
 
+Files under an eval `input/` directory must be human-readable source documents for the coding agent, not pre-interpreted JSON
+records. The generated SOP packages must contain the executable interpretation used by the deterministic test. JSON may be
+used under `results/` to serialize checked machine outputs. SOP eval code must not hide source interpretation behind JSON
+parsing when the evaluated workflow requires the coding agent to translate source documents into circuits.
+
+Each evaluation folder owns one `index.html`. That page must present the evaluation question and method, group files by
+contract, source material, generated SOP code, and observed results, and display a selected file with a file-specific
+explanation in a two-pane browser. The central `docs/eval/index.html` is a scalable catalog of evaluation folders; it must
+not merge every case's file tree into one menu.
+
 The current suite has three non-trivial cases. Eval 1 applies an ordinary legal notice period and an evidenced expedited
 exception across compliant and violating cases. Eval 2 tests a universal scientific claim, finds a concrete counterexample,
 and separately computes descriptive statistics. Eval 3 reconciles timelines and terminology across three documents and
@@ -40,8 +50,9 @@ The complete hash of files under `sop_lang_circuits_design_specs_v1/` must remai
 
 ### Operational example
 
-Eval 2 loads eight observations, runs a counterexample circuit, and compares the public outputs with the committed JSON
-summary. The expected runtime outcome is `SUCCEEDED`; the semantic verdict is `REFUTED` because `-2` is a grounded witness.
+Eval 2 supplies a Markdown observation table to the coding-agent workflow. The generated `dataset.sop` stores its executable
+interpretation, the counterexample circuit scans the resulting values, and the test compares public outputs with the
+committed result summary. Runtime outcome is `SUCCEEDED`; semantic verdict is `REFUTED` because `-2` is a grounded witness.
 
 ## Decisions & Questions
 

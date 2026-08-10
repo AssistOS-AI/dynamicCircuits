@@ -34,6 +34,10 @@ already displays the active DS title. Documentation prose must begin with the co
 explained. Slogans, rhetorical contrasts, and claims framed mainly as what the system is not should be replaced with direct
 operational descriptions.
 
+`docs/tutorial.html` is the maintained manual verification path. Any change to CLI modes, generated workspace structure,
+agent invocation, supported SOP commands, evaluation fixtures, or expected outputs must update the corresponding tutorial
+step and expected observation in the same change.
+
 AchillesAgentLib is authorized but is not installed for the current external-agent architecture. A future in-process integration must route every LLM interaction through `LLMAgent`, use runtime configuration and environment variables, permit explicit code-level configuration overrides, and attach metadata tags for documentation, specification, orchestration, bootstrap, and testing work.
 
 ### Operational example

@@ -14,6 +14,9 @@ Mandatory closure evaluates every declared mandatory matcher against the semanti
 circuit instances, indexes their outputs, repeats until no facts or instances are added, and audits the expected instance set
 against the executed set.
 
+This specification extends matching from DS015 into an exhaustive obligation process. Its closure receipt feeds the
+acceptance gates in DS017 and the final provenance hierarchy in DS019.
+
 ## Core Content
 
 ### Closure algorithm
@@ -46,6 +49,12 @@ Receipts commit to registry and profile hashes so later changes cannot retroacti
 
 The current runtime executes an explicit finite graph and has no matcher registry or closure engine. This document is the
 normative target for the planned Assurance Core, not a claim about current implementation.
+
+### Operational example
+
+Round 1 matches an ordinary policy rule and publishes a computed deadline. That deadline enables a lateness matcher in round
+2, which creates a violation instance and publishes a finding. Round 3 adds nothing. Acceptance proceeds only after the audit
+confirms that every expected ordinary-rule and lateness instance executed.
 
 ## Decisions & Questions
 

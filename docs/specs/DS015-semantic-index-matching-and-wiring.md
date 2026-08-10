@@ -13,6 +13,9 @@ summary: Defines searchable semantic facts, deterministic matcher outcomes, cand
 Automatic reuse requires two distinct operations: high-recall discovery of plausible templates and strict verification
 that a selected template is applicable. The semantic index supports discovery; executable matchers authorize wiring.
 
+This specification consumes interpreted facts defined by DS009 and reviewed templates defined by DS014. Its created
+instances feed mandatory closure under DS016 and appear in receipts under DS019.
+
 ## Core Content
 
 ### Semantic index
@@ -46,6 +49,12 @@ suppressed by a key over matcher, template version, canonical bindings, epoch, a
 Candidate discovery may be approximate for optional work. Mandatory discovery must be complete under the declared
 registry snapshot. The current runtime has explicit circuit calls only; semantic indexing, matcher execution, ranking, and
 automatic wiring are planned Assurance Core features.
+
+### Operational example
+
+Facts identify a notice case, policy jurisdiction, event date, and written-consent artifact. Registry search finds ordinary
+and expedited notice templates. The ordinary matcher binds every case; the exception matcher returns `MATCH` only for the
+case whose consent fact satisfies its predicate. Both matcher outcomes and bindings enter the wiring receipt.
 
 ## Decisions & Questions
 

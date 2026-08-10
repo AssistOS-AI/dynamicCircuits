@@ -7,10 +7,11 @@ This repository implements a coding-agent-driven CLI and a dependency-free Node.
 ## Mandatory Reading Order
 
 1. Read `docs/index.html` for the implemented system boundary.
-2. Read `docs/specs/DS000-vision.md` and the specifications relevant to the change.
-3. Read `docs/specs/DS001-coding-style.md` before changing source layout, style, or tests.
-4. Read the applicable skill under `circuitSkills/` before changing coding-agent workflows or SOP files.
-5. Consult `sop_lang_circuits_design_specs_v1/` only as immutable historical design input.
+2. Use `docs/tutorial.html` to verify user-facing CLI workflows when workspace, agent, SOP, or evaluation behavior changes.
+3. Read `docs/specs/DS000-vision.md` and the specifications relevant to the change.
+4. Read `docs/specs/DS001-coding-style.md` before changing source layout, style, or tests.
+5. Read the applicable skill under `circuitSkills/` before changing coding-agent workflows or SOP files.
+6. Consult `sop_lang_circuits_design_specs_v1/` only as immutable historical design input.
 
 The current DS specifications are the source of truth. If source code changes behavior, interfaces, architecture, workflows, or constraints, update both the affected DS files and HTML documentation in the same change.
 
@@ -47,6 +48,7 @@ required and production code has no external package dependency.
 ## Key Paths
 
 - HTML documentation: `docs/index.html`
+- Manual CLI tutorial: `docs/tutorial.html`
 - Specification matrix: `docs/specs/matrix.md`
 - Specifications: `docs/specs/`
 - Coding-style authority: `docs/specs/DS001-coding-style.md`

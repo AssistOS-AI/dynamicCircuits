@@ -13,6 +13,10 @@ summary: Defines inferred CLI modes, filesystem authority, coding-agent adapters
 Coding agents are external collaborators around the deterministic SOP kernel. The filesystem is the present integration
 protocol; a future API may expose the same operations without changing authority or provenance rules.
 
+This specification connects CLI behavior in DS003, workspace safety in DS008, and execution attempts in DS013. The same
+resolved directories, adapter identity, prompt digest, status, and generated artifacts must remain observable whether a
+user invokes the CLI or a future programmatic API.
+
 ## Core Content
 
 ### Inferred modes
@@ -43,6 +47,10 @@ must not be captured. Preparation and dry-run are non-destructive diagnostics.
 A programmatic API may expose `prepare`, `inspect`, `compile`, `run`, `learn`, `propose`, `validate`, `promote`, `analyze`,
 `resume`, `compareAttempts`, `audit`, and `exportReceipt`. Every mutating operation declares target workspace, authority,
 epoch, profile, expected preconditions, and returned artifacts. Promotion remains a distinct privileged operation.
+
+Operational example: an analysis run with `-kbdir ./kb -workdir ./work/case-17` writes task SOP and reports only under
+`case-17`, reads reviewed packages from `./kb/circuits`, and records Codex plus the prompt digest in `last-run.json`. Replacing
+Codex with a future OpenCode adapter changes process construction, not the workspace layout or write permissions.
 
 ## Decisions & Questions
 

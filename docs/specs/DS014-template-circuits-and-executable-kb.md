@@ -13,6 +13,9 @@ summary: Defines reusable circuit templates, their metadata, review lifecycle, v
 The knowledge base stores reviewed, versioned circuit packages. A template circuit defines a recurring transformation,
 reasoning rule, or verification pattern with explicit inputs, outputs, applicability metadata, provenance, and tests.
 
+This specification connects KB candidate governance in DS006 to semantic discovery and matching in DS015. Mandatory use of
+a reviewed template is governed by closure in DS016 and assurance profiles in DS017.
+
 ## Core Content
 
 ### Template contract
@@ -46,6 +49,12 @@ generation aids; assurance depends on explicit matchers and closure as specified
 
 The current runtime discovers and calls `.sop` packages from a filesystem KB and supports nested circuits. Rich template
 metadata, version solving, promotion, and automatic instantiation remain planned.
+
+### Operational example
+
+A reviewed notice-period template declares policy and case inputs, findings and statistics outputs, refusal for malformed
+cases, applicability to the relevant policy domain, positive and exception tests, provenance, and version. A task matcher
+can bind case facts to this interface without copying its rule implementation.
 
 ## Decisions & Questions
 

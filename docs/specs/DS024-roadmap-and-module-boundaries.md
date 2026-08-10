@@ -14,6 +14,10 @@ The roadmap delivers the parser, compiler, runtime, agent workspaces, persistent
 engine, security isolation, and distributed processing as separate milestones. Every milestone has explicit module
 boundaries and testable exit requirements.
 
+This specification orders the contracts in DS004 through DS023. It prevents a planned feature from being documented as
+current behavior and prevents one implementation shortcut from merging parser, runtime, agent orchestration, or assurance
+policy into an interface that later milestones cannot replace.
+
 ## Core Content
 
 ### Module boundaries
@@ -49,6 +53,11 @@ review proportionate to its authority.
 Source, IR, receipt, profile, and package schemas evolve independently with declared versions. Breaking semantic changes
 require explicit migration or rejection. Generated files remain reproducible. Historical `sop_lang_circuits_design_specs_v1/`
 is immutable evidence; current DS files are the maintained authority.
+
+Operational example: semantic matching is a milestone-7 feature. Adding matcher metadata to the parser is not enough to
+declare it implemented. The registry query, deterministic tri-state matcher, automatic circuit wiring, receipts, negative
+tests, documentation, and migration behavior must all exist at their declared module boundaries before the milestone can
+be presented as executable.
 
 ## Decisions & Questions
 

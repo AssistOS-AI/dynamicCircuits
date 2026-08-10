@@ -14,6 +14,10 @@ SOP Lang combines compiler-style SSA dataflow, rule-system fixed points, workflo
 proof-oriented receipts. This specification compares the selected responsibilities with established alternatives and
 records which parts may use those systems directly.
 
+This rationale explains the implementation boundaries in DS004, DS005, DS016, and DS019. It is not a catalog of abstract
+paradigms: each comparison identifies which project responsibility an alternative can implement and which additional
+responsibilities must remain explicit.
+
 ## Core Content
 
 ### Compared approaches
@@ -44,6 +48,10 @@ interfaces keep the initial language small.
 
 Agent-generated prose is not the execution architecture. Coding agents author and analyze files; the deterministic kernel
 parses, compiles, and runs circuits. Direct LLM APIs are intentionally absent from this version.
+
+Operational example: a future Datalog engine may compute mandatory matcher closure, because facts and fixed points fit that
+model. The notice calculation remains an SOP dataflow circuit with explicit inputs and outputs, while the workspace adapter
+still launches Codex and the receipt service still binds sources, package hashes, execution, and coverage evidence.
 
 ## Decisions & Questions
 

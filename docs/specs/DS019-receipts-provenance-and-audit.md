@@ -13,6 +13,9 @@ summary: Defines canonical node, circuit, closure, and final receipts; provenanc
 Receipts are machine-verifiable execution evidence. They explain what ran, on which exact inputs and code, under which
 policy and epoch, and why the outcome was accepted, rejected, refused, inconclusive, or erroneous.
 
+This specification aggregates runtime evidence from DS005 and DS013, closure evidence from DS016, and acceptance/trust
+evidence from DS017–DS018. DS020 uses receipt identities to validate cache reuse and replay.
+
 ## Core Content
 
 ### Receipt hierarchy
@@ -47,6 +50,12 @@ instances ran or did not run, where a value was produced, what changed between a
 
 The current runtime emits deterministic in-memory receipts for nodes, circuits, dead nodes, checks, invariants, and errors.
 Persistent schemas, closure/final receipts, signing, artifact storage, lineage, and replay commands are planned.
+
+### Operational example
+
+A report finding cites a circuit receipt. That receipt cites the rule node and child interpretation receipt. Their input
+hashes identify the case source and policy artifact, while source locators identify the policy paragraph. An auditor can
+follow the chain from finding to exact evidence without rerunning the coding agent.
 
 ## Decisions & Questions
 

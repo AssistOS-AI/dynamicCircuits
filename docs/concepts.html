@@ -1,61 +1,107 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Concepts and SOP Lang — Dynamic Circuits</title><link rel="stylesheet" href="styles.css">
-<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
-<body><div data-include="partials/header.html"></div><main class="page"><article class="page__panel">
-<p class="breadcrumbs"><a href="index.html">Documentation</a> / Design / Concepts</p>
-<h1>Concept model</h1>
-<p class="lead">Source files are stored as identified artifacts. Interpretation circuits publish provenance-linked facts. SOP commands transform those facts through immutable wires, and receipts record the executed dependencies and outputs.</p>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How the analysis works — Dynamic Circuits</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs"><a href="index.html">Documentation</a> / How it works</p>
+    <h1>From documents to an executable analysis</h1>
+    <p class="lead">The coding agent reads human documents and writes SOP files. The compiler checks the SOP files, the runtime executes them, and the result folder preserves both the report and the execution evidence.</p>
 
-<h2>Purpose and relationship to the system</h2>
-<p>This page defines the objects named throughout the CLI, runtime, assurance, and operations documentation. It explains how
-a source file becomes circuit input, how values move through a circuit, and which record connects a final value back to its
-source. The <a href="sop-runtime.html">runtime page</a> describes the implemented mechanics; the
-<a href="assurance.html">assurance page</a> adds applicability and acceptance rules.</p>
+    <h2>A concrete example</h2>
+    <p><a href="eval/eval1/index.html">Eval 1</a> asks whether three notice cases comply with a policy. Its input folder has
+      three Markdown files: <code>rule.md</code> states the 30-day rule and the 10-day exception,
+      <code>cases.md</code> supplies the facts for cases A–C, and <code>task.md</code> states the requested output. These are
+      ordinary documents. They contain no JSON payload and no hidden runtime instruction.</p>
+    <pre class="mermaid">flowchart LR
+      D[Three Markdown files] --> A[Agent writes SOP]
+      A --> C[Compiler checks graph]
+      C --> R[Runtime returns findings]</pre>
+    <p>This diagram is the complete implemented path. The first arrow is an interpretation step performed by the coding
+      agent: prose rules and case facts become explicit commands and values in <code>sop/</code>. The second arrow is a
+      mechanical check performed by local code: package names, arguments, wires, dependencies, outputs, and cycles are
+      validated. The third arrow is deterministic execution: the same accepted SOP and inputs produce the same findings
+      and receipt.</p>
 
-<h2>Conceptual model</h2>
-<pre class="mermaid">flowchart LR
-  S[Source artifact] --> I[Interpretation]
-  I --> F[Facts and claims]
-  F --> P[Source provenance]</pre>
-<p>The first diagram describes interpretation. A source artifact contains bytes plus identity metadata such as media type,
-origin, digest, locators, access policy, and epoch. Interpretation turns selected source spans into facts or claims. Each
-published item retains a source locator, so later derivations can identify the exact document evidence. Interpretation may
-also record uncertainty or conflicting readings.</p>
-<pre class="mermaid">flowchart LR
-  F[Input facts] --> C[Circuit instance]
-  C --> V[Derived values]
-  V --> G[Checks and goals]
-  G --> R[Receipt]</pre>
-<p>The second diagram describes execution. Input facts enter one circuit instance, commands derive canonical values, and
-checks or goals evaluate declared conditions over those values. The receipt records the package, instance, executed nodes,
-input/output hashes, and check outcomes. Child circuits repeat the same structure behind an explicit ordered interface.</p>
-<p>The full vocabulary—including attempts, profiles, trust states, receipts, closure, cache entries, artifacts, hooks, and epochs—is normative in <a href="specsLoader.html?spec=DS009-conceptual-model.md">DS009</a>.</p>
+    <h2>What each file contributes</h2>
+    <p>The following table traces the example instead of assigning vague architectural labels. Each row names a real file,
+      the information taken from it, and where that information appears after interpretation.</p>
+    <table>
+      <thead><tr><th>File</th><th>Information used</th><th>Executable representation</th></tr></thead>
+      <tbody>
+        <tr><td><code>input/rule.md</code></td><td>Ordinary minimum is 30 days. The minimum becomes 10 days only when expedited treatment is requested and written consent is recorded.</td><td><code>sop/policy.sop</code> validates one case, selects 30 or 10, and returns one finding.</td></tr>
+        <tr><td><code>input/cases.md</code></td><td>Case identifiers, notice days, expedited request, and consent evidence.</td><td><code>sop/analysis.sop</code> calls the policy circuit once for each committed case.</td></tr>
+        <tr><td><code>input/task.md</code></td><td>Required per-case fields, totals, and coverage expectation.</td><td><code>@output</code> ports expose findings and statistics; a goal checks that all three cases were classified.</td></tr>
+        <tr><td><code>sop/*.sop</code></td><td>Agent's explicit interpretation of all three source files.</td><td>The compiler produces the dependency graph executed by the runtime.</td></tr>
+        <tr><td><code>results/result.json</code></td><td>Observed verdicts, totals, runtime outcome, and limitations.</td><td>A compact committed summary of a reproducible run; it is output, not source input.</td></tr>
+      </tbody>
+    </table>
+    <p>The important boundary is visible in the middle column. The agent may misunderstand a document, so its generated SOP
+      must remain inspectable. The runtime does not reread the policy and does not silently repair that interpretation. It
+      executes the rule that was actually written, allowing a reviewer to compare source prose, executable rule, and result.</p>
 
-<h3>Example: interpreting a policy date</h3>
-<p>A policy source states that ordinary notice requires 30 days. Interpretation can publish a fact such as
-<code>{minimumDays: 30}</code> with a locator to the policy paragraph. A task circuit combines that fact with a case value
-such as <code>{noticeDays: 10}</code>. Its derived compliance value is false, its goal checks that every case was classified,
-and its receipt connects the result to both input values and the rule package.</p>
+    <h2>What the agent writes</h2>
+    <p>For one case, the generated rule has five ordered inputs: case identifier, observed notice days, expedited-request
+      flag, and written-consent flag. Its command converts the notice value to a finite number, validates the two flags,
+      selects the required minimum, and returns fields such as <code>requiredDays</code>, <code>compliant</code>, and
+      <code>reason</code>. The task circuit invokes that reusable rule three times and aggregates the returned findings.</p>
+    <pre><code>@input caseId noticeDays expeditedRequested writtenConsentRecorded
+@output finding
 
-<h2>Values, wires, and composition</h2>
-<p>Values are canonical JSON-like data plus explicit absence and content-addressed artifact references. Local wires are single-assignment: an input or node output defines a wire exactly once. Identity is based on canonical content and producing context, not mutable object identity or filesystem path. Child circuits receive ordered input values and return ordered outputs; their internal wires never leak into the caller.</p>
-<p>This SSA model makes dependencies, dead work, parallel opportunities, refusal propagation, hashing, and provenance inspectable. See <a href="specsLoader.html?spec=DS010-values-wires-and-circuit-composition.md">DS010</a>.</p>
+@finding evaluate $caseId $noticeDays $expeditedRequested $writtenConsentRecorded</code></pre>
+    <p>The snippet is intentionally small, but its interface is meaningful. A caller cannot omit consent evidence without an
+      arity error. Inside the complete file, invalid booleans and non-finite notice values produce classified refusal data.
+      A different task can reuse the same rule by supplying different explicit values instead of copying or editing its
+      internal code.</p>
 
-<h2>Surface, packages, and ABI</h2>
-<p>The table separates four contracts that operate on the same circuit source. Reading across a row shows what that layer is
-responsible for and which DS is authoritative when implementation or documentation changes.</p>
-<table><thead><tr><th>Layer</th><th>Contract</th><th>Authority</th></tr></thead><tbody>
-<tr><td>Surface</td><td>Ports, command definitions, calls, goals/invariants, and atomic template metadata.</td><td><a href="specsLoader.html?spec=DS004-sop-language.md">DS004</a></td></tr>
-<tr><td>Command ABI</td><td>Positional bindings, canonical outputs, checks, structured refusal, effects and future capabilities.</td><td><a href="specsLoader.html?spec=DS011-command-abi-effects-and-capabilities.md">DS011</a></td></tr>
-<tr><td>Packages and IR</td><td>Path-derived names, deterministic resolution, normalized nodes, validation, and hashes.</td><td><a href="specsLoader.html?spec=DS012-packages-ir-and-resolution.md">DS012</a></td></tr>
-<tr><td>Core</td><td>Small portable deterministic command set; future Assurance Core remains separate.</td><td><a href="specsLoader.html?spec=DS022-core-and-assurance-commands.md">DS022</a></td></tr>
-</tbody></table>
-<p>The surface defines what authors write. The command ABI defines how JavaScript receives and returns values. Package and IR
-rules turn symbolic calls into resolved graph nodes. Core supplies portable deterministic commands. Keeping these contracts
-separate prevents syntax, runtime behavior, and future assurance policy from becoming one implicit mechanism.</p>
+    <h2>What the compiler checks</h2>
+    <p>The compiler does not judge whether 30 days is the correct legal policy. It checks whether the executable
+      interpretation is internally well formed:</p>
+    <ul>
+      <li>every <code>$wire</code> is produced exactly once before it is consumed;</li>
+      <li>command and child-circuit calls receive the declared number of arguments;</li>
+      <li>public outputs, goals, and invariants are reachable from real graph nodes;</li>
+      <li>package names resolve from file paths without collisions;</li>
+      <li>the dependency graph has no cycle.</li>
+    </ul>
+    <p>For example, removing the consent argument from a call to <code>eval1.policy</code> stops compilation with
+      <code>CIRCUIT_ARITY_MISMATCH</code>. Misspelling <code>$noticeDays</code> stops with <code>FREE_WIRE</code>. Neither defect
+      reaches runtime or becomes a polished report.</p>
 
-<h2>Implemented boundary</h2>
-<p>The current parser and compiler support explicit ports, JSON string arguments, local JavaScript command descriptors, immutable wires, nested positional circuits, goals and invariants, and parsed matcher metadata. The runtime executes relevant graph slices in a restricted Node VM and emits structured receipts. Semantic indexing, automatic matcher wiring, effects/capability brokers, and rich types are designed but not yet implemented.</p>
-<p class="callout">The coding agent authors circuit source. The parser, compiler, and runtime determine whether it compiles, which nodes execute, and which receipt is emitted.</p>
-</article></main><div data-include="partials/footer.html"></div><script src="partials-loader.js"></script></body></html>
+    <h2>What the runtime does</h2>
+    <pre class="mermaid">flowchart LR
+      I[Explicit input values] --> N[Required nodes]
+      N --> O[Public outputs]
+      N --> E[Receipt evidence]</pre>
+    <p>The runtime starts from the requested outputs and obligations, walks backward to find the required nodes, and executes
+      those nodes in dependency order. Nodes unrelated to an output or goal are marked dead and do not run. Public outputs
+      contain the requested findings; the receipt separately records node states, input and output hashes, checks, nested
+      calls, and the final outcome.</p>
+    <p>In Eval 1 the root circuit executes three child calls. Case A fails the 30-day rule, case B uses the 10-day exception,
+      and case C satisfies the ordinary rule. The aggregate output is three cases, two compliant, one violation. The coverage
+      goal passes because three distinct case findings were produced. You can reproduce the exact run from the
+      <a href="tutorial.html">manual tutorial</a>.</p>
+
+    <h2>What is not automatic yet</h2>
+    <p>The current agent chooses which KB circuits to inspect and how to connect them to the task. The current runtime then
+      compiles and executes those explicit calls. It does not yet search a semantic registry, prove that every applicable KB
+      rule was selected, run mandatory fixed-point closure, evaluate trust profiles, or issue a final acceptance certificate.
+      Those mechanisms are maintained design work, not claims about the executable release.</p>
+    <p>This distinction matters during testing. Today you can verify input coverage, inspect generated SOP, rerun circuits,
+      compare outputs, and examine receipts. You cannot infer from one successful run that all rules in an arbitrary corpus
+      were discovered. The <a href="assurance.html">assurance page</a> explains how that future coverage check is intended to
+      work, using the same notice example rather than a separate vocabulary.</p>
+  </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="partials-loader.js"></script>
+</body>
+</html>
