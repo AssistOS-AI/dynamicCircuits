@@ -14,6 +14,23 @@ async function loadPartials() {
       }
     }
   }));
+
+  const navigation = document.querySelector(".site-nav");
+  const groups = [...document.querySelectorAll(".nav-group")];
+  for (const group of groups) {
+    group.addEventListener("toggle", () => {
+      if (!group.open) return;
+      for (const other of groups) if (other !== group) other.open = false;
+    });
+  }
+  document.addEventListener("pointerdown", (event) => {
+    if (navigation?.contains(event.target)) return;
+    for (const group of groups) group.open = false;
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    for (const group of groups) group.open = false;
+  });
 }
 
 loadPartials().catch((error) => {

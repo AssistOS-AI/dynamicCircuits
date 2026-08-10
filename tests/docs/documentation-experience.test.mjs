@@ -205,6 +205,12 @@ test("all reader pages load one grouped, mount-aware navigation source", async (
 
   const loader = await readFile(path.join(docsRoot, "partials-loader.js"), "utf8");
   assert.match(loader, /new URL\("\.\/", loaderUrl\)/);
+  assert.match(loader, /group\.addEventListener\("toggle"/,
+    "opening one navigation group must close its siblings");
+  assert.match(loader, /document\.addEventListener\("pointerdown"/,
+    "clicking outside the primary navigation must close open groups");
+  assert.match(loader, /event\.key !== "Escape"/,
+    "Escape must close open navigation groups");
   assert.match(loader, /new URL\(href, docsRoot\)/);
 });
 
