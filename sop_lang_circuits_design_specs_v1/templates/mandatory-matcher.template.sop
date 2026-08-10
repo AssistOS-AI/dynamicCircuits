@@ -1,0 +1,19 @@
+@template mandatory
+@trigger "semantic.key.a" "semantic.key.b"
+@apply kb.target.rule
+
+@input index delta
+@output matches
+
+@left select $index "semantic.key.a"
+@right select $index "semantic.key.b"
+
+@pairs join
+    $left
+    $right
+    "/subject"
+    "/subject"
+
+@matches filter
+    $pairs
+    "kb.target.applicable"

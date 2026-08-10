@@ -1,0 +1,45 @@
+@input actual minimum
+@output proof witness
+@invariant proofValid covers proof witness
+
+@deriveInvalid define actual minimum
+    async function run({ actual, minimum }, ctx) {
+      if (actual === undefined || minimum === undefined) {
+        return ctx.reject("missing_notice_input")
+      }
+
+      if (actual.subject !== minimum.subject) {
+        return ctx.reject("different_subjects")
+      }
+
+      if (!(Number(actual.value) < Number(minimum.value))) {
+        return ctx.reject("rule_not_applicable")
+      }
+
+      return {
+        proof: {
+          kind: "support",
+          predicate: "validTermination",
+          subject: actual.subject,
+          polarity: "negative"
+        },
+        witness: {
+          actualDays: Number(actual.value),
+          minimumDays: Number(minimum.value)
+        }
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@bundle deriveInvalid $actual $minimum
+@proof get $bundle "/proof"
+@witness get $bundle "/witness"
+
+@proofValid examples.legal.invalidity_verifier
+    $actual
+    $minimum
+    $proof
+    $witness
+
+@proofPublished publish $proof "support.negative"

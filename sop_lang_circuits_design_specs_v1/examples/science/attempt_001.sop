@@ -1,0 +1,58 @@
+@input sourceText
+@output answer
+@goal answerReady covers answer
+
+@dataset @claim examples.science.source $sourceText
+
+@badRule define dataset
+    async function run({ dataset }) {
+      const mean = dataset.values.reduce((a, b) => a + b, 0) / dataset.values.length
+      return {
+        allPositive: mean > 0,
+        mean
+      }
+    }
+
+    async function check({ dataset }, output) {
+      const mean = dataset.values.reduce((a, b) => a + b, 0) / dataset.values.length
+      return output.mean === mean
+    }
+
+    return { run, check, effects: ["pure"] }
+
+@render define badConclusion
+    async function run({ badConclusion }) {
+      return badConclusion.allPositive
+        ? "All values are positive."
+        : "The claim is false."
+    }
+
+    return { run, effects: ["pure"] }
+
+@nonEmpty define answer
+    async function run({ answer }) {
+      return {
+        ok: typeof answer === "string" && answer.length > 0,
+        code: "answer.nonEmpty"
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@badConclusion badRule $dataset
+@answer render $badConclusion
+@makeAnswerRecord define answer claim
+    async function run({ answer, claim }) {
+      return {
+        subject: claim.subject,
+        text: answer
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@answerRecord makeAnswerRecord $answer $claim
+@answerPublished publish $answerRecord "output.answer"
+@answerReady nonEmpty $answer
+
+# Mandatory counterexample + grounding trebuie să respingă acest attempt.

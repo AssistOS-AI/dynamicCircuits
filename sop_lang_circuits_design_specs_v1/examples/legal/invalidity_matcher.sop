@@ -1,0 +1,19 @@
+@template mandatory
+@trigger "fact.noticeDays" "fact.minimumNotice"
+@apply examples.legal.invalidity_rule
+
+@input index delta
+@output matches
+
+@actuals select $index "fact.noticeDays"
+@minimums select $index "fact.minimumNotice"
+
+@pairs join
+    $actuals
+    $minimums
+    "/subject"
+    "/subject"
+
+@matches filter
+    $pairs
+    "examples.legal.invalidity_applicable"

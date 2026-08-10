@@ -1,0 +1,7 @@
+@input answer conflict
+@output assurance
+@invariant assurance covers answer conflict
+
+@assurance examples.assurance.grounding_verifier
+    $answer
+    $conflict

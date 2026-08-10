@@ -1,0 +1,19 @@
+@template mandatory
+@trigger "output.answer" "conflict"
+@apply examples.assurance.grounding_rule
+
+@input index delta
+@output matches
+
+@answers select $index "output.answer"
+@conflicts select $index "conflict"
+
+@sameSubject join
+    $answers
+    $conflicts
+    "/subject"
+    "/subject"
+
+@matches filter
+    $sameSubject
+    "examples.assurance.grounding_applicable"

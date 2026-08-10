@@ -1,0 +1,44 @@
+@input sourceText
+@output answer
+@goal answerReady covers answer refutation witness
+
+@dataset @claim examples.science.source $sourceText
+@refutation @witness examples.science.counterexample_rule $dataset $claim
+
+@render define refutation witness
+    async function run({ refutation, witness }) {
+      return `The claim is false: the dataset contains ${witness.value} ` +
+        `at index ${witness.index}.`
+    }
+
+    return { run, effects: ["pure"] }
+
+@answerCheck define answer refutation witness
+    async function run({ answer, refutation, witness }) {
+      return {
+        ok:
+          answer.includes(String(witness.value)) &&
+          answer.includes(String(witness.index)) &&
+          refutation.polarity === "negative",
+        code: "answer.localCoverage"
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@answer render $refutation $witness
+@makeAnswerRecord define answer refutation
+    async function run({ answer, refutation }) {
+      return {
+        subject: refutation.subject,
+        text: answer
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@answerRecord makeAnswerRecord $answer $refutation
+@answerPublished publish $answerRecord "output.answer"
+@answerReady answerCheck $answer $refutation $witness
+
+# Grounding hook aprobat verifică semantic output-ul.

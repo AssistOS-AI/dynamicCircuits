@@ -1,0 +1,15 @@
+@input answer conflict
+@output applicable
+
+@check define answer conflict
+    async function run({ answer, conflict }) {
+      return Boolean(
+        answer &&
+        conflict &&
+        answer.subject === conflict.subject
+      )
+    }
+
+    return { run, effects: ["pure"] }
+
+@applicable check $answer $conflict

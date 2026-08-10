@@ -1,0 +1,19 @@
+@template mandatory
+@trigger "support.positive" "support.negative"
+@apply examples.assurance.contradiction_rule
+
+@input index delta
+@output matches
+
+@positive select $index "support.positive"
+@negative select $index "support.negative"
+
+@sameSubject join
+    $positive
+    $negative
+    "/subject"
+    "/subject"
+
+@matches filter
+    $sameSubject
+    "examples.assurance.contradiction_applicable"

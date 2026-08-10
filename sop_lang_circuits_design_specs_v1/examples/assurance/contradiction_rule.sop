@@ -1,0 +1,34 @@
+@input positive negative
+@output conflict
+@invariant conflictValid covers conflict positive negative
+
+@buildConflict define positive negative
+    async function run({ positive, negative }, ctx) {
+      if (
+        positive.subject !== negative.subject ||
+        positive.predicate !== negative.predicate ||
+        positive.polarity !== "positive" ||
+        negative.polarity !== "negative"
+      ) {
+        return ctx.reject("not_a_contradiction")
+      }
+
+      return {
+        kind: "conflict",
+        subject: positive.subject,
+        predicate: positive.predicate,
+        positive,
+        negative
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@conflict buildConflict $positive $negative
+
+@conflictValid examples.assurance.contradiction_verifier
+    $positive
+    $negative
+    $conflict
+
+@conflictPublished publish $conflict "conflict"

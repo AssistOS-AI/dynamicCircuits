@@ -1,0 +1,39 @@
+@input dataset claim
+@output refutation witness
+@invariant witnessValid covers refutation witness
+
+@findCounterexample define dataset claim
+    async function run({ dataset, claim }, ctx) {
+      const index = dataset.values.findIndex(value => !(value > 0))
+
+      if (index < 0) {
+        return ctx.reject("no_counterexample")
+      }
+
+      return {
+        refutation: {
+          kind: "support",
+          predicate: claim.predicate,
+          subject: claim.subject,
+          polarity: "negative"
+        },
+        witness: {
+          index,
+          value: dataset.values[index]
+        }
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@bundle findCounterexample $dataset $claim
+@refutation get $bundle "/refutation"
+@witness get $bundle "/witness"
+
+@witnessValid examples.science.counterexample_verifier
+    $dataset
+    $claim
+    $refutation
+    $witness
+
+@refutationPublished publish $refutation "support.negative"

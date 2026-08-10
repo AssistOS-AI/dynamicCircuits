@@ -1,0 +1,13 @@
+@input inputA inputB
+@output result evidence
+@invariant resultValid covers result evidence
+
+@bundle localCommand $inputA $inputB
+@result get $bundle "/result"
+@evidence get $bundle "/evidence"
+
+@resultValid trusted.verifier.package
+    $inputA
+    $inputB
+    $result
+    $evidence

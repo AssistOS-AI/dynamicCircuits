@@ -1,0 +1,41 @@
+@input contractText
+@output answer
+@goal answerReady covers answer
+
+@actual @minimum @declared examples.legal.source $contractText
+
+@renderDeclared define declared
+    async function run({ declared }) {
+      return `Termination ${declared.subject} is valid.`
+    }
+
+    return { run, effects: ["pure"] }
+
+@isNonEmpty define answer
+    async function run({ answer }) {
+      return {
+        ok: typeof answer === "string" && answer.length > 0,
+        code: "answer.nonEmpty"
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@answer renderDeclared $declared
+@makeAnswerRecord define answer declared
+    async function run({ answer, declared }) {
+      return {
+        subject: declared.subject,
+        text: answer
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@answerRecord makeAnswerRecord $answer $declared
+@answerPublished publish $answerRecord "output.answer"
+@answerReady isNonEmpty $answer
+
+# Goal-ul local confirmă numai existența output-ului.
+# Profile-ul extern injectează invalidity, contradiction și grounding.
+# Mandatory grounding trebuie să respingă acest attempt.

@@ -1,0 +1,26 @@
+@input
+@output sample
+
+@sampleCommand define input policy
+    async function run({ input, policy }, ctx) {
+      if (input === undefined) {
+        return ctx.reject("missing_input")
+      }
+
+      return {
+        input,
+        policy
+      }
+    }
+
+    async function check({ input, policy }, output) {
+      return output.input === input
+    }
+
+    return {
+      run,
+      check,
+      effects: ["pure"]
+    }
+
+@sample sampleCommand "example"

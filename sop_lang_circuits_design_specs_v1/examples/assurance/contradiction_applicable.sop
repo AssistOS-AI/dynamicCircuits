@@ -1,0 +1,18 @@
+@input positive negative
+@output applicable
+
+@check define positive negative
+    async function run({ positive, negative }) {
+      return Boolean(
+        positive &&
+        negative &&
+        positive.subject === negative.subject &&
+        positive.predicate === negative.predicate &&
+        positive.polarity === "positive" &&
+        negative.polarity === "negative"
+      )
+    }
+
+    return { run, effects: ["pure"] }
+
+@applicable check $positive $negative

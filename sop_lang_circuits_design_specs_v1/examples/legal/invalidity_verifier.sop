@@ -1,0 +1,27 @@
+@input actual minimum proof witness
+@output assurance
+
+@verify define actual minimum proof witness
+    async function run({ actual, minimum, proof, witness }, ctx) {
+      const ok =
+        actual !== undefined &&
+        minimum !== undefined &&
+        proof !== undefined &&
+        witness !== undefined &&
+        actual.subject === minimum.subject &&
+        proof.subject === actual.subject &&
+        proof.predicate === "validTermination" &&
+        proof.polarity === "negative" &&
+        witness.actualDays === Number(actual.value) &&
+        witness.minimumDays === Number(minimum.value) &&
+        witness.actualDays < witness.minimumDays
+
+      return {
+        ok,
+        code: "legal.notice.invalidity"
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@assurance verify $actual $minimum $proof $witness

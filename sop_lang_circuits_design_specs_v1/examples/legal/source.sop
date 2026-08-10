@@ -1,0 +1,42 @@
+@input text
+@output actual minimum declared
+
+@interpretLegalText define text
+    async function run({ text }, ctx) {
+      if (text === undefined) {
+        return ctx.reject("missing_text")
+      }
+
+      return {
+        actual: {
+          kind: "noticeDays",
+          subject: "T1",
+          value: 10,
+          sourceSpan: "S2"
+        },
+        minimum: {
+          kind: "minimumNotice",
+          subject: "T1",
+          value: 30,
+          sourceSpan: "S1"
+        },
+        declared: {
+          kind: "support",
+          predicate: "validTermination",
+          subject: "T1",
+          polarity: "positive",
+          sourceSpan: "S3"
+        }
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@bundle interpretLegalText $text
+@actual get $bundle "/actual"
+@minimum get $bundle "/minimum"
+@declared get $bundle "/declared"
+
+@actualPublished publish $actual "fact.noticeDays"
+@minimumPublished publish $minimum "fact.minimumNotice"
+@declaredPublished publish $declared "support.positive"

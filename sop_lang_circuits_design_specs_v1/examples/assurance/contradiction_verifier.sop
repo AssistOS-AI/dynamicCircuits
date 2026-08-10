@@ -1,0 +1,20 @@
+@input positive negative conflict
+@output assurance
+
+@verify define positive negative conflict
+    async function run({ positive, negative, conflict }) {
+      return {
+        ok:
+          conflict.subject === positive.subject &&
+          conflict.subject === negative.subject &&
+          conflict.predicate === positive.predicate &&
+          conflict.predicate === negative.predicate &&
+          positive.polarity === "positive" &&
+          negative.polarity === "negative",
+        code: "assurance.contradiction"
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@assurance verify $positive $negative $conflict

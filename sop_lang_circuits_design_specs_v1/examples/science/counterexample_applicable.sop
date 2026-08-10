@@ -1,0 +1,17 @@
+@input dataset claim
+@output applicable
+
+@canSearch define dataset claim
+    async function run({ dataset, claim }) {
+      return Boolean(
+        dataset &&
+        Array.isArray(dataset.values) &&
+        claim &&
+        claim.predicate === "allPositive" &&
+        claim.subject === dataset.id
+      )
+    }
+
+    return { run, effects: ["pure"] }
+
+@applicable canSearch $dataset $claim

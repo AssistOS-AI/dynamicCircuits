@@ -1,0 +1,69 @@
+@input contractText
+@output answer
+@goal answerReady covers answer proof conflict
+
+@actual @minimum @declared examples.legal.source $contractText
+@proof @witness examples.legal.invalidity_rule $actual $minimum
+
+@makeConflict define declared proof
+    async function run({ declared, proof }, ctx) {
+      if (
+        declared.subject !== proof.subject ||
+        declared.predicate !== proof.predicate ||
+        declared.polarity === proof.polarity
+      ) {
+        return ctx.reject("no_conflict")
+      }
+
+      return {
+        kind: "conflict",
+        subject: declared.subject,
+        positive: declared,
+        negative: proof
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@conflict makeConflict $declared $proof
+
+@renderAnswer define proof witness conflict
+    async function run({ proof, witness, conflict }) {
+      return `Termination ${proof.subject} is invalid under the stated rule: ` +
+        `${witness.actualDays} days were given, below the required ` +
+        `${witness.minimumDays}. The text also contains a conflicting declaration.`
+    }
+
+    return { run, effects: ["pure"] }
+
+@answerCheck define answer proof conflict
+    async function run({ answer, proof, conflict }) {
+      return {
+        ok:
+          typeof answer === "string" &&
+          answer.includes(proof.subject) &&
+          answer.includes("conflict") &&
+          conflict.subject === proof.subject,
+        code: "answer.localCoverage"
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@answer renderAnswer $proof $witness $conflict
+@makeAnswerRecord define answer proof
+    async function run({ answer, proof }) {
+      return {
+        subject: proof.subject,
+        text: answer
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@answerRecord makeAnswerRecord $answer $proof
+@answerPublished publish $answerRecord "output.answer"
+@answerReady answerCheck $answer $proof $conflict
+
+# Un mandatory grounding verifier aprobat verifică suplimentar
+# că textul corespunde integral proof-ului și witness-ului.

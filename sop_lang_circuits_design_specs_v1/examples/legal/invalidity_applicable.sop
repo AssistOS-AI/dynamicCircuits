@@ -1,0 +1,16 @@
+@input actual minimum
+@output applicable
+
+@isApplicable define actual minimum
+    async function run({ actual, minimum }) {
+      return Boolean(
+        actual &&
+        minimum &&
+        actual.subject === minimum.subject &&
+        Number(actual.value) < Number(minimum.value)
+      )
+    }
+
+    return { run, effects: ["pure"] }
+
+@applicable isApplicable $actual $minimum

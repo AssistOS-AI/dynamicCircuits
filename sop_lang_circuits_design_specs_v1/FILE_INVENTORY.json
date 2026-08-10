@@ -1,0 +1,396 @@
+{
+  "package": "sop-lang-circuits-design-specs",
+  "version": "1.0.0-draft",
+  "files": [
+    {
+      "path": "00_MANIFEST.md",
+      "bytes": 2863,
+      "sha256": "4a29aef9d7538e3131e4254e807c7c8811035d111b445e143fe82834e8582b8c"
+    },
+    {
+      "path": "DECISIONS.md",
+      "bytes": 1441,
+      "sha256": "18ef4ca32de503fc92cc4a18bc566a08ea2a1d25243e14b63c0531fb09ceadf6"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4186,
+      "sha256": "52c98470ebc0e5044c14f746c4214b57bd8ea9fe90a876ff9ac623df7523157f"
+    },
+    {
+      "path": "VALIDATION_REPORT.md",
+      "bytes": 1367,
+      "sha256": "05669a9db78857afa13af6fbd18ba1ad2ba0de18e77cc14116becbf48df30bd0"
+    },
+    {
+      "path": "checklists/KERNEL_REVIEW.md",
+      "bytes": 503,
+      "sha256": "48ddcad6b839b5cc906c29f24c1d9ed5e357dfb3135bdff473d8fe43c3e5ca66"
+    },
+    {
+      "path": "checklists/PROBLEM_ACCEPTANCE.md",
+      "bytes": 515,
+      "sha256": "fd2ec412759b42884bd81719fc64a5eb395d13a0241f3247961c84d5f68b0203"
+    },
+    {
+      "path": "checklists/TEMPLATE_REVIEW.md",
+      "bytes": 519,
+      "sha256": "c76491c70666f8ed430c490b216b172fe071fb5e1553b45132de7915333dbad3"
+    },
+    {
+      "path": "design/DS-001_VISION_SCOPE_AND_NON_GOALS.md",
+      "bytes": 5260,
+      "sha256": "7765e293ea514f47cfd5c1bb4c0ef8d7f558c948c3814af0932351ea5ba5b5ad"
+    },
+    {
+      "path": "design/DS-002_TERMINOLOGY_AND_CONCEPTUAL_MODEL.md",
+      "bytes": 6126,
+      "sha256": "430c10b4da26de74856dbff2da2e190780580192a3362156a3601ab0eabe3a51"
+    },
+    {
+      "path": "design/DS-003_LEXICAL_AND_SURFACE_SYNTAX.md",
+      "bytes": 6317,
+      "sha256": "69412c6c996a4965cfa3ecf1867120c05aaacb929642ed33c7462c07b391b8fd"
+    },
+    {
+      "path": "design/DS-004_WIRES_VALUES_AND_SSA_SEMANTICS.md",
+      "bytes": 5446,
+      "sha256": "c3153664a084da0d106278af7ff9fd82c5c3fc479d9d3ba7b67be8493c69f78d"
+    },
+    {
+      "path": "design/DS-005_COMMAND_DECLARATION_AND_JS_ABI.md",
+      "bytes": 5965,
+      "sha256": "c1645aad2c94851a31456a117a9cb7fd6edec2fea92cd869b0397ad3479d9a96"
+    },
+    {
+      "path": "design/DS-006_CIRCUIT_FILES_INTERFACES_AND_CALLS.md",
+      "bytes": 4611,
+      "sha256": "6e234cf8f7d8ff1b797b4e6e186ebeaf95a963309cfb30a5f525932839293fce"
+    },
+    {
+      "path": "design/DS-007_PACKAGES_NAMESPACES_AND_RESOLUTION.md",
+      "bytes": 4382,
+      "sha256": "e7d96e86f0cb1af40607507df3a92da7bd63078ac0a9f19ae1a58aeb0beb4e2d"
+    },
+    {
+      "path": "design/DS-008_COMPILER_IR_AND_STATIC_VALIDATION.md",
+      "bytes": 5399,
+      "sha256": "13f7ce871d8c38d35ad64e04fb264d98a6ccdad7acd63bb0e502eba860e08eff"
+    },
+    {
+      "path": "design/DS-009_EXECUTION_SCHEDULING_REFUSAL_AND_ATTEMPTS.md",
+      "bytes": 4561,
+      "sha256": "6033c54d72ec1ae2d4297a95690fce84210939c5c320faa8b04cc2c4b9883ab5"
+    },
+    {
+      "path": "design/DS-010_TEMPLATE_CIRCUITS_AND_EXECUTABLE_KB.md",
+      "bytes": 4402,
+      "sha256": "ae8cc54401e3efd3a22aaad9a8a3342b2ca653ab28cdaa93ba448647b9505c48"
+    },
+    {
+      "path": "design/DS-011_SEMANTIC_INDEX_MATCHING_AND_AUTOMATIC_WIRING.md",
+      "bytes": 5024,
+      "sha256": "7c47e75c76f47208cd95787e7ca2e2b846e2b4ea8216c885eaecc579c232a7e4"
+    },
+    {
+      "path": "design/DS-012_MANDATORY_HOOKS_AND_FIXPOINT_CLOSURE.md",
+      "bytes": 4909,
+      "sha256": "44e2f992636a4baf9e2952249f522381f5ab8d0a8e18a3184927666aec289624"
+    },
+    {
+      "path": "design/DS-013_GOALS_INVARIANTS_AND_ACCEPTANCE.md",
+      "bytes": 5508,
+      "sha256": "f3bbdc0f8f7d45cf9ac32b8d86dc2c916d7fcb66cf10888169f20b9d91ee5d24"
+    },
+    {
+      "path": "design/DS-014_CORRECTNESS_MODEL_AND_TRUST_BOUNDARIES.md",
+      "bytes": 5437,
+      "sha256": "89d78cb57febfd09184de91f3212db8a4a7fc21c9aae4789b436e1014174a530"
+    },
+    {
+      "path": "design/DS-015_RECEIPTS_PROVENANCE_AND_AUDIT.md",
+      "bytes": 3893,
+      "sha256": "c2fca1ef0604faceee5508fee3e4bb25ff7ff777d5b360757eff7102209cff4d"
+    },
+    {
+      "path": "design/DS-016_CACHE_INCREMENTAL_EXECUTION_AND_EPOCHS.md",
+      "bytes": 4087,
+      "sha256": "375219f2cfebe564a2cd2ea02e8936e0fc75ef8897a99edfffde6d2d781127c9"
+    },
+    {
+      "path": "design/DS-017_SCALABILITY_REGISTRY_AND_LARGE_DOCUMENTS.md",
+      "bytes": 3793,
+      "sha256": "4156240e853a03050956b1523b77e2e545ef44ffa87fd279ea92eb9ec5a5c5c8"
+    },
+    {
+      "path": "design/DS-018_SECURITY_SANDBOX_EFFECTS_AND_ORACLES.md",
+      "bytes": 3686,
+      "sha256": "ba14913cfe6f3e10c43527a6cd4cb515d7a20281dc897131aa25274554586bcc"
+    },
+    {
+      "path": "design/DS-019_STANDARD_CORE_COMMANDS.md",
+      "bytes": 5874,
+      "sha256": "e458b94b82e1e5fd41b2d1005b859ee1c3f1169ca29cd5a30be14ad59671256f"
+    },
+    {
+      "path": "design/DS-020_CONFORMANCE_TESTS_AND_BENCHMARKS.md",
+      "bytes": 4816,
+      "sha256": "203c57cf611839eb446ee9a65c4f66371830c290d459bdaacb29ce287ccce1e4"
+    },
+    {
+      "path": "design/DS-021_IMPLEMENTATION_ROADMAP_AND_MODULE_BOUNDARIES.md",
+      "bytes": 4058,
+      "sha256": "9a43ad018d5732d8f8c39dc6f105259ca0a55d5d4c61bd486bbab6245e6c7a4f"
+    },
+    {
+      "path": "design/DS-022_ALTERNATIVE_ARCHITECTURES_AND_DESIGN_RATIONALE.md",
+      "bytes": 4968,
+      "sha256": "02aa4fc2bd29bd3225fc3232d4efaebf1690a99c49f5a3639bfcad16e7e67502"
+    },
+    {
+      "path": "design/DS-023_AGENT_API_AND_WORKSPACE_PROTOCOL.md",
+      "bytes": 4221,
+      "sha256": "698642591ba775b21364a2841d3cb15070aa50239306f9436aa1760f1ad9e22e"
+    },
+    {
+      "path": "design/DS-024_END_TO_END_LIFECYCLE_AND_REFERENCE_FLOW.md",
+      "bytes": 4066,
+      "sha256": "fb7b7018934388c1c95134c093167dd424978ced65d90d4c5efccfa69aedf10c"
+    },
+    {
+      "path": "examples/assurance/README.md",
+      "bytes": 393,
+      "sha256": "a7db6bb77f0b42ce6a48987077d41b50e7abd1456d99b08eca0254ff7fbeb120"
+    },
+    {
+      "path": "examples/assurance/contradiction_applicable.sop",
+      "bytes": 467,
+      "sha256": "e0a365d723c9501af21fd5ba9de3b3435ce40cf2acc54ccb01a87f5f07710ec6"
+    },
+    {
+      "path": "examples/assurance/contradiction_matcher.sop",
+      "bytes": 396,
+      "sha256": "150c2a047d1172efb05285a131e0fafa2909f352bd77b0bdc138563e68364414"
+    },
+    {
+      "path": "examples/assurance/contradiction_rule.sop",
+      "bytes": 859,
+      "sha256": "0cbca28f20605ac3dccf16aa9d7471c521f914083b1099afa2f6015ceb8c5a8d"
+    },
+    {
+      "path": "examples/assurance/contradiction_verifier.sop",
+      "bytes": 625,
+      "sha256": "b037772f446db02e7f0ca8056c5d0d862a7e0d151da2f2af3c2ea870c9f89e57"
+    },
+    {
+      "path": "examples/assurance/grounding_applicable.sop",
+      "bytes": 314,
+      "sha256": "f3e4133ee81d042c992f66dcf8150ed3e3342792c397decade07963c1c5551c9"
+    },
+    {
+      "path": "examples/assurance/grounding_matcher.sop",
+      "bytes": 366,
+      "sha256": "388f24d81b51fde585fae14181506b26ac7756227f2d58e83c1c3a1166eb7391"
+    },
+    {
+      "path": "examples/assurance/grounding_rule.sop",
+      "bytes": 161,
+      "sha256": "4753d2795855281de45269ab4c2f2399fa178b3630950760f26e5f90cd8bbfef"
+    },
+    {
+      "path": "examples/assurance/grounding_verifier.sop",
+      "bytes": 705,
+      "sha256": "d44df9962b91afabd410a51f5942e1f0d5808445eb042c40dc6f961322fa8ed1"
+    },
+    {
+      "path": "examples/book-workspace/README.md",
+      "bytes": 891,
+      "sha256": "65c36f39154b8cff139e8e7c69cdcac7ccaf093cd10646bee203260879bc2002"
+    },
+    {
+      "path": "examples/legal/README.md",
+      "bytes": 689,
+      "sha256": "341780d985af3d1f76ec88e698b2f3246fbe6bf66272d8fe3b398bcb7b6df52a"
+    },
+    {
+      "path": "examples/legal/attempt_001.sop",
+      "bytes": 1102,
+      "sha256": "c53cf455d9cae7f726424a8123f7eb63456f9c5fb89598175c548109012eb0b3"
+    },
+    {
+      "path": "examples/legal/attempt_002.sop",
+      "bytes": 2028,
+      "sha256": "47b5d485127eaa73604178c85ce4b2676798a0038b4e0b21bf47d3af43edc55d"
+    },
+    {
+      "path": "examples/legal/invalidity_applicable.sop",
+      "bytes": 378,
+      "sha256": "7ac0f9860f67b0719440147b3209cb4343cf6eb9881b85786078baecdf3c3b44"
+    },
+    {
+      "path": "examples/legal/invalidity_matcher.sop",
+      "bytes": 370,
+      "sha256": "795a13c127c8f8623fd87658a814d1970b20f1cf6d6a8c6931ca38bbe573cc7f"
+    },
+    {
+      "path": "examples/legal/invalidity_rule.sop",
+      "bytes": 1114,
+      "sha256": "6242be43786224278128458d3e13f1bbfc24ab1c5a698bfccd662fcdb7ea055a"
+    },
+    {
+      "path": "examples/legal/invalidity_verifier.sop",
+      "bytes": 827,
+      "sha256": "1babf8bce1979b9be6d333ebf8ceb88989f1156f7304d3569284a1fe5d989f1b"
+    },
+    {
+      "path": "examples/legal/profile.md",
+      "bytes": 580,
+      "sha256": "be5cc3532b7355732f8c2d088f9ee62f75d1673d63fb0f48042b4082f3e2b4fa"
+    },
+    {
+      "path": "examples/legal/source.sop",
+      "bytes": 1012,
+      "sha256": "3a79da30054a86c263601bf417efe4b0baa41f21494aae6979d05518408d0b30"
+    },
+    {
+      "path": "examples/science/README.md",
+      "bytes": 444,
+      "sha256": "759ea1a100fcd19953cc31408213789982021b3676c3101225cd74105a3fd1fa"
+    },
+    {
+      "path": "examples/science/attempt_001.sop",
+      "bytes": 1484,
+      "sha256": "ed0b800f016b85257dbacfd51bc404316b407401befe0860d236b4919384c7f2"
+    },
+    {
+      "path": "examples/science/attempt_002.sop",
+      "bytes": 1298,
+      "sha256": "6fa81eae3dc095d0a142d0fb46c45d69a69c5c040a36c2cbf29e5d2ad2c15b84"
+    },
+    {
+      "path": "examples/science/counterexample_applicable.sop",
+      "bytes": 391,
+      "sha256": "686bdb9faf97fb44f7283739372fee977ac0f56c47e3e2519d1f5f6d9182f7ef"
+    },
+    {
+      "path": "examples/science/counterexample_matcher.sop",
+      "bytes": 371,
+      "sha256": "fce342b4209bd985946cc4c094aa32f024f14b00e9da6be0982fa245c434aad6"
+    },
+    {
+      "path": "examples/science/counterexample_rule.sop",
+      "bytes": 938,
+      "sha256": "5a2c815713441bfa80d54e5cc305201fa5696abdfec62ddcb4e3f6de4fc6db4c"
+    },
+    {
+      "path": "examples/science/counterexample_verifier.sop",
+      "bytes": 612,
+      "sha256": "7eb85c1c91329f26924dd155f24c23c60d41915ba6404d7d49298f124090a2f1"
+    },
+    {
+      "path": "examples/science/profile.md",
+      "bytes": 625,
+      "sha256": "f4adab19d59608d0ac2cfd092f80dd9bd488df8393859a867beeb4b357c9e425"
+    },
+    {
+      "path": "examples/science/source.sop",
+      "bytes": 696,
+      "sha256": "be09897b270b169eecb0a46b8b169310da175846298deb5f071a2128a90de81d"
+    },
+    {
+      "path": "schemas/ASSURANCE_PROFILE_SCHEMA.md",
+      "bytes": 860,
+      "sha256": "b38d321dd884fabdbbf4a61fb033faf7f8dfb006b5df3f59c0e2a8f80e5ed6bc"
+    },
+    {
+      "path": "schemas/IR_SCHEMA.md",
+      "bytes": 1800,
+      "sha256": "7b9695118747ffeac974000adf202857c307ec80338d3371694e7e6500840823"
+    },
+    {
+      "path": "schemas/RECEIPT_SCHEMA.md",
+      "bytes": 1303,
+      "sha256": "ec39571a9df43fad7bcaaaa178e91786c92e2a2dd1296b52912ad8ae6a9d8ef0"
+    },
+    {
+      "path": "schemas/WORKSPACE_LAYOUT.md",
+      "bytes": 641,
+      "sha256": "c00ce7bc315ea4b9f0fb18214b8b656854a9939b157af30e634d7df6cf9b52d6"
+    },
+    {
+      "path": "skills/AGENT_INVOCATION_TEMPLATES.md",
+      "bytes": 1166,
+      "sha256": "4f5e149fe2fbff6596e5f54e2e7a1772daeab44b9a4e9cc7776a3eb3f67df3aa"
+    },
+    {
+      "path": "skills/README.md",
+      "bytes": 945,
+      "sha256": "b580a128db070a3f9fae43cf3e6e735a7f2258d0e1649ef511a9702229323c53"
+    },
+    {
+      "path": "skills/SKILL-01_KERNEL_IMPLEMENTER.md",
+      "bytes": 3327,
+      "sha256": "20c5abf7eeb053fd17f74295f16384b2f73fdaa8bfa24c878b7b31b012cbac68"
+    },
+    {
+      "path": "skills/SKILL-02_CIRCUIT_LEARNER.md",
+      "bytes": 3934,
+      "sha256": "104ff7e9de82a63491f984dab44a1250cb7124f4de9f48d95c707691a290ab1f"
+    },
+    {
+      "path": "skills/SKILL-03_PROBLEM_SOLVER.md",
+      "bytes": 3444,
+      "sha256": "53b59018b3f273f0ef5c59eb92e1da6a0a2da6de7ae3fd704c234442f637b524"
+    },
+    {
+      "path": "skills/SKILL-04_TEMPLATE_AND_MATCHER_AUTHOR.md",
+      "bytes": 3160,
+      "sha256": "39798556d9289e07d678eb463ae9d19b3897b5e599d7d6bd4ffdb5411f49c875"
+    },
+    {
+      "path": "skills/SKILL-05_ASSURANCE_REVIEWER.md",
+      "bytes": 2247,
+      "sha256": "69c9681d6fb64085b6380690133ed524e79af2bd21afc99e18c6c9f4867cc513"
+    },
+    {
+      "path": "skills/SKILL-06_CIRCUIT_DEBUGGER.md",
+      "bytes": 2044,
+      "sha256": "1f8f00d0f8d35c67ed93afa05818f60b0c8f25c7bac6861c7e642266de639b7f"
+    },
+    {
+      "path": "templates/assurance-profile.template.md",
+      "bytes": 335,
+      "sha256": "43be166b9ea5c0596e0c5ff9c532646529508e29c34ea5f40c230190986fd816"
+    },
+    {
+      "path": "templates/circuit-file.template.sop",
+      "bytes": 282,
+      "sha256": "a960f5a7a5d94b2f4472831facb7fdb630368baf93729d1195b6c352b5ff0648"
+    },
+    {
+      "path": "templates/command-library.template.sop",
+      "bytes": 449,
+      "sha256": "7388791d305b3404b92bce890ebf5742f921170c08dac86b9ad3dac6c415cb58"
+    },
+    {
+      "path": "templates/mandatory-matcher.template.sop",
+      "bytes": 316,
+      "sha256": "abdd5c83b3bef7bd3e1409c78047a39ff82c8990b8fb7a318890fc0116653eb0"
+    },
+    {
+      "path": "templates/problem-workspace.template.md",
+      "bytes": 383,
+      "sha256": "706f9ae5fa92f1487196ca0f1672c4a8510ada7334f90962ae3ed80a329c9b4f"
+    },
+    {
+      "path": "tools/lint_sop_examples.py",
+      "bytes": 12657,
+      "sha256": "89132c76f2417527dee06d00aaf10d96038c43e0551c2dcd188d12c728c2ed44"
+    },
+    {
+      "path": "validation_report.json",
+      "bytes": 72,
+      "sha256": "7b29df10d1026e7c9a7cf47670e2f53ea8d6545a799ce7074a98649d2b95ed8a"
+    }
+  ]
+}

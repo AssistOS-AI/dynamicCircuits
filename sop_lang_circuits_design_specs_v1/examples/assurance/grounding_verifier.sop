@@ -1,0 +1,26 @@
+@input answer conflict
+@output assurance
+
+@verifyGrounding define answer conflict
+    async function run({ answer, conflict }) {
+      const text = String(answer.text ?? "")
+      const mentionsConflict =
+        text.toLowerCase().includes("conflict") ||
+        text.toLowerCase().includes("contradict")
+
+      const mentionsSubject = text.includes(String(conflict.subject))
+
+      return {
+        ok: mentionsConflict && mentionsSubject,
+        code: "assurance.outputGrounding",
+        evidence: {
+          subject: conflict.subject,
+          mentionsConflict,
+          mentionsSubject
+        }
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@assurance verifyGrounding $answer $conflict

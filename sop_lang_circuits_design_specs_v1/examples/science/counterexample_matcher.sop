@@ -1,0 +1,19 @@
+@template mandatory
+@trigger "dataset.numeric" "support.positive"
+@apply examples.science.counterexample_rule
+
+@input index delta
+@output matches
+
+@datasets select $index "dataset.numeric"
+@claims select $index "support.positive"
+
+@pairs join
+    $datasets
+    $claims
+    "/id"
+    "/subject"
+
+@matches filter
+    $pairs
+    "examples.science.counterexample_applicable"

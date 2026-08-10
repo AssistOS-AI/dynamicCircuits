@@ -1,0 +1,31 @@
+@input sourceText
+@output dataset claim
+
+@interpret define sourceText
+    async function run({ sourceText }, ctx) {
+      if (sourceText === undefined) {
+        return ctx.reject("missing_source")
+      }
+
+      return {
+        dataset: {
+          id: "D",
+          values: [3, 5, -2, 8]
+        },
+        claim: {
+          kind: "support",
+          predicate: "allPositive",
+          subject: "D",
+          polarity: "positive"
+        }
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@bundle interpret $sourceText
+@dataset get $bundle "/dataset"
+@claim get $bundle "/claim"
+
+@datasetPublished publish $dataset "dataset.numeric"
+@claimPublished publish $claim "support.positive"

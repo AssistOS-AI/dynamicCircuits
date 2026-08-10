@@ -1,0 +1,21 @@
+@input dataset claim refutation witness
+@output assurance
+
+@verify define dataset claim refutation witness
+    async function run({ dataset, claim, refutation, witness }) {
+      const ok =
+        dataset.values[witness.index] === witness.value &&
+        !(witness.value > 0) &&
+        refutation.subject === claim.subject &&
+        refutation.predicate === claim.predicate &&
+        refutation.polarity === "negative"
+
+      return {
+        ok,
+        code: "science.allPositive.counterexample"
+      }
+    }
+
+    return { run, effects: ["pure"] }
+
+@assurance verify $dataset $claim $refutation $witness
