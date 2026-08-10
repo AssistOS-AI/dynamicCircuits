@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence, Scale, and Security — Dynamic Circuits</title><link rel="stylesheet" href="styles.css">
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
+<body><div data-include="partials/header.html"></div><main class="page"><article class="page__panel">
+<p class="breadcrumbs"><a href="index.html">Documentation</a> / Design / Operations</p>
+<h1>Evidence that scales without hiding authority</h1>
+<p class="lead">Receipts, epochs, semantic cache keys, registry layers, and capability brokers let work be reused and distributed while preserving exactly what was trusted.</p>
+
+<h2>Receipt hierarchy</h2>
+<pre class="mermaid">flowchart BT
+  N[Node receipts] --> C[Circuit receipt]
+  C --> L[Closure receipt]
+  L --> F[Final acceptance receipt]
+  A[Source and artifact commitments] --> N
+  P[Profile, registry, epoch hashes] --> L
+  T[Goals, trust, conflicts, attempts] --> F</pre>
+<p>Node receipts bind code, canonical inputs and outputs, checks, effects, capabilities, artifacts, oracle calls, state, and dependencies. Circuit receipts add interface bindings, relevant slice, invariants, child instances, and public outputs. Closure receipts bind registry coverage and every fixed-point round. Final receipts bind sources, attempts, goals, trust decisions, conflicts, budgets, and acceptance gates. Canonical serialization, content hashes, signatures, selective disclosure, replay modes, and audit queries are specified in <a href="specsLoader.html?spec=DS019-receipts-provenance-and-audit.md">DS019</a>.</p>
+
+<h2>Cache and epochs</h2>
+<p>A cache key includes command/code/package digests, canonical inputs, dependency lock, declared environment, profile-sensitive semantics, runtime version, and epoch-bound external state. A hit revalidates the old receipt and emits a new reuse receipt; it never upgrades trust. Epochs snapshot sources, registry, matchers, templates, profile, and external versions. Incremental invalidation follows semantic dependencies and must converge to the same strict fixed point as a full run. See <a href="specsLoader.html?spec=DS020-cache-incremental-execution-and-epochs.md">DS020</a>.</p>
+
+<h2>Large knowledge bases and documents</h2>
+<p>The registry separates a compact catalog, structured metadata indexes, optional similarity retrieval, full manifests, and content-addressed stores. Strict matching is enumerable within receipt-bound shards. Large documents are immutable artifacts segmented by stable locators; section circuits publish provenance-linked facts and summaries; cross-section circuits reconcile terminology, timelines, claims, and citations. Pure work may run in parallel or distributed leases with deterministic aggregation. Approximate and strict coverage are always reported separately. See <a href="specsLoader.html?spec=DS021-scalability-registry-and-large-documents.md">DS021</a>.</p>
+
+<h2>Effects and threat boundary</h2>
+<p>The full architecture declares effects and supplies least-authority capabilities through host brokers: opaque artifact handles, allowlisted network requests, injected time/randomness, secret references, and receipt-bearing oracles. Resource budgets cover time, memory, output, logs, regexes, recursion, closure growth, calls, bytes, and cost. Package locks, signatures, SBOMs, revocation, redaction, and tenant isolation complete the operational boundary.</p>
+<p>The present Node VM removes accidental ambient process and I/O capabilities and normalizes cross-realm values, but it is not a hostile multi-tenant sandbox. The full threat model and current learning-workspace limitation are in <a href="specsLoader.html?spec=DS008-security-and-trust.md">DS008</a>.</p>
+</article></main><div data-include="partials/footer.html"></div><script src="partials-loader.js"></script></body></html>

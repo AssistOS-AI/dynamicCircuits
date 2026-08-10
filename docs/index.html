@@ -15,26 +15,29 @@
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs">Documentation / Overview</p>
     <h1>Executable analysis workspaces for coding agents</h1>
-    <p class="lead">Dynamic Circuits prepares a task directory, exposes reusable SOP Lang circuits from a separate knowledge base, and asks an external coding agent to create and execute the analysis. The reference kernel keeps circuit mechanics inspectable and independent from direct LLM APIs.</p>
+    <p class="lead">Dynamic Circuits prepares either a knowledge-learning directory or a current task directory, then asks an external coding agent to interpret documents and author SOP Lang. The deterministic kernel keeps execution inspectable and independent from direct LLM APIs.</p>
 
     <h2>Implemented system</h2>
     <pre class="mermaid">flowchart LR
-      U[CLI invocation] --> W[Workspace preparation]
+      U[CLI invocation] --> X{workdir supplied?}
+      X -->|no| KWL[KB learning workspace]
+      X -->|yes| W[Task analysis workspace]
       W --> M[Input manifest]
       W --> S[Circuit skills link]
-      K[KB circuits] --> A[Coding-agent process]
+      K[Trusted KB circuits] --> A[Coding-agent process]
+      KWL --> C[Reviewable KB candidates]
       M --> A
       S --> A
       A --> P[Task SOP files]
       P --> R[Reference compiler and runtime]
       R --> O[Receipts and reports]</pre>
-    <p>The CLI accepts independent KB and work paths. It inventories every regular input file, preserves user-owned guidance, and creates a maintained skill link. Codex is the included coding-agent adapter; a generic standard-input adapter is the extension seam for future tools.</p>
+    <p>With only <code>-kbdir ./kb</code>, the CLI learns candidate circuits from the KB's own <code>input/</code>. Adding <code>-workdir ./work/task-001</code> selects the default analysis flow. It inventories every regular input file, preserves user-owned guidance, and creates maintained skill links. Codex is included; a registry and generic standard-input adapter form the extension seam for future coding agents.</p>
     <p>The runtime skill catalog consists of <code>analyze-task</code>, <code>author-sop-circuit</code>, and <code>circuit-learner</code>. These project-owned skills govern complete input coverage, circuit authoring, and reviewable KB learning.</p>
     <p>The SOP kernel parses positional circuits, compiles immutable wire graphs, rejects invalid dependencies, and executes relevant slices with structured outcomes. Mandatory semantic matching, closure, persistent caches, and production isolation remain later milestones.</p>
 
     <h2>Specifications and historical material</h2>
-    <p>The <a href="specsLoader.html?spec=matrix.md">current DS specification matrix</a> is authoritative for implemented behavior. <a href="specsLoader.html?spec=DS001-coding-style.md">DS001</a> defines coding style, source layout, file-size guidance, and test organization.</p>
-    <p>The repository also retains the first Romanian design package in <a href="../sop_lang_circuits_design_specs_v1/README.md">sop_lang_circuits_design_specs_v1</a>. It is immutable historical input: its broader roadmap informs later work but does not enlarge the current implementation contract.</p>
+    <p>The <a href="specsLoader.html?spec=matrix.md">current DS specification matrix</a> is authoritative. The <a href="concepts.html">design guide</a>, <a href="assurance.html">assurance model</a>, <a href="operations.html">provenance and scale guide</a>, and <a href="lifecycle.html">lifecycle and roadmap</a> make the complete theory navigable while labeling implemented and planned layers.</p>
+    <p>The first design package in <a href="../sop_lang_circuits_design_specs_v1/README.md">sop_lang_circuits_design_specs_v1</a> remains byte-for-byte historical. The <a href="specsLoader.html?spec=historical-coverage.md">coverage index</a> maps every original DS, schema, checklist, decision, template, and agent role into maintained documentation.</p>
 
     <h2>Source and verification layout</h2>
     <table>
@@ -44,7 +47,7 @@
         <tr><td><code>src/agents/</code></td><td>External coding-agent adapter construction.</td></tr>
         <tr><td><code>circuitSkills/</code></td><td>Project-owned skills linked into analysis and evaluation workspaces.</td></tr>
         <tr><td><code>tests/</code></td><td>Deterministic unit suites organized by module boundary.</td></tr>
-        <tr><td><code>eval/evalN/</code></td><td>Reproducible agent-level workspaces with production topology.</td></tr>
+        <tr><td><code>docs/eval/evalN/</code></td><td>Statically browsable, reproducible evaluation workspaces with inputs, circuits, results, and limitations.</td></tr>
       </tbody>
     </table>
     <p>Run <code>npm test</code> for kernel and orchestration tests. Run <code>npm run check</code> to add specification matrix generation and documentation link validation.</p>

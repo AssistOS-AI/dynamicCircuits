@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concepts and SOP Lang — Dynamic Circuits</title><link rel="stylesheet" href="styles.css">
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
+<body><div data-include="partials/header.html"></div><main class="page"><article class="page__panel">
+<p class="breadcrumbs"><a href="index.html">Documentation</a> / Design / Concepts</p>
+<h1>From source evidence to explicit circuits</h1>
+<p class="lead">The design keeps source assertions, interpreted facts, derived values, verified propositions, and accepted outcomes distinct. SOP Lang is the deterministic composition layer between them.</p>
+
+<h2>Conceptual model</h2>
+<pre class="mermaid">flowchart LR
+  S[Immutable source artifact] --> I[Interpretation circuit]
+  I --> F[Provenance-linked facts]
+  F --> M[Matcher: MATCH / NO_MATCH / UNKNOWN]
+  M --> T[Template instance]
+  T --> V[Derived canonical values]
+  V --> G[Checks, invariants, goals]
+  G --> R[Receipts and qualified outcome]</pre>
+<p>A source is identified content plus media type, origin, digest, locators, access policy, and epoch. Interpretation publishes facts and claims without pretending that a source assertion is true. Wires name immutable local values. Commands perform one declared transformation; circuits compose commands and child circuits; templates describe reusable circuit families; matchers prove when a template applies.</p>
+<p>The full vocabulary—including attempts, profiles, trust states, receipts, closure, cache entries, artifacts, hooks, and epochs—is normative in <a href="specsLoader.html?spec=DS009-conceptual-model.md">DS009</a>.</p>
+
+<h2>Values, wires, and composition</h2>
+<p>Values are canonical JSON-like data plus explicit absence and content-addressed artifact references. Local wires are single-assignment: an input or node output defines a wire exactly once. Identity is based on canonical content and producing context, not mutable object identity or filesystem path. Child circuits receive ordered input values and return ordered outputs; their internal wires never leak into the caller.</p>
+<p>This SSA model makes dependencies, dead work, parallel opportunities, refusal propagation, hashing, and provenance inspectable. See <a href="specsLoader.html?spec=DS010-values-wires-and-circuit-composition.md">DS010</a>.</p>
+
+<h2>Surface, packages, and ABI</h2>
+<table><thead><tr><th>Layer</th><th>Contract</th><th>Authority</th></tr></thead><tbody>
+<tr><td>Surface</td><td>Ports, command definitions, calls, goals/invariants, and atomic template metadata.</td><td><a href="specsLoader.html?spec=DS004-sop-language.md">DS004</a></td></tr>
+<tr><td>Command ABI</td><td>Positional bindings, canonical outputs, checks, structured refusal, effects and future capabilities.</td><td><a href="specsLoader.html?spec=DS011-command-abi-effects-and-capabilities.md">DS011</a></td></tr>
+<tr><td>Packages and IR</td><td>Path-derived names, deterministic resolution, normalized nodes, validation, and hashes.</td><td><a href="specsLoader.html?spec=DS012-packages-ir-and-resolution.md">DS012</a></td></tr>
+<tr><td>Core</td><td>Small portable deterministic command set; future Assurance Core remains separate.</td><td><a href="specsLoader.html?spec=DS022-core-and-assurance-commands.md">DS022</a></td></tr>
+</tbody></table>
+
+<h2>Implemented boundary</h2>
+<p>The current parser and compiler support explicit ports, JSON string arguments, local JavaScript command descriptors, immutable wires, nested positional circuits, goals and invariants, and parsed matcher metadata. The runtime executes relevant graph slices in a restricted Node VM and emits structured receipts. Semantic indexing, automatic matcher wiring, effects/capability brokers, and rich types are designed but not yet implemented.</p>
+<p class="callout">A coding agent can author a circuit, but only the parser/compiler/runtime determine whether the supported source compiles and what it executes. Agent prose is never substituted for a receipt.</p>
+</article></main><div data-include="partials/footer.html"></div><script src="partials-loader.js"></script></body></html>

@@ -16,11 +16,29 @@ The reference kernel converts SOP packages into an explicit graph and executes o
 
 The registry must discover `.sop` files deterministically, skip symbolic links, derive package names, parse sources, and reject collisions. Compilation must resolve local commands, core commands, qualified commands, and circuit packages. It must validate single assignment, free wires, command and circuit arity, declared outputs, coverage reachability, and graph acyclicity.
 
-Compiled packages must expose stable package hashes, ordered ports, command descriptors, topologically ordered nodes, goals, invariants, template metadata, and dead-node markers. Nodes outside all output, goal, and invariant slices must not execute.
+Compilation phases are discovery, parse, declaration collection, name resolution, wire binding, arity and interface checks,
+dependency construction, cycle detection, obligation reachability, relevant-slice marking, normalization, and hashing. A
+failure stops before execution and uses a stable classification and source location. Compiled packages expose stable package
+hashes, ordered ports, command descriptors, topologically ordered nodes, resolved callee records, canonical arguments,
+goals, invariants, template metadata, and dead-node markers. Nodes outside all output, goal, and invariant slices do not run.
 
-The runtime must bind inputs by order, deep-freeze canonical values, execute nested circuits with separate instance identities, and prevent failed child outputs from reaching a parent. JavaScript definitions and calls must run in a Node `vm` context with string and WebAssembly code generation disabled and a synchronous timeout. No process, module loader, filesystem, network, clock, random, or oracle capability is supplied.
+The runtime binds inputs by order, validates canonical types, deep-freezes values, executes nested circuits with separate
+instance identities, and prevents failed child outputs from reaching a parent. Values created in a VM realm are copied into
+host-owned canonical arrays or prototype-safe objects before freezing and hashing; non-finite numbers, cycles, unsupported
+types, getters, symbols, and exotic prototypes are rejected. JavaScript definitions and calls run in a Node `vm` context
+with string and WebAssembly code generation disabled and a synchronous timeout. No process, module loader, filesystem,
+network, clock, random, or oracle capability is supplied.
 
-A command may succeed, refuse through `ctx.reject`, fail its `check`, or raise an error. Circuit outcomes must distinguish `SUCCEEDED`, `REFUSED`, `REJECTED`, and `ERROR`. A rejected or failed circuit must expose no successful public outputs. Receipts must include package and instance identity, node statuses, input and output hashes, assurance checks, child receipts, and a deterministic receipt hash.
+A command may succeed, return a structured core refusal, refuse through `ctx.reject`, fail its `check`, or raise an error.
+The scheduler records `PENDING`, `RUNNING`, `SUCCEEDED`, `REFUSED`, `REJECTED`, `ERROR`, `BLOCKED`, and dead-node evidence as
+applicable. Circuit outcomes distinguish `SUCCEEDED`, `REFUSED`, `REJECTED`, and `ERROR`; planned `INCONCLUSIVE`, caching,
+and cancellation are specified by DS013. A rejected or failed circuit exposes no successful public outputs. Receipts include
+package and instance identity, node states, source lines, input/output hashes, checks, child receipts, dead nodes, and a
+deterministic receipt hash.
+
+Nested calls are ordinary graph nodes: their input arity equals child ports, their output arity equals child outputs, and
+their receipt is embedded or hash-linked. Resolution never depends on discovery order. Runtime iteration follows the
+compiler's topological order, so independent-node source reordering cannot change pure results or receipt semantics.
 
 The `vm` boundary is a reference-development guard, not a production security sandbox. Asynchronous resource limits, worker isolation, persistent caching, effects, semantic indexes, mandatory closure, and trust-profile enforcement remain unsupported.
 

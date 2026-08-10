@@ -53,5 +53,5 @@ required and production code has no external package dependency.
 - Runtime source: `src/`
 - Modular tests: `tests/`
 - Coding-agent skills: `circuitSkills/`
-- Evaluation workspaces: `eval/eval1/`, `eval/eval2/`
+- Evaluation workspaces and static evidence: `docs/eval/eval1/`, `docs/eval/eval2/`, `docs/eval/eval3/`
 - Historical design package: `sop_lang_circuits_design_specs_v1/`

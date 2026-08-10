@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assurance Model — Dynamic Circuits</title><link rel="stylesheet" href="styles.css">
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
+<body><div data-include="partials/header.html"></div><main class="page"><article class="page__panel">
+<p class="breadcrumbs"><a href="index.html">Documentation</a> / Design / Assurance</p>
+<h1>Completeness before acceptance</h1>
+<p class="lead">A successful computation is not automatically a correct domain conclusion. The assurance design requires explicit applicability, exhaustive declared obligations, independent verification, trust policy, and auditable evidence.</p>
+
+<h2>Discovery, verification, and closure</h2>
+<pre class="mermaid">flowchart TD
+  F[Semantic facts] --> D[High-recall candidate discovery]
+  D --> M[Deterministic matcher]
+  M -->|MATCH + bindings| I[Create unique template instance]
+  M -->|NO_MATCH| N[Record reason]
+  M -->|UNKNOWN| U[Unresolved prerequisite]
+  I --> E[Execute and index outputs]
+  E --> F
+  F --> C{No new facts or instances?}
+  C -->|yes| A[Compare expected vs executed mandatory set]
+  C -->|no| D</pre>
+<p>Approximate search may rank optional candidates, but it cannot authorize mandatory work. Matchers return three states and preserve evidence. Closure runs mandatory matchers to a monotone fixed point, suppresses duplicate instances by canonical key, records each round, and audits the expected instance set against what executed. Limits yield <code>INCONCLUSIVE</code>, never success. See <a href="specsLoader.html?spec=DS015-semantic-index-matching-and-wiring.md">DS015</a> and <a href="specsLoader.html?spec=DS016-mandatory-closure.md">DS016</a>.</p>
+
+<h2>Seven acceptance gates</h2>
+<ol><li>Compilation and static validation succeed.</li><li>Required execution has no refusal, error, or blocked dependency.</li><li>Mandatory closure reaches a verified fixed point.</li><li>Blocking checks and invariants pass.</li><li>Every goal is verified by an allowed verifier.</li><li>Trust, capability, budget, conflict, and profile policies pass.</li><li>The final receipt is complete, canonical, and publishable.</li></ol>
+<p>The classified alternatives are deliberate: malformed execution is <code>ERROR</code>; unmet preconditions are <code>REFUSED</code>; false obligations are <code>REJECTED</code>; unresolved evidence or exhausted budgets are <code>INCONCLUSIVE</code>; only every-gate success is <code>ACCEPTED</code>. Full contracts are in <a href="specsLoader.html?spec=DS017-goals-invariants-and-acceptance.md">DS017</a>.</p>
+
+<h2>Conditional correctness and trust</h2>
+<p>An acceptance certificate means the declared computation followed the identified sources, code, rules, profile, registry, and environment. It remains conditional on source authenticity and completeness, command semantics, matcher coverage, verifier correctness, runtime integrity, and oracle behavior. Trust is versioned and scoped: <code>UNTRUSTED</code>, <code>CANDIDATE</code>, <code>REVIEWED</code>, <code>VERIFIED</code>, or <code>REVOKED</code>.</p>
+<p>Parser, compiler, scheduler, canonicalizer, capability enforcement, Assurance Core, and selected verifiers form the trusted computing base. Coding agents, approximate retrieval, candidate circuits, and a command's own confidence are outside it. High-assurance profiles need independent checks, redundant implementations, certificate verifiers, signatures, or audits. See <a href="specsLoader.html?spec=DS018-correctness-and-trust.md">DS018</a>.</p>
+
+<h2>Current implementation</h2>
+<p>The current runtime implements checks, invariants, refusal/rejection/error separation, nested receipts, canonical values, and deterministic graph execution. Profiles, semantic matchers, mandatory closure, trust registries, independent goal verifiers, and acceptance certificates are normative future work. Current evals therefore report runtime outcome and semantic verdict separately.</p>
+</article></main><div data-include="partials/footer.html"></div><script src="partials-loader.js"></script></body></html>

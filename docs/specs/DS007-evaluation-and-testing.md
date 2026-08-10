@@ -16,9 +16,21 @@ Dynamic Circuits separates deterministic implementation tests from end-to-end co
 
 `npm test` must execute modular unit suites for parser syntax, compiler graph validation, runtime outcomes and nesting, workspace preparation and non-destructive behavior, coding-agent invocation construction, the public CLI argument form, and historical-package integrity. Tests must cover successful and failing paths, including bare arguments, free wires, arity mismatch, dead nodes, refusal, failed checks, exceptions, false invariants, symlink creation, user-owned guidance, and generic adapter extension.
 
-Every evaluation case must live under a contiguous `eval/evalN/` directory and contain `input/`, `results/`, and `sop/` plus the same `circuitSkills` link created for production workspaces. Eval inputs and circuits must be committed; generated result reports may remain empty until a coding-agent evaluation is executed. Each case must state its purpose and reproducible compile or run command.
+Every evaluation case lives under a contiguous `docs/eval/evalN/` directory so all artifacts are statically browsable using
+relative URLs. It contains `input/`, `results/`, `sop/`, a detailed `README.md`, an `index.html`, and the same skill links as
+a production workspace. Inputs, governing rules, circuits, expected semantic verdicts, and deterministic results are
+committed and linked; the README states exactly what was evaluated, complexity, commands, observed outcome, limitations,
+and the distinction between runtime success and semantic success.
 
-Documentation verification must regenerate `docs/specs/matrix.md`, require contiguous DS numbers, validate local links, and check Mermaid availability on every HTML page. `npm run check` must combine unit tests and documentation checks. Skill folders must pass the skill-creator validator.
+The current suite has three non-trivial cases. Eval 1 applies an ordinary legal notice period and an evidenced expedited
+exception across compliant and violating cases. Eval 2 tests a universal scientific claim, finds a concrete counterexample,
+and separately computes descriptive statistics. Eval 3 reconciles timelines and terminology across three documents and
+retains rather than hides two conflicts. Unit tests execute every committed circuit against its source data and compare exact
+outcomes; the HTML index exposes all inputs, circuits, results, and READMEs.
+
+Documentation verification regenerates `docs/specs/matrix.md`, requires contiguous DS numbers, validates local links, and
+checks Mermaid availability on every HTML page. Matrix links must remain relative to preserve arbitrary static mount prefixes.
+`npm run check` combines unit tests and documentation checks. Skill folders must pass the skill-creator validator.
 
 The complete hash of files under `sop_lang_circuits_design_specs_v1/` must remain unchanged across initialization work. The integrity suite must compare the deterministic aggregate against the captured initial hash on every test run.
 
@@ -28,9 +40,10 @@ The complete hash of files under `sop_lang_circuits_design_specs_v1/` must remai
 
 Response: Coding-agent outputs may depend on agent versions and user configuration, while parser, compiler, and runtime semantics require deterministic, fast regression tests.
 
-### Question #2: What does an empty eval results directory mean?
+### Question #2: Does a `SUCCEEDED` runtime outcome prove the domain conclusion?
 
-Response: It means the reproducible case is prepared but has not been run by a coding agent. Committed expected behavior belongs in the case contract, not in fabricated agent reports.
+Response: No. It proves the explicit circuit executed successfully. Each eval separately states the semantic verdict and the
+rules and evidence under which that verdict is valid; future Assurance Core would enforce the stronger acceptance gates.
 
 ## Conclusion
 

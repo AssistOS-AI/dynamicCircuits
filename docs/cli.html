@@ -17,15 +17,23 @@
     <h1>One KB, one current task</h1>
     <p class="lead">The CLI keeps reusable knowledge separate from the current analysis. It prepares the directory contract before any coding-agent process starts.</p>
 
-    <h2>Prepare and analyze</h2>
+    <h2>Learn reusable circuits</h2>
+    <pre><code>agent prepare -kbdir ./kb
+agent -kbdir ./kb -agent codex
+agent -kbdir ./kb -agent codex --dry-run</code></pre>
+    <p>The absence of <code>--workdir</code> selects learning. Place sources in <code>./kb/input</code>; the agent may read trusted <code>circuits/</code>, write proposed packages only to <code>candidates/</code>, and write learning reports to <code>results/</code>. Promotion remains a separate review action.</p>
+
+    <h2>Analyze a current task</h2>
     <pre><code>agent prepare -kbdir ./kb -workdir ./work/task-001
 agent -kbdir ./kb -workdir ./work/task-001 -agent codex
 agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
     <p>Both single-dash and conventional double-dash forms are accepted for KB, workdir, and agent options. Preparation creates missing directories, inventories inputs, and links the project skill catalog at <code>circuitSkills</code> and <code>.agents/skills</code>. It refuses overlapping KB/work roots and conflicting skill-link paths.</p>
 
     <pre class="mermaid">flowchart TD
-      K[KB root] --> KC[circuits: trusted]
+      K[KB root and learning cwd] --> KI[input sources]
+      K --> KC[circuits: trusted]
       K --> KN[candidates: review required]
+      K --> KR[learning results]
       W[Work root] --> I[input]
       W --> P[sop]
       W --> R[results]
@@ -33,7 +41,7 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
       W --> L[circuitSkills symlink]</pre>
 
     <h2>Agent authority</h2>
-    <p>Normal analysis treats the KB as read-only. Learning mode lets the Codex sandbox write under the KB root, while the generated instructions restrict reusable output to <code>candidates/</code>. This restriction is currently instructional rather than a host-mediated filesystem capability; <a href="specsLoader.html?spec=DS008-security-and-trust.md">DS008</a> records the limitation.</p>
+    <p>Analysis treats the KB as read-only. Learning uses the KB as the coding agent's current directory, while generated instructions restrict reusable output to <code>candidates/</code>. This restriction is currently instructional rather than a host-mediated filesystem capability; <a href="specsLoader.html?spec=DS008-security-and-trust.md">DS008</a> records the limitation. The former explicit learn flag is rejected because mode is now inferred unambiguously.</p>
     <p><code>--prepare-only</code> stops before adapter construction. <code>--dry-run</code> prints the command, arguments, working directory, and prompt without launching a process. The <code>generic</code> adapter accepts a program through <code>--agent-command</code> and sends the prompt through standard input. Installed compatibility aliases are <code>dc-agent</code> and <code>dynamic-circuits</code>.</p>
 
     <h2>Workspace skill catalog</h2>

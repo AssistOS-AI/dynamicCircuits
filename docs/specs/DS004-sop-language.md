@@ -20,9 +20,28 @@ SOP files must be UTF-8 text. Simple identifiers must match `[A-Za-z_][A-Za-z0-9
 
 Wires must be local and single-assignment. Inputs are the only external wire values. Multiple output wires before a qualified package name bind a nested circuit's ordered outputs. `@invariant` and `@goal` may declare `covers`; the compiler must verify actual dependency reachability.
 
-The implemented core commands are `value`, `absent`, `alias`, `get`, `hash`, `equal`, `compare`, `parseNumber`, `assertInvariant`, `emptyList`, `append`, and `concat`. Package names derive from `.sop` paths, with `index.sop` collapsing to its containing directory. Multiple roots may use explicit prefixes, and duplicate package names must fail.
+The implemented core commands are `value`, `absent`, `alias`, `get`, `hash`, `equal`, `compare`, `parseNumber`,
+`assertInvariant`, `emptyList`, `append`, and `concat`. Their exact contracts are in DS022. Package names derive from `.sop`
+paths, with `index.sop` collapsing to its containing directory. Multiple roots may use explicit prefixes, and duplicate
+package names fail.
+
+The surface grammar has four statement families: unique port directives; local command definitions with indented JavaScript
+bodies; goal and invariant directives; and calls. A call begins with one or more `@outputWire` tokens, followed by a simple
+command or qualified circuit name, then `$wire` or JSON string arguments. A continued call uses indentation; indentation
+without a parent statement is an error. `#` starts a comment outside a quoted JSON string. CRLF is normalized to LF; string
+escapes follow JSON. Diagnostics carry stable codes plus file and line.
+
+`@input` may be empty; `@output` must name at least one distinct port. `@goal wire covers dep...` and `@invariant wire covers
+dep...` name an already produced boolean-like wire and optional dependencies whose reachability the compiler verifies.
+Local command definitions use `@name define formal...`; names and formals are unique. The JavaScript body evaluates to a
+descriptor with `run(ctx)` and optional `check(output, ctx)` according to DS011.
 
 Template metadata directives are parsed as an atomic `@template`, `@trigger`, and `@apply` set, but mandatory matching and closure are not executed in this milestone.
+
+Reserved future syntax includes richer literals, types, named arguments, explicit imports/versions, effects, capabilities,
+profiles, proof declarations, and structured template metadata. Implementations must reject rather than guess unknown
+directives, malformed bare literals, empty definitions, duplicate ports or commands, partial matcher metadata, free wires,
+and illegal redefinition.
 
 ## Decisions & Questions
 

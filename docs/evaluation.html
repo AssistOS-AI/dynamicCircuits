@@ -15,7 +15,7 @@
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="index.html">Documentation</a> / Evaluation</p>
     <h1>Deterministic tests and agent evaluations</h1>
-    <p class="lead">Unit suites establish language and orchestration mechanics. Evaluation workspaces exercise a coding agent against representative task inputs using the same directory structure as production.</p>
+    <p class="lead">Unit suites establish language and orchestration mechanics. Three browsable evaluation workspaces test legal exception handling, scientific counterexamples, and cross-document conflicts using executable circuits and committed evidence.</p>
 
     <h2>Unit test organization</h2>
     <table>
@@ -28,20 +28,29 @@
         <tr><td><code>tests/agents/</code></td><td>Codex arguments and generic adapter extensibility.</td></tr>
         <tr><td><code>tests/cli/</code></td><td>The public single-dash invocation form and dry-run behavior.</td></tr>
         <tr><td><code>tests/integrity/</code></td><td>The immutable historical v1 package aggregate hash.</td></tr>
+        <tr><td><code>tests/docs/</code></td><td>Relative specification links remain valid below a static mount prefix.</td></tr>
       </tbody>
     </table>
     <p><a href="specsLoader.html?spec=DS001-coding-style.md">DS001</a> is authoritative for test organization. Run <code>npm test</code> for code and <code>npm run check</code> for code plus documentation verification.</p>
 
     <h2>Evaluation cases</h2>
     <pre class="mermaid">flowchart TD
-      E[eval/evalN] --> I[input]
+      E[docs/eval/evalN] --> I[input and rules]
       E --> S[sop]
       E --> R[results]
       E --> L[circuitSkills link]
       I --> A[Coding-agent evaluation]
       S --> A
       A --> R</pre>
-    <p><code>eval/eval1</code> is a numeric circuit smoke case. <code>eval/eval2</code> is a document-consistency case designed for coding-agent analysis and explicit handling of conflicting claims. Result directories contain no fabricated reports before an agent run.</p>
+    <table>
+      <thead><tr><th>Case</th><th>What is evaluated</th><th>Observed result</th></tr></thead>
+      <tbody>
+        <tr><td><a href="eval/eval1/index.html">Eval 1</a></td><td>Ordinary notice period plus written-consent exception, across three cases.</td><td>One violation, two compliant cases, including one evidenced exception.</td></tr>
+        <tr><td><a href="eval/eval2/index.html">Eval 2</a></td><td>Universal positive-value claim versus exhaustive counterexample search and mean.</td><td>Claim refuted by <code>-2</code> despite positive mean <code>5.25</code>.</td></tr>
+        <tr><td><a href="eval/eval3/index.html">Eval 3</a></td><td>Three-document timeline and terminology reconciliation with source attribution.</td><td>Both conflict classes retained; neither alternative chosen silently.</td></tr>
+      </tbody>
+    </table>
+    <p>Open the <a href="eval/index.html">full evaluation catalog</a> for direct links to every rule, input, circuit, report, and JSON result. Runtime <code>SUCCEEDED</code> means the circuit completed; each case separately states its semantic verdict and limitations.</p>
 
     <h2>Historical integrity</h2>
     <p>The original design package remains an immutable baseline. Initialization and later migrations must compare its aggregate file hash before and after work. Current requirements live in the contiguous DS set and must be regenerated into the <a href="specsLoader.html?spec=matrix.md">specification matrix</a>.</p>

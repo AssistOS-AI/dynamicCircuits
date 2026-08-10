@@ -17,10 +17,11 @@ commands implement deterministic graph mechanics; Assurance Core implements poli
 
 ### Implemented Core
 
-The reference runtime currently provides `identity`, `const`, `concat`, `equals`, `not`, `and`, `or`, `add`, `subtract`,
-`multiply`, `divide`, `length`, `get`, `array`, `object`, `mapGet`, and `assert`. Implementations validate arity and value
-shape, return canonical data, refuse invalid division or failed assertions with structured codes, and emit receipts. User
-commands cannot shadow these names.
+The reference runtime currently provides `value`, `absent`, `alias`, `get`, `hash`, `equal`, `compare`, `parseNumber`,
+`assertInvariant`, `emptyList`, `append`, and `concat`. They cover literal/wire forwarding, explicit absence, JSON Pointer or
+dot-path lookup, canonical hashing/equality, six comparison operators, strict finite-number parsing, invariant result
+construction, and immutable list construction. Invalid paths, comparison operators, numbers, or list operands return
+structured refusal values. User commands cannot shadow these names.
 
 Core contracts require deterministic behavior, no ambient I/O, explicit refusal for unmet preconditions, finite canonical
 numbers, prototype-safe object handling, stable error classifications, and conformance vectors. Object and array values
