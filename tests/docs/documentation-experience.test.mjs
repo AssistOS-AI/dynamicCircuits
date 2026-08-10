@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readdir, readFile, realpath, stat } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
+import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -93,21 +94,59 @@ test("reader pages provide standalone context, examples, and onward navigation",
   }
 });
 
-test("each evaluation has an independent grouped file browser with valid targets", async () => {
+test("each evaluation uses the shared hierarchical file tree with valid targets", async () => {
   const evalDirectories = (await readdir(evalRoot, { withFileTypes: true }))
     .filter((entry) => entry.isDirectory() && /^eval\d+$/.test(entry.name));
   assert.ok(evalDirectories.length >= 3);
+  const catalog = await readFile(path.join(evalRoot, "index.html"), "utf8");
 
+  const manifestSource = await readFile(path.join(evalRoot, "eval-manifests.js"), "utf8");
+  const treeSource = await readFile(path.join(evalRoot, "eval-file-tree.js"), "utf8");
+  assert.match(treeSource, /customElements\.define\("eval-file-tree", EvalFileTree\)/);
+  assert.match(treeSource, /button\.title = item\.file/,
+    "file leaves must expose the complete relative path as a tooltip");
+  assert.doesNotMatch(treeSource, /path\.textContent = item\.file/,
+    "file leaves must not render complete paths into the narrow tree pane");
   for (const entry of evalDirectories) {
+    assert.match(catalog, new RegExp(`href="${entry.name}/index\\.html"`),
+      `evaluation catalog must link ${entry.name}`);
     const caseRoot = path.join(evalRoot, entry.name);
     const indexPath = path.join(caseRoot, "index.html");
     const html = await readFile(indexPath, "utf8");
-    assert.match(html, /Files by purpose/);
+    assert.match(html, /Evaluation files/);
+    assert.match(html, /<eval-file-tree id="eval-file-tree"><\/eval-file-tree>/);
+    assert.match(html, /\.\.\/eval-file-tree\.js/);
     assert.match(html, /\.\.\/eval-browser\.js/);
-    assert.match(html, /title: "(?:Evaluation|KB|Task)/);
+    assert.match(html, /\.\.\/eval-manifests\.js/);
+    assert.doesNotMatch(html, /window\.evalPage\s*=/, `${entry.name} duplicates the shared file manifest`);
 
-    const targets = [...html.matchAll(/file:\s*"([^"]+)"/g)].map((match) => match[1]);
-    assert.ok(targets.length >= 6, `${entry.name} should expose its complete fixture`);
+    const context = { window: { evalCaseId: entry.name } };
+    vm.runInNewContext(manifestSource, context, { filename: "eval-manifests.js" });
+    const config = context.window.evalPage;
+    assert.equal(config.tree.length, 5, `${entry.name} must expose the evaluation, KB, and three task roots`);
+    assert.deepEqual(
+      Array.from(config.tree, ({ label }) => label),
+      ["Evaluation record", "Knowledge base", "Task 1", "Task 2", "Task 3"],
+      `${entry.name} has an unexpected file-tree root order`,
+    );
+    assert.deepEqual(
+      Array.from(config.tree[1].children, ({ label }) => label),
+      ["Source documents", "Reviewed SOP circuits"],
+      `${entry.name} must separate KB prose from reviewed circuits`,
+    );
+    for (const task of config.tree.slice(2)) {
+      assert.deepEqual(
+        Array.from(task.children, ({ label }) => label),
+        ["Input documents", "Generated SOP circuits", "Executor result", "Evaluation evidence"],
+        `${entry.name}/${task.label} has an unexpected role tree`,
+      );
+    }
+    const flattenFiles = (nodes) => nodes.flatMap((node) => [
+      ...(node.files ?? []),
+      ...flattenFiles(node.children ?? []),
+    ]);
+    const targets = flattenFiles(config.tree).map(({ file }) => file);
+    assert.ok(targets.length >= 15, `${entry.name} should expose all three complete fixtures`);
     for (const target of targets) {
       const targetPath = path.resolve(caseRoot, target);
       assert.ok(targetPath.startsWith(`${caseRoot}${path.sep}`), `${entry.name} browser target escapes its case`);
@@ -119,7 +158,12 @@ test("each evaluation has an independent grouped file browser with valid targets
 test("evaluation fixtures separate reusable KB artifacts from current task artifacts", async () => {
   const evalDirectories = (await readdir(evalRoot, { withFileTypes: true }))
     .filter((entry) => entry.isDirectory() && /^eval\d+$/.test(entry.name));
-  const expectedDirectories = ["kb/input", "kb/circuits", "task/input", "task/sop", "task/results"];
+  const expectedDirectories = [
+    "kb/input", "kb/circuits",
+    "task/input", "task/sop", "task/results",
+    "task2/input", "task2/sop", "task2/results",
+    "task3/input", "task3/sop", "task3/results",
+  ];
   const skillsRoot = await realpath(path.join(repositoryRoot, "circuitSkills"));
 
   for (const entry of evalDirectories) {
@@ -132,7 +176,7 @@ test("evaluation fixtures separate reusable KB artifacts from current task artif
       await assert.rejects(stat(path.join(caseRoot, obsoleteDirectory)),
         `${entry.name}/${obsoleteDirectory} must not merge KB and task roles`);
     }
-    for (const workspace of ["kb", "task"]) {
+    for (const workspace of ["kb", "task", "task2", "task3"]) {
       for (const link of ["circuitSkills", ".agents/skills"]) {
         assert.equal(await realpath(path.join(caseRoot, workspace, link)), skillsRoot,
           `${entry.name}/${workspace}/${link} must resolve to the project skill catalog`);

@@ -51,6 +51,15 @@ discoveries. That journal must not restate or interpret the semantic verdict. Be
 managed runtime report so an agent or runtime failure cannot leave stale output looking current. `.dynamic-circuits/last-run.json`
 records both the coding-agent completion state and the executor entrypoint, outcome, hashes, and report path.
 
+Analysis is dependency-aware. `task/input/` and reviewed `kb/circuits/` are coding-agent dependencies. Generated
+`task/sop/` is an executor dependency. When `runtime-result.md` is newer than all three sets, the CLI preserves it and skips
+both Codex and the executor. When only generated SOP is newer, the CLI skips Codex and reruns the executor. When task input
+or a reviewed KB circuit is newer, or when `runtime-result.md` is absent, the CLI removes any stale result, invokes the
+coding agent, and then invokes the executor. Deleting `runtime-result.md` is therefore the explicit force-rerun mechanism.
+Evaluation expectations, READMEs, HTML, prior results, KB candidates, and learning reports are not dependencies because
+they are outside the analysis semantic-source boundary. KB learning remains an explicit run because it has no executor-owned
+canonical result target in the current implementation.
+
 The analysis semantic-source boundary includes manifest-listed task input and reviewed KB circuits. Evaluation expectations,
 prior results, evaluation presentation pages, KB candidates, learning reports, and sibling workspaces are excluded. Project
 skills and compiler/runtime documentation may be read only to author mechanically valid SOP. Learning applies the analogous
@@ -104,6 +113,13 @@ runtime can verify the actual composition and the report can cite an observed re
 Response: The SOP executor owns it. Codex authors executable source and may record provenance, but only the CLI's deterministic
 rendering of the runtime public outputs and receipt is an official result. This prevents post-execution prose from silently
 changing, omitting, or embellishing circuit output.
+
+### Question #7: Why are Codex and executor invalidation separate?
+
+Response: Editing generated SOP does not require another natural-language interpretation, while editing task input or a
+reviewed KB circuit can change that interpretation. Separate dependency sets avoid an expensive agent call when a direct
+SOP correction only needs deterministic re-execution. The report timestamp remains the visible cache boundary, and deleting
+the report intentionally requests a complete rerun.
 
 ## Conclusion
 

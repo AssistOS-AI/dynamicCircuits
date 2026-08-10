@@ -15,56 +15,74 @@
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="../index.html">Documentation</a> / Evaluation catalog</p>
     <h1>Evaluation catalog</h1>
-    <p class="lead">Each evaluation folder has one self-contained page. Its left menu separates reusable KB material from the current task and its results; selecting a file shows its purpose, relationship to the evaluation, and exact content on the right.</p>
+    <p class="lead">The catalog links all eight evaluation domains. Each domain page keeps one KB separate from three independent task runs and lets you inspect source text, generated SOP, and executor output without mixing their roles.</p>
 
     <h2>Purpose of the catalog</h2>
     <p>The catalog separates evaluation cases so the interface remains usable as the repository grows. An evaluation page
-      explains one question and one artifact set. It does not mix filenames or explanations from unrelated cases. The source
-      material under <code>kb/input/</code> and <code>task/input/</code> is human-readable Markdown intended for a coding agent.
+      explains one domain and three distinct task runs. It does not mix filenames or explanations from unrelated cases. The source
+      material under <code>kb/input/</code> and each <code>taskN/input/</code> is human-readable Markdown intended for a coding agent.
       Reusable reviewed circuits live under <code>kb/circuits/</code>; current adaptation and wiring live under
-      <code>task/sop/</code>. JSON is used only for machine-readable task results, not as source input to the coding agent or as
-      a hidden parsing layer inside the circuits. The <a href="../workspace-conventions.html">KB/task convention</a> explains
+      the corresponding <code>taskN/sop/</code>. Official task results are executor-rendered Markdown reports; JSON is neither
+      source input nor a substitute for circuit execution. The <a href="../workspace-conventions.html">KB/task convention</a> explains
       how to classify files whose role is not immediately obvious.</p>
 
     <table>
-      <thead><tr><th>Evaluation page</th><th>Question</th><th>Implemented transformation</th><th>Observed result</th></tr></thead>
+      <thead><tr><th>Evaluation page</th><th>Question</th><th>Three-run coverage</th><th>Observed executor results</th></tr></thead>
       <tbody>
         <tr>
           <td><a href="eval1/index.html">Eval 1: notice-period exception</a></td>
           <td>Does the exception apply only with written consent, while the ordinary rule still applies to all other cases?</td>
-          <td>Rule prose and a Markdown case table become a reusable policy circuit plus a task-specific root circuit.</td>
-          <td>One violation and two compliant cases; one compliance uses the evidenced exception.</td>
+          <td>Three distinct notice tables cover ordinary failure, exception failure, threshold boundaries, and ordinary/exception success.</td>
+          <td>All three roots succeeded; totals are 2/1, 1/2, and 3/1 compliant/non-compliant.</td>
         </tr>
         <tr>
           <td><a href="eval2/index.html">Eval 2: universal claim</a></td>
           <td>Does one non-positive observation refute a universal positive-value claim even when the mean is positive?</td>
-          <td>A Markdown observation table becomes a dataset circuit consumed by a reusable counterexample circuit.</td>
-          <td>Verdict <code>REFUTED</code>, witness <code>-2</code>, mean <code>5.25</code>.</td>
+          <td>Mixed values, all-positive values, and a zero-first boundary counterexample use the same reviewed universal-claim circuit.</td>
+          <td>All roots succeeded: refuted, supported, and refuted with the first zero witness.</td>
         </tr>
         <tr>
           <td><a href="eval3/index.html">Eval 3: document consistency</a></td>
           <td>Are conflicting dates and definitions retained with their source chapters?</td>
-          <td>Three source chapters enter repeated interpretation circuits and one cross-document consistency circuit.</td>
-          <td>Two launch dates and two definitions are reported as unresolved conflicts.</td>
+          <td>Unresolved conflicts, a fully consistent two-chapter plan, and an explicit supersession plan are compared.</td>
+          <td>All roots succeeded and retain source labels; supersession resolves only the explicitly superseded date.</td>
         </tr>
         <tr>
           <td><a href="eval4/index.html">Eval 4: context entailment</a></td>
           <td>Can ordinary English facts and a rule support direct and derived answers without treating missing knowledge as false?</td>
-          <td>Two Markdown files become an executable fact/rule package, a fixed-point unary reasoner, and a task root.</td>
-          <td>Direct man and derived mortal propositions are supported; philosopher remains unknown.</td>
+          <td>Direct/derived/unknown, two-step derivation, and direct contradiction are exercised through separate task SOP.</td>
+          <td>All roots succeeded; outputs include supported, unknown, and conflict classifications with evidence.</td>
         </tr>
         <tr>
           <td><a href="eval5/index.html">Eval 5: agent-generated composition</a></td>
           <td>Can coding agents turn one large KB source and one large task source into a verified composed analysis?</td>
-          <td>A real learning run splits ten KB chapters into reviewed packages; a real analysis run encodes ten task records and executes one explicit 10 × 10 root.</td>
-          <td>100 covered decisions: 90 pass, 10 fail, one fully compliant release, and nine non-compliant releases.</td>
+          <td>Ten large records, two focused records, and three retention-boundary records reuse the same ten-rule KB family.</td>
+          <td>The large and boundary roots succeeded; the focused run was explicitly refused on an unsupported vocabulary value.</td>
+        </tr>
+        <tr>
+          <td><a href="eval6/index.html">Eval 6: literary generation</a></td>
+          <td>Can a deterministic generator produce a constrained vignette and can an independent circuit verify every requested feature?</td>
+          <td>Three different prose briefs vary characters, setting, objects, choices, consequences, closing images, and ordered motifs.</td>
+          <td>All roots executed; two compact variants pass all verifier checks, while the original retains its observed length failure.</td>
+        </tr>
+        <tr>
+          <td><a href="eval7/index.html">Eval 7: operational SOP generation</a></td>
+          <td>Can one reviewed circuit family generate and independently verify incident-handoff procedures without performing operations?</td>
+          <td>Three incident briefs cover distinct services, roles, deadlines, evidence lists, channels, and prohibited actions.</td>
+          <td>All roots succeeded and all three generated SOP documents passed independent verification.</td>
+        </tr>
+        <tr>
+          <td><a href="eval8/index.html">Eval 8: contractual notice generation</a></td>
+          <td>Can fact-bounded notices be generated without unsupported legal additions and then independently verified?</td>
+          <td>Three supplied briefs include ordinary facts plus a boundary case where a currency symbol and disputed phrase are explicitly authorized input.</td>
+          <td>All roots succeeded; generated notices and independent verification reports pass their declared checks.</td>
         </tr>
       </tbody>
     </table>
-    <p>The table compares the evaluation intent and the source-to-circuit transformation. Eval 4 shows the explicit
+    <p>The table compares the evaluation intent and the source-to-circuit transformation across 24 task runs. Eval 4 shows the explicit
       coding-agent interpretation required before the deterministic runtime can execute facts and rules. Eval 5 records both
-      coding-agent transformations, promotion, and a larger explicitly wired runtime execution without claiming automatic
-      semantic rule discovery. Open one row to inspect its files.
+      coding-agent transformations, promotion, and larger explicitly wired runtime executions without claiming automatic
+      semantic rule discovery. Eval 6–8 add generation followed by independent symbolic verification. Open one row to inspect its files.
       The <a href="../evaluation.html">testing guide</a> explains how these cases relate to unit suites, while
       <a href="../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a> defines the normative evaluation contract.</p>
   </article></main>

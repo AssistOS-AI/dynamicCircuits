@@ -33,8 +33,9 @@ diagnose from receipts and create an immutable child attempt with the smallest s
 emit reports, artifacts, and a final receipt/certificate; otherwise publish the classified failure without pretending success.
 
 The present version automates workspace preparation, external coding-agent invocation, explicit circuit compilation and
-execution, local checks/invariants, and runtime receipts. Agents currently perform document interpretation and report
-assembly in files. Registry discovery, automatic wiring, closure, profiles, attempts, and certificates remain planned.
+execution, local checks/invariants, runtime receipts, and executor-owned Markdown report rendering. Agents currently perform
+document interpretation and task-circuit assembly, and may write a provenance-only journal. Registry discovery, automatic
+wiring, closure, profiles, attempts, and certificates remain planned.
 
 ### Reference flows
 
@@ -53,12 +54,15 @@ comparison circuits expose incompatible values; the outcome reports conflicts ra
 In a short contextual-reasoning task, a coding agent interprets English facts, unary implications, and questions into an
 explicit SOP knowledge package. A reusable reasoner computes fixed-point closure, distinguishes direct from derived support,
 and keeps absent propositions `UNKNOWN`. The runtime verifies the generated symbolic representation; it does not parse
-unrestricted English itself. A fifth flow applies ten reviewed KB rule packages to ten current records and verifies the
+unrestricted English itself. A fifth domain applies ten reviewed KB rule packages to multiple record sets and verifies the
 explicit 100-decision cross-product. In that fifth flow, one large KB document is transformed by a real learning-agent run
 into focused candidate SOP packages, reviewed packages are promoted into the KB, and one large task document is transformed
-by a separate analysis-agent run into task-data SOP plus a larger composition circuit. The coding agent writes the Markdown
-report only after executing that circuit. These five flows are executable current evals under `docs/eval/`, with stronger future
-assurance gates labeled as such.
+by a separate analysis-agent run into task-data SOP plus a larger composition circuit. Three additional domains generate
+literary, operational, and contractual documents and pass each generated value to an independent verifier circuit.
+
+These eight domains contain 24 task runs under `docs/eval/`. For every run, Codex authors task SOP and exits; the CLI then
+executes the fixed root and renders the Markdown runtime report. A fresh report skips unchanged agent and executor work,
+while deleting it forces the complete path. Stronger future assurance gates remain labeled as such.
 
 Operational example: Eval 3 starts with three Markdown chapters. The committed interpreter circuit extracts each chapter's
 launch date and term definition, the synthesis circuit compares those values, and the result reports both conflicts with

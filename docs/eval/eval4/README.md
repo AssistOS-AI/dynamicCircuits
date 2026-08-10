@@ -25,16 +25,28 @@ The source-derived expectation and comparison are in `expected.md`. That file is
 agent is instructed not to inspect it. Eval 6 retains both the original expectation and the correction justified by the
 independent verifier.
 
+## Three independent task runs
+
+| Run | Human input | Observed executor result |
+| --- | --- | --- |
+| Task 1 | Direct fact, one implication, and three questions | direct `SUPPORTED`, derived `SUPPORTED`, `UNKNOWN` |
+| Task 2 | Scholar → reader → curious two-step chain | `SUPPORTED`, `SUPPORTED`, `UNKNOWN` |
+| Task 3 | Positive and negative pilot facts plus implication | `CONFLICT`, `SUPPORTED`, `UNKNOWN` |
+
+Codex separately converts each English context into explicit task SOP. The deterministic runtime reasons only over that SOP
+and the reviewed unary-entailment circuit; it does not parse unrestricted English itself.
+
 ## Artifact groups
 
 - `kb/input/`: reusable human-readable source only.
 - `kb/candidates/`: Codex learning artifacts, tests, and provenance; not trusted automatically.
 - `kb/circuits/`: reviewed executable KB SOP only.
-- `task/input/`: current human-readable facts, brief, or request only.
-- `task/sop/task/`: Codex-generated executable representation of this task and `task.analysis`.
-- `task/results/runtime-result.md`: authoritative executor output.
-- `task/results/agent-summary.md`: non-authoritative coding-agent provenance.
-- `expected.md`: evaluator expectation and explicit observed comparison.
+- `task/input/`, `task2/input/`, `task3/input/`: three distinct human-readable task sources.
+- `taskN/sop/task/`: Codex-generated executable representation for that run and its `task.analysis`.
+- `taskN/results/runtime-result.md`: authoritative executor output for that run.
+- `taskN/results/agent-summary.md`: non-authoritative coding-agent provenance for that run.
+- `expected.md`, `task2/expected.md`, and `task3/expected.md`: post-run expectations, never semantic input.
+- `../eval-manifests.js` and `../eval-file-tree.js`: the shared hierarchy, explanations, and reusable tree component used by every evaluation page.
 
 The HTML file browser keeps these groups distinct; it never labels a source document and a generated circuit as the same
 kind of artifact.

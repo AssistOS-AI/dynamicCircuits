@@ -15,16 +15,17 @@
   <main class="page"><article class="page__panel">
     <p class="breadcrumbs"><a href="index.html">Documentation</a> / Evaluation</p>
     <h1>Tests and evaluation cases</h1>
-    <p class="lead">Unit tests cover the parser, compiler, runtime, CLI, workspace preparation, agent adapters, documentation links, and historical integrity. Five evaluation workspaces execute policy, scientific, cross-document, contextual-reasoning, and large 10 × 10 composition cases against committed inputs.</p>
+    <p class="lead">Unit tests cover the deterministic implementation. Eight evaluation domains add 24 real task workspaces spanning policy, scientific claims, document consistency, contextual reasoning, large governance review, and three generator–verifier families.</p>
 
     <h2>Purpose and relationship to the system</h2>
     <p>The project has two verification levels. Unit tests isolate one contract, such as free-wire detection or workspace
       symlink creation. Evaluation cases combine source documents, multiple circuit packages, goals, expected outputs, and
       reports in the same directory shape used by a task. Together they show whether the implementation primitives work
       individually and whether they compose into a meaningful analysis.</p>
-    <p>The evaluation fixtures currently validate deterministic circuit behavior. They provide reference material for future
-      coding-agent benchmarks, but they do not claim that a particular agent version independently recreated each circuit
-      from the prose sources.</p>
+    <p>The committed fixtures validate deterministic circuit behavior and also retain real Codex authoring provenance. Codex
+      generated each task's SOP from that task's readable input and the reviewed KB; after it exited, the CLI executed the
+      fixed root and rendered the official result. Re-running committed SOP is deterministic. Re-generating it with a future
+      agent version is a separate benchmark and may produce different, reviewable code.</p>
 
     <h2>Unit test organization</h2>
     <p>The table groups tests by the public boundary they exercise. A regression belongs in the smallest suite that can
@@ -48,10 +49,10 @@
       to add matrix regeneration and documentation verification.</p>
 
     <h2>Evaluation cases</h2>
-    <p>Each case reproduces two workspaces. <code>kb/input/</code> stores reusable rules or reference knowledge and
-      <code>kb/circuits/</code> stores their reviewed executable packages. <code>task/input/</code> stores the current dataset and
-      request, <code>task/sop/</code> stores the task-specific interpretation and wiring, and <code>task/results/</code> stores the
-      checked machine summary and human report. <code>README.md</code> states the evaluation question, reproduction command,
+    <p>Each domain contains one KB and three task workspaces. <code>kb/input/</code> stores reusable rules or reference knowledge and
+      <code>kb/circuits/</code> stores reviewed executable packages. Each <code>taskN/input/</code> stores one distinct current
+      dataset or brief, <code>taskN/sop/</code> stores only that task's generated interpretation and wiring, and
+      <code>taskN/results/runtime-result.md</code> stores the executor-owned output. <code>README.md</code> states the evaluation question, reproduction command,
       observed result, complexity, and limitations. See the <a href="workspace-conventions.html">KB/task convention</a> for
       the classification rule and package namespaces.</p>
     <table>
@@ -62,14 +63,18 @@
         <tr><td><a href="eval/eval3/index.html">Eval 3</a></td><td>Three-document timeline and terminology reconciliation with source attribution.</td><td>Both conflict classes retained; neither alternative chosen silently.</td></tr>
         <tr><td><a href="eval/eval4/index.html">Eval 4</a></td><td>English context converted into direct facts, a unary rule, and three symbolic questions.</td><td>Direct and derived propositions supported; absent proposition remains unknown.</td></tr>
         <tr><td><a href="eval/eval5/index.html">Eval 5</a></td><td>One large KB document and one large task document transformed by two real Codex runs.</td><td>Generated KB and task SOP compose into an executed 100-decision root: 90 pass and 10 fail.</td></tr>
+        <tr><td><a href="eval/eval6/index.html">Eval 6</a></td><td>Constrained literary generation followed by an independent verifier.</td><td>One explicit length failure and two fully passing compact variants.</td></tr>
+        <tr><td><a href="eval/eval7/index.html">Eval 7</a></td><td>Operational handoff-document generation and independent structural/factual verification.</td><td>Three distinct handoff SOPs execute and pass verification without operational effects.</td></tr>
+        <tr><td><a href="eval/eval8/index.html">Eval 8</a></td><td>Fact-bounded contractual notice generation and unsupported-addition checks.</td><td>Three notices pass, including a supplied-term boundary case.</td></tr>
       </tbody>
     </table>
-    <p>The five rows exercise different failure risks. Eval 1 checks that an exception does not replace the base rule for
+    <p>The eight rows exercise different failure risks across three runs each. Eval 1 checks that an exception does not replace the base rule for
       unrelated cases. Eval 2 checks that an aggregate statistic does not answer a universal claim. Eval 3 checks that
       repeated interpretation and synthesis preserve incompatible source claims. Eval 4 checks direct evidence, rule-derived
       evidence, and open-world unknown behavior after coding-agent interpretation. Eval 5 checks real source-to-SOP learning,
-      reviewed promotion, real task-to-SOP interpretation, 10 repeated review instances, 100 nested rule instances, and exact
-      aggregate coverage. Open the <a href="eval/index.html">evaluation catalog</a>, choose one evaluation, then select any
+      reviewed promotion, real task-to-SOP interpretation, 10 repeated review instances, 100 nested rule instances, refusal,
+      and boundary coverage. Eval 6–8 verify generated prose through separate circuits rather than trusting the generator.
+      Open the <a href="eval/index.html">evaluation catalog</a>, choose one evaluation, then select any
       source, circuit, review record, or report in that case's two-pane view.</p>
     <p>Runtime <code>SUCCEEDED</code> means the circuit completed and its local goals passed. The domain result can still be a
       violation, a refuted claim, or an unresolved conflict; each case therefore states runtime outcome, semantic result, and

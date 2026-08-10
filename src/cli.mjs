@@ -31,6 +31,9 @@ function usage() {
 Options accept both the requested single-dash form (-kbdir) and conventional long form (--kbdir).
 Without --workdir the agent learns candidate circuits from KB/input. With --workdir it analyzes
 WORK/input and writes WORK/sop and WORK/results while treating the KB as read-only.
+An analysis is incremental: a fresh runtime-result.md skips both stages; newer generated SOP
+runs only the executor; changed task input, changed reviewed KB circuits, or a deleted result
+runs the coding agent and executor again.
 The generic adapter also requires --agent-command PATH. Installed aliases are agent, dc-agent,
 and dynamic-circuits.`;
 }
@@ -99,6 +102,9 @@ async function handleWorkspace(command, options) {
     return;
   }
   if (incrementalPlan.action === "executor-only" && !options["dry-run"]) {
+    await unlink(incrementalPlan.reportPath).catch((error) => {
+      if (error.code !== "ENOENT") throw error;
+    });
     const startedAt = new Date().toISOString();
     const execution = await executeWorkspaceCircuit(workspace);
     const finishedAt = new Date().toISOString();

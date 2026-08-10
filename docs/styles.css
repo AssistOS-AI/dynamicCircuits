@@ -83,14 +83,32 @@ tbody tr:nth-child(even) { background: #f5f9f8; }
 .capability-row--unsupported .capability-badge { color: #963232; }
 .example-pair { display: grid; grid-template-columns: minmax(20rem, 0.8fr) minmax(0, 1.2fr); gap: 1rem; align-items: start; }
 .example-pair pre { margin: 0.6rem 0; }
-.eval-browser { display: grid; grid-template-columns: 19rem minmax(0, 1fr); gap: 1rem; align-items: start; }
+.eval-browser { display: grid; grid-template-columns: minmax(18rem, 23rem) minmax(0, 1fr); gap: 1rem; align-items: start; }
 .eval-menu { position: sticky; top: 0.75rem; max-height: calc(100vh - 1.5rem); overflow: auto; padding: 0.7rem; border: 1px solid #b9d2cf; background: #f9fcfb; box-shadow: 0 0.1rem 0.3rem rgb(16 63 61 / 8%); }
 .eval-menu h2 { margin-top: 0; }
-.eval-menu h3 { margin: 0.9rem -0.2rem 0.25rem; padding: 0.35rem 0.45rem; background: var(--accent-dark); color: #fff; }
-.eval-menu ul { margin: 0; padding: 0; list-style: none; }
-.eval-menu button { width: 100%; padding: 0.3rem 0.45rem; border: 0; border-left: 0.18rem solid transparent; background: transparent; color: var(--accent); font: inherit; text-align: left; cursor: pointer; }
-.eval-menu button:hover, .eval-menu button[aria-current="true"] { background: var(--code); }
-.eval-menu button[aria-current="true"] { border-left-color: var(--accent); font-weight: 700; }
+.eval-menu__help { margin: -0.15rem 0 0.7rem; color: var(--muted); font-size: 0.82rem; text-align: left; }
+.eval-tree ul { margin: 0; padding: 0; list-style: none; }
+.eval-tree__roots { display: grid; gap: 0.35rem; }
+.eval-tree__node { min-width: 0; }
+.eval-tree__branch > summary { position: relative; display: grid; grid-template-columns: 1fr; min-width: 0; padding: 0.38rem 0.45rem 0.38rem 1.55rem; border-radius: 0.25rem; color: var(--heading); cursor: pointer; list-style: none; }
+.eval-tree__branch > summary::-webkit-details-marker { display: none; }
+.eval-tree__branch > summary::before { content: "▸"; position: absolute; left: 0.5rem; top: 0.38rem; color: var(--accent); transition: transform 120ms ease; }
+.eval-tree__branch[open] > summary::before { transform: rotate(90deg); }
+.eval-tree__branch > summary:hover { background: var(--accent-soft); }
+.eval-tree__label { overflow-wrap: anywhere; font-size: 0.9rem; font-weight: 700; line-height: 1.25; }
+.eval-tree summary small { overflow-wrap: anywhere; color: var(--muted); font-size: 0.7rem; line-height: 1.25; }
+.eval-tree__roots > .eval-tree__node > .eval-tree__branch > summary { border: 1px solid var(--line); background: #fff; }
+.eval-tree__roots > .eval-tree__node[data-kind="kb"] > .eval-tree__branch > summary { border-left: 0.25rem solid #2877a8; }
+.eval-tree__roots > .eval-tree__node[data-kind="task"] > .eval-tree__branch > summary { border-left: 0.25rem solid var(--accent); }
+.eval-tree__roots > .eval-tree__node[data-kind="record"] > .eval-tree__branch > summary { border-left: 0.25rem solid #8a5614; }
+.eval-tree__children { margin-left: 0.75rem !important; padding: 0.22rem 0 0.25rem 0.55rem !important; border-left: 1px solid #b9d2cf; }
+.eval-tree__children .eval-tree__branch > summary { padding-block: 0.3rem; }
+.eval-tree__file { position: relative; padding-left: 0.45rem; }
+.eval-tree__file::before { content: ""; position: absolute; top: 0.9rem; left: -0.55rem; width: 0.55rem; border-top: 1px solid #b9d2cf; }
+.eval-tree__file button { display: grid; width: 100%; min-width: 0; padding: 0.28rem 0.4rem; border: 0; border-left: 0.18rem solid transparent; border-radius: 0.2rem; background: transparent; color: var(--accent); font: inherit; text-align: left; cursor: pointer; }
+.eval-tree__file button:hover, .eval-tree__file button[aria-current="page"] { background: var(--code); }
+.eval-tree__file button[aria-current="page"] { border-left-color: var(--accent); color: var(--accent-dark); }
+.eval-tree__filename { overflow: hidden; font-size: 0.84rem; font-weight: 650; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
 .eval-viewer { min-width: 0; }
 .eval-case-summary { padding: 0.1rem 0.8rem 0.7rem; border: 1px solid var(--line); background: var(--panel); }
 .file-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; }

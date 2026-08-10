@@ -22,3 +22,13 @@ fields by local runtime code. It was not generated or summarized by Codex.
 
 Machine-local workspace manifests and `.dynamic-circuits/last-run.json` retain additional paths and timestamps during a live
 run. This repository-facing record uses relative paths so it remains readable through the static documentation server.
+
+## Additional real task runs
+
+| Run | Codex interval (UTC) | Agent exit | Executor outcome | Receipt |
+| --- | --- | --- | --- | --- |
+| `task2` | `14:04:16–14:07:45` | 0 | `REFUSED` | `sha256:13970d69…163b` |
+| `task3` | `14:09:57–14:15:52` | 0 | `SUCCEEDED` | `sha256:0c414a5e…93f9` |
+
+Commands used `-kbdir ./docs/eval/eval5/kb -workdir ./docs/eval/eval5/taskN -agent codex`. Task 2's coding agent exited
+normally; the later circuit refusal is preserved in the executor report and is not an agent failure or agent-authored result.

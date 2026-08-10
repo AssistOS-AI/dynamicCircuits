@@ -25,16 +25,28 @@ The source-derived expectation and comparison are in `expected.md`. That file is
 agent is instructed not to inspect it. Eval 6 retains both the original expectation and the correction justified by the
 independent verifier.
 
+## Three independent task runs
+
+| Run | Human input | Observed executor result |
+| --- | --- | --- |
+| Task 1 | Mixed observations with a later negative witness | `SUCCEEDED`; `REFUTED`, mean 5.25 |
+| Task 2 | Four positive observations | `SUCCEEDED`; `SUPPORTED`, no witness, mean 2.5 |
+| Task 3 | Zero followed by mixed observations | `SUCCEEDED`; `REFUTED` by Z1, mean 3.5 |
+
+The three inputs are separate Markdown datasets. Each has separately generated SOP and a separately rendered receipt-backed
+result; the KB reviewer is the only reusable circuit shared by the runs.
+
 ## Artifact groups
 
 - `kb/input/`: reusable human-readable source only.
 - `kb/candidates/`: Codex learning artifacts, tests, and provenance; not trusted automatically.
 - `kb/circuits/`: reviewed executable KB SOP only.
-- `task/input/`: current human-readable facts, brief, or request only.
-- `task/sop/task/`: Codex-generated executable representation of this task and `task.analysis`.
-- `task/results/runtime-result.md`: authoritative executor output.
-- `task/results/agent-summary.md`: non-authoritative coding-agent provenance.
-- `expected.md`: evaluator expectation and explicit observed comparison.
+- `task/input/`, `task2/input/`, `task3/input/`: three distinct human-readable task sources.
+- `taskN/sop/task/`: Codex-generated executable representation for that run and its `task.analysis`.
+- `taskN/results/runtime-result.md`: authoritative executor output for that run.
+- `taskN/results/agent-summary.md`: non-authoritative coding-agent provenance for that run.
+- `expected.md`, `task2/expected.md`, and `task3/expected.md`: post-run expectations, never semantic input.
+- `../eval-manifests.js` and `../eval-file-tree.js`: the shared hierarchy, explanations, and reusable tree component used by every evaluation page.
 
 The HTML file browser keeps these groups distinct; it never labels a source document and a generated circuit as the same
 kind of artifact.

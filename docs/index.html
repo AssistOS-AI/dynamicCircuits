@@ -16,12 +16,12 @@
     <p class="breadcrumbs">Documentation / Current experiment</p>
     <h1>What Dynamic Circuits can do today</h1>
     <p class="lead">The repository tests whether a coding agent can turn readable task documents into executable SOP
-      circuits, then use a deterministic local runtime to produce inspectable findings and receipts. Five committed
-      evaluations work now; unrestricted natural-language question answering and automatic discovery of every relevant KB
+      circuits, then use a deterministic local runtime to produce inspectable findings and receipts. Eight committed
+      evaluation domains with 24 task runs work now; unrestricted natural-language question answering and automatic discovery of every relevant KB
       rule do not.</p>
 
     <section class="status-summary" aria-label="Current status summary">
-      <div class="status-card status-card--verified"><strong>5 verified evaluations</strong><span>Focused reasoning cases plus a 10-rule × 10-record composition</span></div>
+      <div class="status-card status-card--verified"><strong>8 domains / 24 runs</strong><span>Reasoning, scale, text generation, and independent verification</span></div>
       <div class="status-card status-card--agent"><strong>2 agent workflows</strong><span>Task analysis and KB candidate learning through Codex</span></div>
       <div class="status-card status-card--planned"><strong>Planned assurance</strong><span>Automatic matching, complete closure, trust profiles, and certificates</span></div>
     </section>
@@ -77,10 +77,31 @@
           <td>100 decisions: 90 pass, 10 fail; Markdown report from an executed root</td>
           <td><a href="eval/eval5/index.html">Eval 5 files</a></td>
         </tr>
+        <tr class="capability-row capability-row--verified">
+          <td><span class="capability-badge">Verified</span></td>
+          <td>3 constrained literary briefs</td>
+          <td>Generates structured vignettes and runs an independent requirement verifier.</td>
+          <td>2 pass completely; 1 correctly exposes a word-count failure</td>
+          <td><a href="eval/eval6/index.html">Eval 6 files</a></td>
+        </tr>
+        <tr class="capability-row capability-row--verified">
+          <td><span class="capability-badge">Verified</span></td>
+          <td>3 operational incident-handoff briefs</td>
+          <td>Generates SOP documents, then verifies roles, deadlines, evidence, steps, and prohibited actions.</td>
+          <td>3 generated documents pass independent verification</td>
+          <td><a href="eval/eval7/index.html">Eval 7 files</a></td>
+        </tr>
+        <tr class="capability-row capability-row--verified">
+          <td><span class="capability-badge">Verified</span></td>
+          <td>3 fact-bounded contractual notice briefs</td>
+          <td>Generates notices and separately checks supplied facts, exhibits, omissions, and unsupported additions.</td>
+          <td>3 notices pass, including a supplied-term boundary case</td>
+          <td><a href="eval/eval8/index.html">Eval 8 files</a></td>
+        </tr>
         <tr class="capability-row capability-row--agent">
           <td><span class="capability-badge">Agent run</span></td>
           <td>Arbitrary readable files placed in one task <code>input/</code> folder</td>
-          <td>Codex inventories inputs, authors task SOP, runs it, and writes coverage and result reports.</td>
+          <td>Codex inventories inputs and authors task SOP; after Codex exits, the CLI executor runs the fixed root and renders the official result.</td>
           <td>Workflow and invocation are tested; semantic quality varies with inputs and agent</td>
           <td><a href="tutorial.html">Run manually</a></td>
         </tr>
@@ -93,8 +114,8 @@
         </tr>
       </tbody>
     </table>
-    <p>The first five rows use committed executable SOP, so <code>npm test</code> reruns their public results. They do not prove
-      that Codex will recreate identical SOP from prose on every live run. The sixth row is the live experiment for that
+    <p>The first eight rows use committed executable SOP, so <code>npm test</code> reruns their public results. They do not prove
+      that Codex will recreate identical SOP from prose on every live run. The next row is the live experiment for that
       source-to-code step. The last row is maintained architecture and is labeled planned wherever it appears.</p>
 
     <h2>What knowledge is built in</h2>

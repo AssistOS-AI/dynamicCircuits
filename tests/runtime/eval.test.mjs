@@ -7,10 +7,10 @@ import { PackageRegistry, SopRuntime } from "../../src/index.mjs";
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const evalRoot = path.join(repositoryRoot, "docs", "eval");
 
-async function evalRuntime(caseName) {
+async function evalRuntime(caseName, taskRoot = "task") {
   const registry = await PackageRegistry.fromRoots([
     { path: path.join(evalRoot, caseName, "kb", "circuits"), prefix: "kb" },
-    { path: path.join(evalRoot, caseName, "task", "sop"), prefix: "" },
+    { path: path.join(evalRoot, caseName, taskRoot, "sop"), prefix: "" },
   ]);
   return new SopRuntime(registry);
 }
@@ -129,4 +129,33 @@ test("executes eval8 legal-notice generation and independent verification", asyn
   assert.ok(Object.values(verification.checks).every(Boolean));
   assert.deepEqual(verification.missingItems, []);
   assert.deepEqual(verification.prohibitedAdditions, []);
+});
+
+test("executes two additional independent task runs for every evaluation domain", async () => {
+  const expectations = [
+    ["eval1", "task2", "SUCCEEDED", [/\"nonCompliant\":2/, /\"complete\":true/]],
+    ["eval1", "task3", "SUCCEEDED", [/\"nonCompliant\":1/, /\"total\":4/]],
+    ["eval2", "task2", "SUCCEEDED", [/\"verdict\":\"SUPPORTED\"/, /\"mean\":2\.5/]],
+    ["eval2", "task3", "SUCCEEDED", [/\"verdict\":\"REFUTED\"/, /\"value\":0/, /\"mean\":3\.5/]],
+    ["eval3", "task2", "SUCCEEDED", [/\"reviewVerdict\":\"CONSISTENT\"/, /2026-09-01/]],
+    ["eval3", "task3", "SUCCEEDED", [/\"reviewVerdict\":\"CONSISTENT\"/, /2026-10-17/, /Launch-date assertion A/]],
+    ["eval4", "task2", "SUCCEEDED", [/\"status\":\"SUPPORTED\"/, /\"status\":\"UNKNOWN\"/, /curious/]],
+    ["eval4", "task3", "SUCCEEDED", [/\"status\":\"CONFLICT\"/, /\"status\":\"SUPPORTED\"/, /\"status\":\"UNKNOWN\"/]],
+    ["eval5", "task2", "REFUSED", []],
+    ["eval5", "task3", "SUCCEEDED", [/\"totalFindingCount\":30/, /\"passCount\":28/, /\"failCount\":2/, /\"complete\":true/]],
+    ["eval6", "task2", "SUCCEEDED", [/The Quiet Ferry/, /\"ok\":true/]],
+    ["eval6", "task3", "SUCCEEDED", [/Orchard Signal/, /\"ok\":true/]],
+    ["eval7", "task2", "SUCCEEDED", [/Orders Database SEV-2 Handoff/, /\"ok\":true/]],
+    ["eval7", "task3", "SUCCEEDED", [/Identity Gateway SEV-1 Handoff/, /\"ok\":true/]],
+    ["eval8", "task2", "SUCCEEDED", [/Archive Conversion Agreement/, /\"ok\":true/, /\"prohibitedAdditions\":\[\]/]],
+    ["eval8", "task3", "SUCCEEDED", [/Collection Digitization Agreement/, /\"ok\":true/, /statutory penalty/]],
+  ];
+
+  for (const [caseName, taskRoot, outcome, patterns] of expectations) {
+    const result = await (await evalRuntime(caseName, taskRoot)).execute("task.analysis", []);
+    assert.equal(result.outcome, outcome, `${caseName}/${taskRoot}`);
+    const outputs = JSON.stringify(result.outputs);
+    for (const pattern of patterns) assert.match(outputs, pattern, `${caseName}/${taskRoot}: ${pattern}`);
+    assert.match(result.receipt.receiptHash, /^sha256:[a-f0-9]{64}$/);
+  }
 });

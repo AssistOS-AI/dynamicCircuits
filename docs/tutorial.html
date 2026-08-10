@@ -64,7 +64,7 @@ node src/cli.mjs help</code></pre>
     <p>Expected observation: outcome <code>SUCCEEDED</code>; case A is non-compliant; case B is compliant through the expedited
       exception; case C is ordinarily compliant; statistics are total 3, compliant 2, violations 1. The receipt contains one
       root circuit, three child policy receipts, node input/output hashes, and a passing goal. Compare it with
-      <a href="eval/eval1/index.html?file=task/results/result.json">the checked result summary</a>.</p>
+      <a href="eval/eval1/index.html?file=task/results/runtime-result.md">the executor-owned runtime report</a>.</p>
 
     <h3>Change one case interactively</h3>
     <p>Run the reusable policy circuit directly to see how one fact changes the decision. These three calls use the same case
@@ -112,7 +112,7 @@ node src/cli.mjs sop run --kb-root ./docs/eval/eval1/kb/circuits \
       passes and 10 failures; one fully compliant record. The receipt is intentionally large because it retains ten review
       executions and 100 nested rule executions. Use <a href="eval/eval5/index.html">the Eval 5 browser</a> to compare the two
       large source documents, Codex-generated KB candidates, promotion record, task-local SOP layers, and Markdown report.
-      Eval 5 deliberately has no <code>result.json</code>.</p>
+      Every task run uses an executor-owned Markdown report; no hand-authored JSON result stands in for execution.</p>
 
     <h2>2. Prepare a task</h2>
     <p>Reproduce the two workspace roles instead of mixing every Markdown file into one input folder. Seed the KB with the
@@ -168,6 +168,12 @@ node src/cli.mjs prepare \
       result is Markdown or text; JSON is generated only when the task explicitly asks for it. A report with no input
       coverage, no circuit execution evidence, or hidden source assumptions is incomplete even when the prose sounds plausible.</p>
 
+    <h3>Repeat without paying for unchanged work</h3>
+    <p>Run the same command a second time. Because <code>runtime-result.md</code> is newer than task input, reviewed KB circuits,
+      and generated task SOP, the CLI reports that the workspace is up to date and does not start Codex. Edit a file under
+      <code>input/</code> to request reinterpretation. Edit only a generated <code>sop/</code> file to rerun just the executor.
+      Delete <code>results/runtime-result.md</code> to force the full Codex-plus-executor path.</p>
+
     <h2>5. Learn a KB rule</h2>
     <p>Learning uses no workdir. Copy only reusable source material into the KB input directory:</p>
     <pre><code>mkdir -p ./kb/input
@@ -200,8 +206,9 @@ node src/cli.mjs -kbdir ./kb -agent codex</code></pre>
     <h2>Current limits</h2>
     <p>The current runtime executes explicit circuit calls, local checks and goals, nested packages, canonical values, and
       receipts. Semantic registry search, automatic matcher wiring, mandatory closure, assurance profiles, trust evaluation,
-      persistent caching, final certificates, and hardened multi-tenant isolation remain planned. A useful current test should
-      evaluate workspace preparation, coding-agent transformation, explicit SOP execution, and report grounding; it should
+      semantic content-addressed caching across machines, final certificates, and hardened multi-tenant isolation remain
+      planned. The CLI does implement local timestamp-based dependency skipping for one prepared analysis workspace. A useful
+      current test should evaluate workspace preparation, coding-agent transformation, explicit SOP execution, and report grounding; it should
       not expect the planned Assurance Core to run automatically.</p>
 
     <h2>Maintenance checklist</h2>

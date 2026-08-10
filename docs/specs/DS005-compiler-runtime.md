@@ -43,7 +43,11 @@ Nested calls are ordinary graph nodes: their input arity equals child ports, the
 their receipt is embedded or hash-linked. Resolution never depends on discovery order. Runtime iteration follows the
 compiler's topological order, so independent-node source reordering cannot change pure results or receipt semantics.
 
-The `vm` boundary is a reference-development guard, not a production security sandbox. Asynchronous resource limits, worker isolation, persistent caching, effects, semantic indexes, mandatory closure, and trust-profile enforcement remain unsupported.
+The `vm` boundary is a reference-development guard, not a production security sandbox. Asynchronous resource limits,
+worker isolation, runtime memoization, content-addressed cross-machine caching, effects, semantic indexes, mandatory closure,
+and trust-profile enforcement remain unsupported. DS003's timestamp-based workspace invalidation is a CLI orchestration
+optimization: it skips whole agent/executor stages when the existing report is newer than their file dependencies. It does
+not cache nodes, values, or receipts inside the runtime.
 
 For workspace analysis, the CLI registers `KB/circuits` with prefix `kb`, registers `WORK/sop` without a prefix, compiles
 the fixed no-input package `task.analysis`, executes it, and renders `WORK/results/runtime-result.md`. The renderer copies

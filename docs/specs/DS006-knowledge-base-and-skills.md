@@ -22,7 +22,8 @@ Trusted reusable `.sop` packages must live under `KB/circuits/`. New learning ou
 
 The KB source corpus and the current task are different contracts. `KB/input/` contains durable source knowledge intended
 for reuse or candidate extraction. `WORK/input/` contains the current dataset, cases, source documents, questions, and
-requested deliverable. Analysis may read reviewed KB circuits but may write only task SOP and task results. A discovery made
+requested deliverable. Analysis may read reviewed KB circuits but may write only task SOP and a provenance journal; the CLI
+executor owns the authoritative task result. A discovery made
 during analysis must be reported for later learning and review; it must not move current task facts into the trusted KB or
 edit a reviewed package in place.
 
@@ -30,17 +31,19 @@ The project must ship `circuitSkills/analyze-task`, `circuitSkills/author-sop-ci
 
 Workspace preparation links the entire `circuitSkills` directory rather than copying it. The visible `circuitSkills` link
 and `.agents/skills` discovery links resolve to that same catalog; an existing local discovery directory receives project
-skill links without losing unrelated entries. This keeps one maintained skill version across normal workspaces and both the
-`kb/` and `task/` directories inside `docs/eval/evalN` cases. Repository-maintenance skills under the root `.agents/` are read-only guidance for project work and
+skill links without losing unrelated entries. This keeps one maintained skill version across normal workspaces and the
+`kb/`, `task/`, `task2/`, and `task3/` directories inside `docs/eval/evalN` cases. Repository-maintenance skills under the root `.agents/` are read-only guidance for project work and
 are never modified or repurposed as runtime circuit skills.
 
 The three maintained skills consolidate the six historical roles. `author-sop-circuit` covers kernel implementation
 constraints plus template/matcher authoring; `circuit-learner` covers source inventory, rule extraction, candidate packaging,
 provenance, tests, ambiguity, and assurance review preparation; `analyze-task` covers problem solving, receipt-guided
-debugging, coverage, report publication, and reusable-discovery reporting. Agents must read only the skill needed for their
+debugging, coverage, task-root construction, and reusable-discovery reporting. Agents must read only the skill needed for their
 task and must distinguish implemented syntax from planned matching, closure, profiles, and proof features.
 
-Analysis reports must distinguish reused trusted circuits, generated task-local circuits, unexecuted source, successful execution, and proposed KB candidates. Learning artifacts must retain input hashes or paths and review-relevant source spans without copying unnecessary document bodies.
+The executor report must distinguish successful execution from refusal or failure. Agent provenance journals must distinguish
+reused trusted circuits, generated task-local circuits, unexecuted source, and proposed KB candidates without restating a
+semantic result. Learning artifacts must retain input hashes or paths and review-relevant source spans without copying unnecessary document bodies.
 
 Candidate packages include a manifest, source provenance, applicability, inputs/outputs, effects/capabilities, assumptions,
 exceptions and priorities, refusal codes, positive/negative/boundary examples, test commands, expected receipts, overlap and

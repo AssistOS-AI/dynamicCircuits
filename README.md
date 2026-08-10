@@ -27,6 +27,14 @@ root circuit that composes those packages with reviewed KB SOP. After the coding
 write a separate provenance journal, but it cannot author or reinterpret the official result. The CLI never creates a JSON
 result artifact.
 
+Analysis runs are incremental. If `results/runtime-result.md` is newer than task input, reviewed KB circuits, and generated
+task SOP, the CLI skips both Codex and the executor. If only SOP is newer, it runs only the executor. Changed task input or
+reviewed KB circuits trigger Codex plus execution. Deleting `runtime-result.md` explicitly forces the complete rerun.
+
+The committed evaluation suite contains eight domain KBs and 24 independent task runs. Each eval page uses one shared file
+manifest to keep KB source, reviewed KB SOP, each task's source, each task's generated SOP, executor output, expectation, and
+provenance in separate menu groups.
+
 See [the current capability dashboard](docs/index.html), [the architecture reference](docs/architecture.html),
 [the KB/task directory convention](docs/workspace-conventions.html), [the manual CLI tutorial](docs/tutorial.html), [the evaluation
 catalog](docs/eval/index.html), and [the current specification matrix](docs/specs/matrix.md). The Romanian

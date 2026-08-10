@@ -49,8 +49,8 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
       <li>The CLI creates missing task directories and inventories every regular file under <code>input/</code>.</li>
       <li>The coding agent reads the manifest, task documents, and applicable KB circuit interfaces.</li>
       <li>It writes SOP packages for the current request and facts without copying reusable KB policy.</li>
-      <li>It writes a larger task root that consumes those packages and calls reviewed KB packages, then compiles and executes that root.</li>
-      <li>It derives a Markdown or text report from the observed output and receipt under <code>results/</code>; JSON is emitted only when the task requests it.</li>
+      <li>It writes a larger task root that consumes those packages and calls reviewed KB packages, then compiles that root.</li>
+      <li>After the agent exits, the CLI executes <code>task.analysis</code> and renders <code>results/runtime-result.md</code> directly from public outputs and the receipt.</li>
     </ol>
     <p>Both single-dash and conventional double-dash forms are accepted. KB and work roots may not overlap because overlap
       would make read/write authority and input discovery ambiguous. Existing user guidance is preserved, and conflicting
@@ -95,6 +95,21 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
     <h2>Who can write where</h2>
     <p>Analysis treats the KB as read-only. Learning uses the KB as the coding agent's current directory, while generated instructions restrict reusable output to <code>candidates/</code>. This restriction is currently instructional rather than a host-mediated filesystem capability; <a href="specsLoader.html?spec=DS008-security-and-trust.md">DS008</a> records the limitation. The former explicit learn flag is rejected because mode is now inferred unambiguously.</p>
     <p><code>--prepare-only</code> stops before adapter construction. <code>--dry-run</code> prints the command, arguments, working directory, and prompt without launching a process. The <code>generic</code> adapter accepts a program through <code>--agent-command</code> and sends the prompt through standard input. Installed compatibility aliases are <code>dc-agent</code> and <code>dynamic-circuits</code>.</p>
+
+    <h2>Incremental analysis</h2>
+    <p>The runtime report is the build target. If it is newer than task input, reviewed KB circuits, and generated task SOP,
+      the CLI prints <code>Up to date</code> and starts neither Codex nor the executor. A newer file under <code>sop/</code>
+      starts only the executor. A newer task input or reviewed KB circuit starts Codex and then the executor. To force a full
+      rerun without another option, delete <code>results/runtime-result.md</code> and repeat the analysis command.</p>
+    <pre><code># cached when nothing relevant changed
+node src/cli.mjs -kbdir ./kb -workdir ./work/task-001 -agent codex
+
+# explicit full rerun
+rm ./work/task-001/results/runtime-result.md
+node src/cli.mjs -kbdir ./kb -workdir ./work/task-001 -agent codex</code></pre>
+    <p>README files, HTML pages, expectations, old results, KB candidates, and learning reports do not invalidate an analysis.
+      They are outside the semantic dependencies. KB learning is still explicit because the present learning flow produces
+      candidates for review, not one canonical executor result.</p>
 
     <h2>Skills linked into the workspace</h2>
     <p><code>analyze-task</code> enforces complete input coverage and grounded results. <code>author-sop-circuit</code> supplies the implemented syntax and verification loop. <code>circuit-learner</code> separates reusable candidates from task-specific facts. The CLI links the catalog as one directory so the same instructions govern normal tasks and evaluation cases.</p>

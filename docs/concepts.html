@@ -46,7 +46,7 @@
         <tr><td><code>task/input/cases.md</code></td><td>Case identifiers, notice days, expedited request, and consent evidence.</td><td><code>task/sop/analysis.sop</code> calls the reusable policy once for each committed case.</td></tr>
         <tr><td><code>task/input/task.md</code></td><td>Required per-case fields, totals, and coverage expectation.</td><td><code>@output</code> ports expose findings and statistics; a goal checks that all three cases were classified.</td></tr>
         <tr><td><code>kb/circuits/*.sop</code> and <code>task/sop/*.sop</code></td><td>The explicit interpretation, separated by reuse lifetime.</td><td>The compiler resolves both package roots and produces the dependency graph executed by the runtime.</td></tr>
-        <tr><td><code>task/results/result.json</code></td><td>Observed verdicts, totals, runtime outcome, and limitations.</td><td>A compact committed summary of a reproducible run; it is output, not source input.</td></tr>
+        <tr><td><code>task/results/runtime-result.md</code></td><td>Exact public outputs, assurance checks, and execution receipt.</td><td>The authoritative report rendered by the CLI from the SOP executor, never an agent-authored interpretation.</td></tr>
       </tbody>
     </table>
     <p>The important boundary is visible in the middle column. The agent may misunderstand a document, so its generated SOP

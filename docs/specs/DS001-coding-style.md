@@ -17,7 +17,7 @@ the HTML pages and DS contracts synchronized with observable implementation beha
 
 ## Core Content
 
-Production code must use Node.js ECMAScript modules under `src/` and must support Node.js 20 or newer. Runtime code must avoid external package dependencies. Modules must have explicit responsibilities: `src/sop/` contains language mechanics, `src/agents/` contains coding-agent adapters, `src/workspace.mjs` owns workspace preparation, and `src/cli.mjs` owns argument handling and process orchestration.
+Production code must use Node.js ECMAScript modules under `src/` and must support Node.js 20 or newer. Runtime code must avoid external package dependencies. Modules must have explicit responsibilities: `src/sop/` contains language mechanics, `src/agents/` contains coding-agent adapters, `src/workspace.mjs` owns workspace preparation, `src/incremental.mjs` owns analysis invalidation, `src/runtime-report.mjs` owns fixed-root execution and report rendering, and `src/cli.mjs` owns argument handling and process orchestration.
 
 Functions should remain deterministic unless their boundary explicitly represents an effect. Errors crossing module or CLI boundaries must use stable codes and structured details. Canonical data must not contain non-finite numbers, functions, or unstable object identities. Code must not use hidden globals to transfer runtime values.
 

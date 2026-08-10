@@ -22,3 +22,13 @@ fields by local runtime code. It was not generated or summarized by Codex.
 
 Machine-local workspace manifests and `.dynamic-circuits/last-run.json` retain additional paths and timestamps during a live
 run. This repository-facing record uses relative paths so it remains readable through the static documentation server.
+
+## Additional real task runs
+
+| Run | Codex interval (UTC) | Agent exit | Executor outcome | Receipt |
+| --- | --- | --- | --- | --- |
+| `task2` | `13:59:51–14:03:22` | 0 | `SUCCEEDED` | `sha256:ed1055f9…cab2` |
+| `task3` | `14:04:16–14:08:58` | 0 | `SUCCEEDED` | `sha256:15af7201…5d38` |
+
+Commands used `-kbdir ./docs/eval/eval2/kb -workdir ./docs/eval/eval2/taskN -agent codex`. Full hashes are in each
+executor report; agent summaries remain provenance only.

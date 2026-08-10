@@ -39,7 +39,7 @@ The current milestone includes explicit ports, immutable local wires, positional
 static graph checks, relevant-slice and nested execution, local checks/invariants, canonical values, and structured receipts.
 
 Non-goals for this release are direct LLM API integration, autonomous promotion of learned knowledge, natural-language
-truth guarantees, general-purpose programming syntax, mandatory semantic closure, persistent caches, formal proofs, trust
+truth guarantees, general-purpose programming syntax, mandatory semantic closure, content-addressed cross-machine caches, formal proofs, trust
 profiles, distributed execution, and production multi-tenant isolation. These are either deliberately external or specified
 as future layers in DS014–DS027.
 
@@ -50,8 +50,8 @@ ultimately, it can issue conditional acceptance certificates after exhaustive de
 ### Operational example
 
 Given policy documents under `./work/task-001/input`, the CLI prepares the workdir, Codex authors a task circuit under
-`sop/`, the runtime executes it against explicit values, and the agent writes a report under `results/` that cites the
-runtime outcome and source files.
+`sop/`, and after Codex exits the CLI executes `task.analysis` and renders `results/runtime-result.md` directly from public
+outputs and receipt evidence. A second unchanged command skips both stages; deleting the report forces the full rerun.
 
 ## Decisions & Questions
 
