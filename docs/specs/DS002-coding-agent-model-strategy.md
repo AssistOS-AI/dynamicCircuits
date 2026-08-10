@@ -18,7 +18,10 @@ The CLI must expose an `--agent` parameter. `codex` is the built-in default and 
 
 The adapter registry must own process-specific arguments. A `generic` adapter must accept an explicit executable through `--agent-command` and deliver the task prompt over standard input. New OpenCode, Claude Code, or other adapters may be added as separate registry implementations once their invocation contracts are verified; workspace and SOP modules must not contain product-specific branches.
 
-Normal analysis must not grant the agent a writable KB root. Learning mode may add the KB as a writable directory, but agent instructions must restrict writes to `candidates/`. Trusted circuit promotion remains outside agent authority.
+Normal analysis starts the agent in the task workdir and must not grant a writable KB root. Inferred learning starts the
+agent in the KB because no workdir exists, but generated instructions restrict knowledge writes to `candidates/` and report
+writes to `results/`. That candidate-only restriction is instructional in the current Codex sandbox and is documented as a
+security limitation; trusted circuit promotion remains outside agent authority.
 
 No runtime command, workspace module, or adapter may call an LLM HTTP API directly in this release. If a future embedded model path is approved, AchillesAgentLib and `LLMAgent` become mandatory, with environment defaults, manual runtime overrides, and tagged routing metadata.
 

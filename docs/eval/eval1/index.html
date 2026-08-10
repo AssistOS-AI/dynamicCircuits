@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eval 1: Notice Period — Dynamic Circuits</title><link rel="stylesheet" href="../../styles.css">
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head><body>
+<header class="site-header"><a class="brand" href="../../index.html">Dynamic Circuits Documentation</a><nav><a href="../index.html">All evals</a><a href="../../evaluation.html">Evaluation guide</a><a href="../../specsLoader.html?spec=DS027-end-to-end-lifecycle.md">Lifecycle DS</a></nav></header>
+<main class="page"><article class="page__panel"><p class="breadcrumbs"><a href="../index.html">Evaluation</a> / Eval 1</p>
+<h1>Notice-period rule with an exception</h1><p class="lead">Tests whether the executable analysis retains a written-consent exception while still applying the ordinary 30-day minimum to all other cases.</p>
+<pre class="mermaid">flowchart LR
+  R[Normative rule] --> P[Structured policy]
+  P --> A[policy.sop]
+  C[Three cases] --> A
+  A --> F[Per-case findings and stats]
+  F --> G[Completeness goal]
+  G --> O[1 violation; 2 compliant]</pre>
+<h2>Evidence and rules</h2><ul>
+<li><a href="input/rule.md">Normative prose rule</a></li><li><a href="input/policy.json">Reviewable structured policy interpretation</a></li><li><a href="input/cases.json">Three source cases</a></li><li><a href="input/task.md">Requested analysis contract</a></li></ul>
+<h2>Executable circuit</h2><ul><li><a href="sop/policy.sop">Rule application circuit</a></li><li><a href="sop/analysis.sop">Root composition and completeness goal</a></li></ul>
+<h2>Observed result</h2><p>Case A violates the ordinary minimum. Case B uses the 10-day exception because both expedited status and written consent are present. Case C satisfies the ordinary minimum. The runtime outcome is <code>SUCCEEDED</code>, all cases are classified, and the goal passes.</p>
+<ul><li><a href="results/result.json">Machine-readable result summary checked by the test suite</a></li><li><a href="results/report.md">Grounded human report</a></li><li><a href="README.md">Full scope, reproduction command, and complexity</a></li></ul>
+<p class="callout">Limit: the test proves behavior for the supplied rule interpretation and cases. It does not establish legal authority, jurisdictional applicability, or completeness of external evidence.</p>
+</article></main></body></html>

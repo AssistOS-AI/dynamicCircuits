@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluation Catalog — Dynamic Circuits</title><link rel="stylesheet" href="../styles.css">
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
+<body><header class="site-header"><a class="brand" href="../index.html">Dynamic Circuits Documentation</a><nav><a href="../evaluation.html">Evaluation guide</a><a href="../specsLoader.html?spec=DS007-evaluation-and-testing.md">DS007</a><a href="../specsLoader.html?spec=matrix.md">Specifications</a></nav></header>
+<main class="page"><article class="page__panel"><p class="breadcrumbs"><a href="../index.html">Documentation</a> / Evaluation / Catalog</p>
+<h1>Executable evaluation evidence</h1>
+<p class="lead">Each case commits the source rules, task, structured data, SOP packages, deterministic outputs, human report, reproduction command, and an explicit statement of what the result does not prove.</p>
+<pre class="mermaid">flowchart LR
+  I[Source documents and rules] --> C[Task SOP packages]
+  C --> K[Compiler and runtime]
+  K --> J[Exact JSON result]
+  J --> H[Grounded human report]
+  K --> U[Automated unit assertion]</pre>
+<table><thead><tr><th>Case</th><th>Reasoning pressure</th><th>Scale</th><th>Result</th></tr></thead><tbody>
+<tr><td><a href="eval1/index.html">Eval 1: notice period</a></td><td>Default rule, evidenced exception, per-case witness, complete classification.</td><td>4 inputs, 2 packages, 3 cases, 1 nested call, 1 goal.</td><td>1 violation; 2 compliant, one via exception.</td></tr>
+<tr><td><a href="eval2/index.html">Eval 2: scientific claim</a></td><td>Universal quantifier versus average; exhaustive witness search.</td><td>4 inputs, 2 packages, 8 observations, 1 goal.</td><td>Refuted by <code>-2</code>; mean <code>5.25</code>.</td></tr>
+<tr><td><a href="eval3/index.html">Eval 3: document consistency</a></td><td>Repeated interpretation, synthesis, source attribution, unresolved alternatives.</td><td>5 inputs, 3 packages, 3 child instances, 2 conflict classes.</td><td>Timeline and terminology conflicts retained.</td></tr>
+</tbody></table>
+<h2>What is actually tested</h2>
+<p><code>tests/runtime/eval.test.mjs</code> reads the committed source data and text, executes all three circuit graphs, and checks exact public outputs and assurance goals. Other suites independently test parser/compiler failure paths, workspace mode inference and links, coding-agent invocation, CLI migration behavior, static documentation links, and historical integrity.</p>
+<p class="callout">These are deterministic circuit evaluations, not recorded claims about a particular model's quality. A future coding-agent benchmark can run the same workspaces from raw prose and compare its authored circuits and reports against these committed contracts.</p>
+</article></main></body></html>

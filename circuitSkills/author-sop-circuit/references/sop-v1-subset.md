@@ -47,4 +47,12 @@ Declare structural checks:
 
 ## Runtime boundaries
 
-The compiler validates package resolution, arity, single assignment, free wires, cycles, and declared coverage. The runtime executes only output and assurance dependency slices, supports nested circuits, freezes canonical values, and emits receipts. Mandatory matching, closure, persistent cache, effect capabilities, and trust-profile enforcement are later milestones and must not be claimed as implemented.
+The compiler validates package resolution, arity, single assignment, free wires, cycles, and declared coverage. The runtime
+executes only output and assurance dependency slices, supports nested circuits, normalizes cross-realm arrays and plain
+objects, freezes canonical values, and emits receipts. Runtime values must be strings, booleans, finite numbers, null,
+arrays, plain string-keyed objects, or the deliberately accepted undefined sentinel; functions, cycles, exotic prototypes,
+and non-finite numbers fail canonicalization.
+
+`@template mandatory|optional`, `@trigger "..."`, and `@apply qualified.package` are accepted only as a complete metadata
+set. They are not executed. Mandatory matching, semantic indexing, automatic wiring, closure, persistent cache, effect
+capabilities, assurance profiles, and trust enforcement are later milestones and must not be claimed as implemented.

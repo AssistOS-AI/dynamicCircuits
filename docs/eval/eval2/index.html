@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eval 2: Scientific Counterexample — Dynamic Circuits</title><link rel="stylesheet" href="../../styles.css">
+<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head><body>
+<header class="site-header"><a class="brand" href="../../index.html">Dynamic Circuits Documentation</a><nav><a href="../index.html">All evals</a><a href="../../evaluation.html">Evaluation guide</a><a href="../../specsLoader.html?spec=DS027-end-to-end-lifecycle.md">Lifecycle DS</a></nav></header>
+<main class="page"><article class="page__panel"><p class="breadcrumbs"><a href="../index.html">Evaluation</a> / Eval 2</p>
+<h1>A positive mean does not prove a universal claim</h1><p class="lead">Tests an exhaustive counterexample rule: one non-positive observation refutes “all observations are positive,” even when the aggregate mean is positive.</p>
+<pre class="mermaid">flowchart LR
+  D[8 observations] --> S[Exhaustive scan]
+  D --> M[Mean calculation]
+  S --> W[Witness -2]
+  W --> V[Verdict REFUTED]
+  M --> X[Mean 5.25]
+  V --> G[Witness grounding goal]</pre>
+<h2>Evidence and rules</h2><ul><li><a href="input/rule.md">Refutation and uncertainty rule</a></li><li><a href="input/dataset.json">Eight observations</a></li><li><a href="input/claim.md">Claims under review</a></li><li><a href="input/task.md">Requested output contract</a></li></ul>
+<h2>Executable circuit</h2><ul><li><a href="sop/counterexample.sop">Parser, scan, witness, and mean</a></li><li><a href="sop/analysis.sop">Root result and witness-grounding goal</a></li></ul>
+<h2>Observed result</h2><p>The runtime succeeds and correctly returns semantic verdict <code>REFUTED</code>, witness <code>-2</code>, and mean <code>5.25</code>. The goal verifies that the witness occurs in the dataset and satisfies the refutation predicate.</p>
+<ul><li><a href="results/result.json">Machine-readable result summary checked by the test suite</a></li><li><a href="results/report.md">Grounded human report</a></li><li><a href="README.md">Full scope, reproduction command, and complexity</a></li></ul>
+<p class="callout">Limit: the result concerns only the committed dataset and claim. It does not establish sampling quality, measurement validity, or generalization beyond those observations.</p>
+</article></main></body></html>

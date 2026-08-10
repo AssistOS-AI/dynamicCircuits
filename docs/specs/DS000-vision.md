@@ -3,7 +3,7 @@ id: DS000
 title: Vision and Scope
 status: active
 owner: repository
-summary: Defines a coding-agent-driven analysis CLI, an executable circuit workspace, and the boundary of the reference implementation.
+summary: Defines inferred learning and analysis workspaces, external coding-agent orchestration, executable circuits, and the reference boundary.
 ---
 
 # DS000 Vision and Scope

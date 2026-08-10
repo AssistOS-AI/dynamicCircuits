@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -63,6 +64,9 @@ async function runChild(invocation, prompt) {
     const child = spawn(invocation.command, invocation.args, { cwd: invocation.cwd, stdio: ["pipe", "inherit", "inherit"] });
     child.on("error", reject);
     child.on("exit", (code, signal) => resolve({ code, signal }));
+    child.stdin.on("error", (error) => {
+      if (error.code !== "EPIPE") reject(error);
+    });
     child.stdin.end(prompt);
   });
 }
@@ -98,11 +102,18 @@ async function handleWorkspace(command, options) {
     process.stdout.write(`${JSON.stringify({ ...invocation, prompt }, null, 2)}\n`);
     return;
   }
+  const startedAt = new Date().toISOString();
   const result = await runChild(invocation, prompt);
+  const finishedAt = new Date().toISOString();
   await writeFile(path.join(workspace.agentWorkDir, ".dynamic-circuits", "last-run.json"), `${JSON.stringify({
     schemaVersion: 1,
     agent: options.agent ?? "codex",
+    mode: workspace.mode,
     command: invocation.command,
+    cwd: invocation.cwd,
+    promptSha256: createHash("sha256").update(prompt).digest("hex"),
+    startedAt,
+    finishedAt,
     exitCode: result.code,
     signal: result.signal,
   }, null, 2)}\n`, "utf8");

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
@@ -51,4 +51,23 @@ test("rejects the obsolete explicit --learn switch", async (context) => {
   ], { cwd: repositoryRoot, encoding: "utf8" });
   assert.equal(result.status, 1);
   assert.match(result.stderr, /--learn was removed/);
+});
+
+test("records inferred mode, workspace, prompt digest, and completion state", async (context) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "dc-cli-run-state-"));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  const kbDir = path.join(root, "kb");
+  const result = spawnSync(process.execPath, [
+    path.join(repositoryRoot, "src", "cli.mjs"),
+    "-kbdir", kbDir,
+    "-agent", "generic",
+    "--agent-command", "/bin/true",
+  ], { cwd: repositoryRoot, encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr);
+  const runState = JSON.parse(await readFile(path.join(kbDir, ".dynamic-circuits", "last-run.json"), "utf8"));
+  assert.equal(runState.mode, "learn");
+  assert.equal(runState.cwd, kbDir);
+  assert.equal(runState.exitCode, 0);
+  assert.match(runState.promptSha256, /^[a-f0-9]{64}$/);
+  assert.ok(Date.parse(runState.finishedAt) >= Date.parse(runState.startedAt));
 });

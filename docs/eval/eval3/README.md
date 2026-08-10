@@ -18,4 +18,13 @@ This case evaluates section-level interpretation and cross-document consistency.
 
 The run found launch dates `2026-06-15` and `2026-07-01`, plus two definitions of Node. Both timeline and terminology conflicts were reported and the completeness goal passed. See `results/result.json` and `results/report.md`.
 
+## Reproduction
+
+The automated case reads the three chapter files without lossy shell quoting and compares the public output with the
+committed result summary:
+
+```bash
+node --test --test-name-pattern "eval3" ../../../tests/runtime/eval.test.mjs
+```
+
 Complexity: five input documents, three SOP packages, three repeated child instances with hygienic local wires, cross-document aggregation, two conflict classes, source attribution, and a root goal covering the final report.

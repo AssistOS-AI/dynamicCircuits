@@ -27,7 +27,7 @@
     return { run, check }
 
 @total add $left $right</code></pre>
-    <p>Ports and calls are positional. String literals are JSON strings. Commands return one value; circuits may expose multiple ordered outputs. Wires are local and immutable, and nested circuits exchange values only through their declared interfaces.</p>
+    <p>Ports and calls are positional. String literals are JSON strings. Commands return one value; circuits may expose multiple ordered outputs. Wires are local and immutable, and nested circuits exchange values only through their declared interfaces. Arrays and plain objects returned from a command's VM realm are normalized into host canonical values before they are frozen and hashed.</p>
 
     <h2>Compilation and execution</h2>
     <pre class="mermaid">flowchart LR
