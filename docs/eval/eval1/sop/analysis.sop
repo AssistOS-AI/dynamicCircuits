@@ -1,8 +1,28 @@
-@input policyJson casesJson
+@input
 @output findings stats
 @goal complete covers findings stats
 
-@findings @stats eval1.policy $policyJson $casesJson
+@caseA eval1.policy "A" "10" "false" "false"
+@caseB eval1.policy "B" "10" "true" "true"
+@caseC eval1.policy "C" "30" "false" "false"
+
+@start emptyList
+@withA append $start $caseA
+@withB append $withA $caseB
+@findings append $withB $caseC
+
+@summarize define caseA caseB caseC
+    function run({ caseA, caseB, caseC }) {
+      const findings = [caseA, caseB, caseC]
+      return {
+        total: findings.length,
+        compliant: findings.filter((item) => item.compliant).length,
+        violations: findings.filter((item) => !item.compliant).length
+      }
+    }
+    return { run }
+
+@stats summarize $caseA $caseB $caseC
 
 @verifyComplete define findings stats
     function run({ findings, stats }) {

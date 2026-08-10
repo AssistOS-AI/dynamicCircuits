@@ -21,9 +21,7 @@ async function expectedResult(caseName) {
 
 test("executes eval1 notice-period rule and exception paths", async () => {
   const runtime = await evalRuntime("eval1");
-  const policy = await readFile(path.join(evalRoot, "eval1", "input", "policy.json"), "utf8");
-  const cases = await readFile(path.join(evalRoot, "eval1", "input", "cases.json"), "utf8");
-  const result = await runtime.execute("eval1.analysis", [policy, cases]);
+  const result = await runtime.execute("eval1.analysis", []);
   const expected = await expectedResult("eval1");
   assert.equal(result.outcome, "SUCCEEDED");
   assert.equal(result.outcome, expected.outcome);
@@ -32,8 +30,7 @@ test("executes eval1 notice-period rule and exception paths", async () => {
 
 test("executes eval2 counterexample search without confusing mean and universal claim", async () => {
   const runtime = await evalRuntime("eval2");
-  const dataset = await readFile(path.join(evalRoot, "eval2", "input", "dataset.json"), "utf8");
-  const result = await runtime.execute("eval2.analysis", [dataset]);
+  const result = await runtime.execute("eval2.analysis", []);
   const expected = await expectedResult("eval2");
   assert.equal(result.outcome, expected.outcome);
   assert.deepEqual(result.outputs, [expected.verdict, expected.witness, expected.mean]);

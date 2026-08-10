@@ -1,16 +1,17 @@
-@input datasetJson
+@input
 @output verdict witness mean
 @goal grounded covers verdict witness
 
-@verdict @witness @mean eval2.counterexample $datasetJson
+@dataset eval2.dataset
+@verdict @witness @mean eval2.counterexample $dataset
 
-@verifyWitness define datasetJson verdict witness
-    function run({ datasetJson, verdict, witness }) {
-      const values = JSON.parse(datasetJson)
+@verifyWitness define dataset verdict witness
+    function run({ dataset, verdict, witness }) {
+      const values = dataset
       if (verdict !== "REFUTED") return witness === null
       return values.includes(witness) && witness <= 0
     }
     return { run }
 
-@witnessValid verifyWitness $datasetJson $verdict $witness
+@witnessValid verifyWitness $dataset $verdict $witness
 @grounded assertInvariant $witnessValid "eval2.counterexample-grounded"
