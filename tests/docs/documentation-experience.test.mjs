@@ -22,7 +22,7 @@ async function filesBelow(root, predicate) {
   return files;
 }
 
-test("documentation diagrams stay small and have an adjacent explanation", async () => {
+test("documentation diagrams stay small, titled, centered, and explained", async () => {
   const htmlFiles = await filesBelow(docsRoot, (file) => file.endsWith(".html"));
   let diagramCount = 0;
 
@@ -33,8 +33,12 @@ test("documentation diagrams stay small and have an adjacent explanation", async
       diagramCount += 1;
       const nodeIds = new Set([...diagram[1].matchAll(/\b([A-Z][A-Z0-9_]*)\s*[\[({]/g)].map((match) => match[1]));
       assert.ok(nodeIds.size <= 5, `${path.relative(repositoryRoot, htmlFile)} has ${nodeIds.size} diagram nodes`);
+      const before = html.slice(Math.max(0, diagram.index - 300), diagram.index);
+      assert.match(before, /<figure class="diagram">[\s\S]*<figcaption>/,
+        `${path.relative(repositoryRoot, htmlFile)} must title and center each diagram`);
       const following = html.slice(diagram.index + diagram[0].length).trimStart();
-      assert.match(following, /^<p>/, `${path.relative(repositoryRoot, htmlFile)} must explain each diagram immediately`);
+      assert.match(following, /^<\/figure>\s*<p>/,
+        `${path.relative(repositoryRoot, htmlFile)} must explain each diagram immediately`);
     }
   }
 

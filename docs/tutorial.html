@@ -64,6 +64,22 @@ node src/cli.mjs help</code></pre>
       root circuit, three child policy receipts, node input/output hashes, and a passing goal. Compare it with
       <a href="eval/eval1/index.html?file=results/result.json">the checked result summary</a>.</p>
 
+    <h3>Change one case interactively</h3>
+    <p>Run the reusable policy circuit directly to see how one fact changes the decision. These three calls use the same case
+      identifier and 10 notice days. Only the evidence flags or notice value change:</p>
+    <pre><code>node src/cli.mjs sop run --root ./docs/eval/eval1/sop --prefix eval1 \
+  --package eval1.policy --inputs '["manual","10","false","false"]'
+
+node src/cli.mjs sop run --root ./docs/eval/eval1/sop --prefix eval1 \
+  --package eval1.policy --inputs '["manual","10","true","true"]'
+
+node src/cli.mjs sop run --root ./docs/eval/eval1/sop --prefix eval1 \
+  --package eval1.policy --inputs '["manual","unknown","true","true"]'</code></pre>
+    <p>The first call succeeds with <code>compliant: false</code> because the ordinary minimum is 30. The second succeeds with
+      <code>exceptionUsed: true</code> and <code>compliant: true</code> because both exception conditions are present. The third
+      returns <code>REFUSED</code> and no public output because <code>unknown</code> is not a finite notice duration. The quoted
+      array is only the CLI transport for ordered circuit ports; task and KB source documents remain readable text files.</p>
+
     <h2>2. Prepare a task</h2>
     <p>Reuse the eval's Markdown documents as raw agent input, but do not copy its generated <code>sop/</code> or
       <code>results/</code>. The new task therefore starts with source material only:</p>

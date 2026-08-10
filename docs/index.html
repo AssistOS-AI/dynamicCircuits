@@ -59,11 +59,13 @@
       <li>New SOP packages, contracts, provenance, and tests are written to <code>candidates/</code>.</li>
       <li>Compilation and tests check mechanical behavior. A separate review decides whether a candidate is promoted to <code>circuits/</code>.</li>
     </ol>
+    <figure class="diagram">
+      <figcaption><strong>Learning flow</strong>From reusable source material to a reviewed KB candidate</figcaption>
     <pre class="mermaid">flowchart LR
       I[KB input] --> A[Coding agent]
       A --> C[Candidate package]
       C --> V[Compile and test]
-      V --> R[Review]</pre>
+      V --> R[Review]</pre></figure>
     <p>The diagram follows one candidate from source documents to review. “KB input” is the evidence being learned. The coding
       agent extracts a reusable rule and packages it under <code>candidates/</code>. Compilation and tests validate syntax,
       dependencies, positive cases, negative cases, and refusal cases. Review is the trust boundary: only reviewed material
@@ -79,19 +81,23 @@
       <li>The agent compiles and runs the circuits. The runtime returns outputs and receipts or a classified refusal, rejection, or error.</li>
       <li>The agent writes the analysis and coverage summary under <code>results/</code>. The KB remains read-only during this workflow.</li>
     </ol>
+    <figure class="diagram">
+      <figcaption><strong>Analysis construction</strong>Task documents and reviewed KB rules become task-local SOP</figcaption>
     <pre class="mermaid">flowchart LR
       I[Task input] --> A[Coding agent]
       K[KB circuits] --> A
       A --> S[Task SOP files]
-      S --> X[Compiler and runtime]</pre>
+      S --> X[Compiler and runtime]</pre></figure>
     <p>The first analysis diagram shows circuit construction. Task documents supply case-specific facts; KB circuits supply
       reviewed reusable rules. The coding agent connects both sources by writing task-local SOP files, and the compiler turns
       those files into a validated dependency graph.</p>
+    <figure class="diagram">
+      <figcaption><strong>Result publication</strong>Runtime values and execution evidence support the report</figcaption>
     <pre class="mermaid">flowchart LR
       X[Runtime outcome] --> R[Receipts]
       X --> O[Public outputs]
       R --> P[Results report]
-      O --> P</pre>
+      O --> P</pre></figure>
     <p>The second diagram shows publication. Public outputs contain the values requested by the circuit interface. Receipts
       contain the execution evidence behind those values. The coding agent uses both to write the report, so the report can
       distinguish a computed conclusion from a refusal, failed check, runtime error, or unresolved source conflict.</p>

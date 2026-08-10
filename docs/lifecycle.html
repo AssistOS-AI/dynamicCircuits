@@ -1,71 +1,115 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lifecycle and Roadmap — Dynamic Circuits</title><link rel="stylesheet" href="styles.css">
-<script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs'; mermaid.initialize({startOnLoad:true,theme:'neutral'});</script></head>
-<body><div data-include="partials/header.html"></div><main class="page"><article class="page__panel">
-<p class="breadcrumbs"><a href="index.html">Documentation</a> / Design / Lifecycle</p>
-<h1>Analysis lifecycle</h1>
-<p class="lead">The lifecycle ingests source artifacts, extracts provenance-linked facts, selects and executes circuits, evaluates assurance requirements, records repair attempts, and publishes the resulting report and receipt.</p>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One analysis from start to finish — Dynamic Circuits</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs"><a href="index.html">Documentation</a> / One complete run</p>
+    <h1>What happens during one analysis</h1>
+    <p class="lead">This page follows the notice-policy example from files placed in a task folder to generated SOP, runtime findings, and the final report. It marks each step as current behavior or planned assurance work.</p>
 
-<h2>Purpose and relationship to the system</h2>
-<p>This page orders the concepts from the other documentation into one end-to-end process. The
-<a href="cli.html">CLI</a> prepares the source and workspace boundary. The <a href="concepts.html">concept model</a> defines
-artifacts, facts, templates, and attempts. The <a href="sop-runtime.html">runtime</a> compiles and executes explicit circuits.
-The <a href="assurance.html">assurance layer</a> evaluates completeness and acceptance, while the
-<a href="operations.html">operations layer</a> persists receipts and manages reuse.</p>
-<p>The complete lifecycle is a target architecture. The current release implements workspace preparation, explicit circuit
-authoring, compilation, execution, local checks and goals, and runtime receipts. The sections below identify the later
-registry, closure, acceptance, attempt, and publication responsibilities in their execution order.</p>
+    <h2>Start with three readable files</h2>
+    <p>The user creates <code>work/notice-review/input/</code>. The folder contains <code>rule.md</code> with the ordinary and
+      exceptional notice periods, <code>cases.md</code> with one row per case, and <code>task.md</code> with the requested fields
+      and coverage requirement. The user also supplies a KB path, even when that KB currently has no reviewed circuit.</p>
+    <pre><code>node src/cli.mjs \
+  -kbdir ./kb \
+  -workdir ./work/notice-review \
+  -agent codex</code></pre>
+    <p>The presence of <code>-workdir</code> selects analysis mode. The process runs with the task folder as its current
+      directory. The task is writable; reviewed KB circuits are readable and remain outside the task's write area.</p>
 
-<h2>Phases A–I</h2>
-<h3>Prepare the graph</h3>
-<pre class="mermaid">flowchart LR
-  A[Ingest sources] --> B[Interpret facts]
-  B --> C[Discover circuits]
-  C --> D[Wire instances]</pre>
-<p>Graph preparation starts by storing immutable source artifacts with digests and locators. Interpretation publishes facts
-and claims tied to those locators. Registry discovery finds candidate templates, deterministic matchers verify applicability,
-and wiring creates explicit circuit instances with bound inputs. The output of this stage is a compiled dependency graph.</p>
-<h3>Execute and evaluate</h3>
-<pre class="mermaid">flowchart LR
-  D[Compiled graph] --> E[Execute]
-  E --> F[Mandatory closure]
-  F --> G[Assurance gates]</pre>
-<p>Execution evaluates only nodes required by outputs and obligations. Mandatory closure indexes new facts, runs every
-applicable mandatory matcher, executes new instances, and repeats to a fixed point. Assurance then checks goals, invariants,
-trust, conflicts, capabilities, budgets, and receipt completeness.</p>
-<h3>Publish or repair</h3>
-<pre class="mermaid">flowchart LR
-  G[Assurance result] -->|accepted| P[Publish]
-  G -->|failed| A[New attempt]
-  A --> E[Execute revised graph]</pre>
-<p>An accepted assurance result publishes the requested report, artifacts, and final receipt. A refusal, rejection,
-inconclusive result, or technical error creates diagnostic evidence. Repair preserves the failed attempt, records the changed
-packages and reason, and executes a child attempt. This lineage lets reviewers compare exactly what changed.</p>
-<p><a href="specsLoader.html?spec=DS027-end-to-end-lifecycle.md">DS027</a> includes legal exception, scientific counterexample, and cross-document conflict reference flows. Their inputs, circuits, and results are available in the <a href="eval/index.html">evaluation file browser</a>.</p>
+    <h2>The CLI prepares the folder</h2>
+    <pre class="mermaid">flowchart LR
+      I[input files] --> M[hash manifest]
+      M --> W[sop and results folders]
+      W --> A[Codex workspace]</pre>
+    <p>The CLI recursively inventories regular files under <code>input/</code>. For each file it records the relative path, byte
+      size, and SHA-256 digest in <code>.dynamic-circuits/input-manifest.json</code>. It creates missing <code>sop/</code> and
+      <code>results/</code> folders, writes managed instructions when no user-owned guidance exists, and links the project
+      <code>circuitSkills</code> catalog for Codex discovery. It then starts Codex in that prepared directory.</p>
 
-<h2>Knowledge learning versus task analysis</h2>
-<p>The lifecycle can enter through KB learning or through one task. The table compares the process working directory and its
-read/write contract; it is the same distinction implemented by the CLI.</p>
-<table><thead><tr><th>Invocation</th><th>Agent cwd</th><th>Reads</th><th>Writes</th></tr></thead><tbody>
-<tr><td><code>agent -kbdir ./kb</code></td><td><code>./kb</code></td><td><code>input/</code>, trusted <code>circuits/</code></td><td><code>candidates/</code>, <code>results/</code></td></tr>
-<tr><td><code>agent -kbdir ./kb -workdir ./work/task-001</code></td><td>task workdir</td><td>all task <code>input/</code>, applicable KB circuits</td><td>task <code>sop/</code>, <code>results/</code></td></tr>
-</tbody></table>
-<p>The first row produces reusable candidates and learning reports. The second row produces task-local circuits and analysis
-reports while keeping reviewed KB circuits read-only. Codex is the default external coding agent. Adapters may later support
-OpenCode, Claude Code, or others through the same filesystem contract. Details are in
-<a href="specsLoader.html?spec=DS026-agent-api-and-workspace-protocol.md">DS026</a>.</p>
+    <h2>Codex turns prose into SOP</h2>
+    <p>Codex must account for every manifest entry. It reads the policy, cases, and requested output; inspects reusable package
+      interfaces under <code>kb/circuits/</code>; and writes task code under <code>sop/</code>. For the notice example, a useful
+      implementation separates:</p>
+    <ul>
+      <li>a rule circuit that accepts one case and selects either the 30-day minimum or the 10-day exception;</li>
+      <li>a task circuit that supplies the interpreted case rows, calls the rule once per case, aggregates findings, and checks coverage.</li>
+    </ul>
+    <p>The source documents remain unchanged. SOP is the agent's reviewable interpretation of them. A reviewer can therefore
+      detect a missing exception, a transcribed value, or a case that was never wired before trusting the prose report.</p>
 
-<h3>Example across the lifecycle</h3>
-<p>For the notice-period eval, ingest stores the rule, structured policy, and three cases. Interpretation exposes policy and
-case values. The root circuit wires them to the policy circuit. Execution produces three findings and aggregate statistics.
-The current local goal confirms that every case has a finding. A future strict profile would additionally prove matcher
-coverage, package trust, conflict handling, and final receipt completeness before publishing an acceptance certificate.</p>
+    <h2>Local code checks and runs SOP</h2>
+    <pre class="mermaid">flowchart LR
+      S[generated SOP] --> C[compile]
+      C --> X[execute]
+      X --> R[outputs and receipt]</pre>
+    <p>The parser reads directives and local JavaScript command bodies. The compiler derives package names from file paths,
+      resolves child calls, validates ordered arguments and immutable wires, rejects graph cycles, and identifies nodes
+      required by outputs and goals. Only a valid graph reaches the runtime.</p>
+    <p>The runtime executes required nodes in dependency order. In the committed example it calls the rule three times,
+      produces three findings, calculates totals, and checks that every case was classified. A command can succeed, refuse an
+      invalid input, fail its own check, or raise an execution error. The root outcome exposes no successful-looking output
+      when a required child fails.</p>
 
-<h2>Roadmap and design choices</h2>
-<p>The staged roadmap starts with syntax and deterministic IR, then adds runtime execution, workspace orchestration, persistent evidence, semantic templates, mandatory closure, hardened capabilities, and distributed processing. Each milestone has its own implementation and conformance requirements. Module and schema compatibility rules are in <a href="specsLoader.html?spec=DS024-roadmap-and-module-boundaries.md">DS024</a>.</p>
-<p>The architecture uses compiler/dataflow SSA for circuit execution, rule-system fixed points for mandatory closure, workflow-style effects and attempts for operations, and proof/evidence-style receipts for audit. <a href="specsLoader.html?spec=DS025-alternative-architectures-and-rationale.md">DS025</a> compares these choices with Datalog, CHR, attribute grammars, semantic parsing, rewriting systems, proof assistants, e-graphs, dataflow engines, and workflow systems.</p>
+    <h2>The report is grounded in execution</h2>
+    <p>Codex writes reader-facing material under <code>results/</code>. A useful report names all input files, explains the
+      policy interpretation, lists the circuits compiled and run, states each runtime outcome, reports uncovered material,
+      and distinguishes limitations from conclusions. The receipt supplies machine evidence: package hashes, node states,
+      input and output hashes, child receipts, goal results, and public outputs.</p>
+    <p>For the committed notice case, the report says case A violates the ordinary minimum, case B satisfies the documented
+      exception, and case C satisfies the ordinary minimum. It can point to a successful receipt and a passing three-case
+      coverage goal. It must not claim that an unknown external law or an absent KB rule was checked.</p>
 
-<h2>What exists now</h2>
-<p>The current repository delivers parser, package discovery, graph compiler, deterministic runtime, local checks/invariants, receipts, inferred CLI modes, skill-linked agent workspaces, three serious evals, and documentation/integrity tests. Attempts, semantic indexing, automatic wiring, closure, profiles, trust registry, persistent cache, artifact store, production isolation, certificates, and distributed execution remain planned.</p>
-</article></main><div data-include="partials/footer.html"></div><script src="partials-loader.js"></script></body></html>
+    <h2>What the planned assurance stage adds</h2>
+    <pre class="mermaid">flowchart LR
+      F[published case facts] --> M[match all rules]
+      M --> E[execute expected instances]
+      E --> P[accept or explain gap]</pre>
+    <p>Today Codex selects the explicit rule calls and a human reviews coverage. The planned semantic registry will query all
+      rule packages that consume notice-case facts. Deterministic matchers will decide whether the ordinary rule and exception
+      apply to each case. Mandatory closure will execute newly expected instances until no new facts activate more rules.
+      An audit will then compare expected instance keys with executed receipt keys.</p>
+    <p>If the exception matched case B but its circuit never ran, the future system will report incomplete coverage. If the
+      consent fact is missing, it will report <code>INCONCLUSIVE</code> rather than assume consent is false. Only after coverage,
+      goals, trust, conflicts, budgets, and receipt completeness pass may a strict profile publish
+      <code>ACCEPTED</code>. The details are expanded with the same example on the <a href="assurance.html">coverage page</a>.</p>
+
+    <h2>Learning uses a different destination</h2>
+    <p>Running with only <code>-kbdir ./kb</code> selects learning mode. Codex reads documents under <code>kb/input/</code> and
+      reviewed packages under <code>kb/circuits/</code>, then writes proposed reusable packages under
+      <code>kb/candidates/</code>. It does not write a task <code>sop/</code> folder and does not promote its own proposal to the
+      trusted circuit set. The candidate needs provenance, applicability, explicit ports, refusal behavior, and tests before
+      a separate review can promote it.</p>
+    <p>Analysis therefore answers one task in a workdir; learning proposes code for future tasks in the KB. Both use the same
+      parser, compiler, runtime, skills, and coding-agent adapter. The <a href="tutorial.html">manual tutorial</a> contains
+      runnable commands for both flows.</p>
+
+    <h2>Implemented versus planned</h2>
+    <table>
+      <thead><tr><th>Runs now</th><th>Still planned</th></tr></thead>
+      <tbody>
+        <tr><td>Input inventory, workspace creation, skill links, Codex or generic process adapter</td><td>Persistent artifact store and epoch snapshots</td></tr>
+        <tr><td>SOP parsing, package discovery, graph compilation, nested calls</td><td>Semantic registry lookup and automatic matcher wiring</td></tr>
+        <tr><td>Required-slice execution, local checks, goals, invariants, nested receipts</td><td>Mandatory closure, trust profiles, conflicts, final certificates</td></tr>
+        <tr><td>Task-local reports and KB candidate workflow</td><td>Hardened effect brokers, persistent cache, distributed execution</td></tr>
+      </tbody>
+    </table>
+    <p>The left column can be tested in this repository now. The right column remains maintained design and must not be
+      inferred from a successful current eval. <a href="specsLoader.html?spec=DS027-end-to-end-lifecycle.md">DS027</a>
+      preserves the normative full lifecycle and links each planned stage to its detailed specification.</p>
+  </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="partials-loader.js"></script>
+</body>
+</html>

@@ -56,20 +56,24 @@ agent run --kbdir ./kb --workdir ./work/task-001 --agent codex</code></pre>
       skill-link paths produce a structured error.</p>
 
     <h3>KB folders</h3>
+    <figure class="diagram">
+      <figcaption><strong>KB folder contract</strong>Source, reviewed code, proposals, and reports have separate destinations</figcaption>
     <pre class="mermaid">flowchart LR
       K[KB] --> I[input]
       K --> C[circuits]
       K --> N[candidates]
-      K --> R[results]</pre>
+      K --> R[results]</pre></figure>
     <p>The KB diagram shows the learning data lifecycle. <code>input/</code> contains evidence to extract; <code>circuits/</code>
       contains reviewed reusable packages; <code>candidates/</code> contains generated proposals awaiting review; and
       <code>results/</code> contains learning coverage and validation reports.</p>
     <h3>Task folders</h3>
+    <figure class="diagram">
+      <figcaption><strong>Task folder contract</strong>One analysis keeps documents, generated code, and results apart</figcaption>
     <pre class="mermaid">flowchart LR
       W[Task workspace] --> I[input]
       W --> S[sop]
       W --> R[results]
-      W --> M[manifests and skill links]</pre>
+      W --> M[manifests and skill links]</pre></figure>
     <p>The task diagram shows the analysis boundary. Source files remain under <code>input/</code>, generated circuit source
       remains under <code>sop/</code>, and reports remain under <code>results/</code>. The manifest and skill links under the same
       workspace tell the coding agent what to process and how to author supported SOP Lang.</p>
