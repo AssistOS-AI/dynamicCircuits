@@ -3,7 +3,7 @@ id: DS006
 title: Knowledge Base and Circuit Skills
 status: active
 owner: repository
-summary: Defines trusted KB circuits, reviewable candidates, task-local circuits, and the coding-agent skill catalog.
+summary: Defines KB circuits, candidates, and the analyze-task, author-sop-circuit, and circuit-learner skills.
 ---
 
 # DS006 Knowledge Base and Circuit Skills

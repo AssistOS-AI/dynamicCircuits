@@ -14,7 +14,7 @@ Dynamic Circuits separates deterministic implementation tests from end-to-end co
 
 ## Core Content
 
-`npm test` must execute modular unit suites for parser syntax, compiler graph validation, runtime outcomes and nesting, workspace preparation and non-destructive behavior, and coding-agent invocation construction. Tests must cover successful and failing paths, including bare arguments, free wires, arity mismatch, dead nodes, refusal, failed checks, exceptions, false invariants, symlink creation, user-owned guidance, and generic adapter extension.
+`npm test` must execute modular unit suites for parser syntax, compiler graph validation, runtime outcomes and nesting, workspace preparation and non-destructive behavior, coding-agent invocation construction, and the public CLI argument form. Tests must cover successful and failing paths, including bare arguments, free wires, arity mismatch, dead nodes, refusal, failed checks, exceptions, false invariants, symlink creation, user-owned guidance, and generic adapter extension.
 
 Every evaluation case must live under a contiguous `eval/evalN/` directory and contain `input/`, `results/`, and `sop/` plus the same `circuitSkills` link created for production workspaces. Eval inputs and circuits must be committed; generated result reports may remain empty until a coding-agent evaluation is executed. Each case must state its purpose and reproducible compile or run command.
 

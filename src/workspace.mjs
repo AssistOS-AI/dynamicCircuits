@@ -110,5 +110,5 @@ export async function prepareWorkspace(options) {
 
 export function buildAnalysisPrompt(workspace) {
   const count = workspace.inputManifest.files.length;
-  return `Use the linked circuitSkills to analyze this workspace. Process all ${count} files in .dynamic-circuits/input-manifest.json, inspect relevant reusable circuits in ${workspace.kbDir}/circuits, author task-local SOP Lang in sop/, execute relevant circuits, and write grounded reports to results/. Finish with results/agent-summary.md containing coverage, generated circuits, execution outcomes, limitations, and any KB candidates. Follow AGENTS.md and do not use direct LLM API integrations.`;
+  return `Use the linked circuitSkills to analyze this workspace. Read AGENTS.md and, when present, .dynamic-circuits/AGENT_INSTRUCTIONS.md. Process all ${count} files in .dynamic-circuits/input-manifest.json, inspect relevant reusable circuits in ${workspace.kbDir}/circuits, author task-local SOP Lang in sop/, execute relevant circuits, and write grounded reports to results/. Finish with results/agent-summary.md containing coverage, generated circuits, execution outcomes, limitations, and any KB candidates. Do not use direct LLM API integrations.`;
 }

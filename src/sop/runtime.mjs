@@ -37,19 +37,18 @@ export class SopRuntime {
       name: `sop:${key}`,
       codeGeneration: { strings: false, wasm: false },
     });
-    let descriptor;
     try {
-      const factory = new vm.Script(`(function () { "use strict";\n${definition.code}\n})`, {
+      new vm.Script(`__descriptor = (function () { "use strict";\n${definition.code}\n})()`, {
         filename: this.packages.get(packageName).filePath,
         lineOffset: definition.line,
       }).runInContext(context, { timeout: this.timeoutMs });
-      descriptor = factory();
     } catch (error) {
       throw new SopError("COMMAND_DEFINITION_ERROR", `Cannot initialize command ${key}: ${error.message}`, {
         package: packageName,
         line: definition.line,
       });
     }
+    const descriptor = context.__descriptor;
     if (!descriptor || typeof descriptor.run !== "function") {
       fail("COMMAND_DEFINITION_ERROR", `Command ${key} must return a descriptor with run()`);
     }
@@ -61,17 +60,26 @@ export class SopRuntime {
 
   async invokeCommand(node, inputs) {
     if (node.resolved.kind === "core") {
-      const descriptor = coreCommands[node.resolved.commandName];
-      const output = await descriptor.run(inputs);
-      if (output === undefined && !descriptor.acceptsUndefined) {
-        return { status: "ERROR", error: { name: "UndefinedOutput", message: "Command returned undefined" } };
+      try {
+        const descriptor = coreCommands[node.resolved.commandName];
+        const output = await descriptor.run(inputs);
+        if (output === undefined && !descriptor.acceptsUndefined) {
+          return { status: "ERROR", error: { name: "UndefinedOutput", message: "Command returned undefined" } };
+        }
+        return isRefusal(output)
+          ? { status: "REFUSED", refusal: { code: output.code, details: output.details ?? {} } }
+          : { status: "SUCCEEDED", output: deepFreeze(output) };
+      } catch (error) {
+        return { status: "ERROR", error: sanitizedError(error) };
       }
-      return isRefusal(output)
-        ? { status: "REFUSED", refusal: { code: output.code, details: output.details ?? {} } }
-        : { status: "SUCCEEDED", output: deepFreeze(output) };
     }
 
-    const compiled = this.commandContext(node.resolved.packageName, node.resolved.commandName);
+    let compiled;
+    try {
+      compiled = this.commandContext(node.resolved.packageName, node.resolved.commandName);
+    } catch (error) {
+      return { status: "ERROR", error: sanitizedError(error) };
+    }
     const notes = [];
     const ctx = deepFreeze({
       reject: (code, details = {}) => ({ __sopRefusal: true, code, details }),
@@ -133,7 +141,10 @@ export class SopRuntime {
       if (node.resolved.kind === "circuit") {
         const child = await this.executeInstance(node.resolved.packageName, args, instanceCounter);
         if (child.outcome !== "SUCCEEDED") {
-          result = { status: "BLOCKED", childReceipt: child.receipt };
+          const childStatus = child.outcome === "REFUSED"
+            ? "REFUSED"
+            : child.outcome === "REJECTED" ? "CHECK_FAILED" : "ERROR";
+          result = { status: childStatus, childReceipt: child.receipt };
         } else {
           result = { status: "SUCCEEDED", outputs: child.outputs, childReceipt: child.receipt };
         }

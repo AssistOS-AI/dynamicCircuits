@@ -42,3 +42,14 @@ test("rejects duplicate command formals", () => {
     (error) => error.code === "PARSE_ERROR",
   );
 });
+
+test("rejects duplicate ports and literal coverage wire names", () => {
+  assert.throws(
+    () => parseSop("@input same same\n@output same\n"),
+    (error) => error.code === "WIRE_REDEFINITION",
+  );
+  assert.throws(
+    () => parseSop("@output result\n@goal \"result\"\n@result value \"x\"\n"),
+    (error) => error.code === "PARSE_ERROR",
+  );
+});

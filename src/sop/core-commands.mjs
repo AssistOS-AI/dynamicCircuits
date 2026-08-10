@@ -53,6 +53,14 @@ export const coreCommands = Object.freeze({
     run: ({ condition, code }) => ({ ok: condition?.ok === true || condition === true, code }),
   },
   emptyList: { formals: [], run: () => [] },
-  append: { formals: ["list", "item"], run: ({ list, item }) => [...list, item] },
-  concat: { formals: ["left", "right"], run: ({ left, right }) => [...left, ...right] },
+  append: {
+    formals: ["list", "item"],
+    run: ({ list, item }) => Array.isArray(list) ? [...list, item] : refusal("list_required"),
+  },
+  concat: {
+    formals: ["left", "right"],
+    run: ({ left, right }) => Array.isArray(left) && Array.isArray(right)
+      ? [...left, ...right]
+      : refusal("lists_required"),
+  },
 });

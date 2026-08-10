@@ -4,6 +4,7 @@
   "description": "Coding-agent orchestration and a reference SOP Lang circuit runtime",
   "type": "module",
   "bin": {
+    "agent": "./src/cli.mjs",
     "dynamic-circuits": "./src/cli.mjs",
     "dc-agent": "./src/cli.mjs"
   },

@@ -76,6 +76,7 @@ function parseNameList(tokens, filePath, line, label) {
 
 function parseCoverage(tokens, filePath, line, kind) {
   if (tokens.length < 2) fail("PARSE_ERROR", `@${kind} requires a wire`, location(filePath, line));
+  if (tokens[1].kind !== "word") fail("PARSE_ERROR", `@${kind} requires a bare wire name`, location(filePath, line));
   const wire = tokens[1].value;
   assertIdentifier(wire, filePath, line, `${kind} wire`);
   if (tokens.length === 2) return { wire, covers: [], line };
@@ -177,6 +178,9 @@ export function parseSop(source, options = {}) {
       if (directive === "input" || directive === "output") {
         const names = parseNameList(topTokens.slice(1), filePath, lineNumber, `${directive} port`);
         if (directive === "output" && !names.length) fail("PARSE_ERROR", "@output cannot be empty", location(filePath, lineNumber));
+        if (new Set(names).size !== names.length) {
+          fail("WIRE_REDEFINITION", `@${directive} contains a duplicate port`, location(filePath, lineNumber));
+        }
         result[`${directive}s`] = names;
       } else if (directive === "invariant" || directive === "goal") {
         result[`${directive}s`].push(parseCoverage(topTokens, filePath, lineNumber, directive));

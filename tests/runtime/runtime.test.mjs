@@ -76,3 +76,38 @@ test("rejects a false invariant and does not expose outputs", async (context) =>
   assert.equal(result.outcome, "REJECTED");
   assert.deepEqual(result.outputs, []);
 });
+
+test("turns invalid core inputs into refusals and command initialization timeouts into errors", async (context) => {
+  const runtime = await runtimeFor(context, {
+    "core_error.sop": "@input raw\n@output result\n@result append $raw \"item\"\n",
+    "timeout.sop": `@output result
+@hang define
+    while (true) {}
+    return { run() { return true } }
+@result hang
+`,
+  });
+  runtime.timeoutMs = 20;
+  assert.equal((await runtime.execute("test.core_error", [{}])).outcome, "REFUSED");
+  assert.equal((await runtime.execute("test.timeout")).outcome, "ERROR");
+});
+
+test("propagates child refusal and rejection without exposing child outputs", async (context) => {
+  const runtime = await runtimeFor(context, {
+    "refusing.sop": "@input raw\n@output number\n@number parseNumber $raw\n",
+    "parent_refusal.sop": "@input raw\n@output number\n@number test.refusing $raw\n",
+    "rejecting.sop": `@output result
+@invariant valid covers result
+@result value "answer"
+@same equal $result "different"
+@valid assertInvariant $same "same"
+`,
+    "parent_rejection.sop": "@output result\n@result test.rejecting\n",
+  });
+  const refusal = await runtime.execute("test.parent_refusal", ["invalid"]);
+  assert.equal(refusal.outcome, "REFUSED");
+  assert.deepEqual(refusal.outputs, []);
+  const rejection = await runtime.execute("test.parent_rejection");
+  assert.equal(rejection.outcome, "REJECTED");
+  assert.deepEqual(rejection.outputs, []);
+});

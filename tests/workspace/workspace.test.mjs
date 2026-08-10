@@ -33,3 +33,16 @@ test("does not overwrite a user-owned AGENTS.md", async (context) => {
   assert.equal(await readFile(path.join(workDir, "AGENTS.md"), "utf8"), "user rules\n");
   assert.match(await readFile(path.join(workDir, ".dynamic-circuits", "AGENT_INSTRUCTIONS.md"), "utf8"), /Dynamic Circuits Workspace/);
 });
+
+test("rejects overlapping KB and work roots", async (context) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "dc-workspace-"));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  await assert.rejects(
+    prepareWorkspace({
+      kbDir: root,
+      workDir: path.join(root, "work"),
+      skillsDir: path.join(root, "skills"),
+    }),
+    (error) => error.code === "INVALID_WORKSPACE_LAYOUT",
+  );
+});
