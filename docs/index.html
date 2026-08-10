@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Circuits Documentation</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs">Documentation / Overview</p>
+    <h1>Executable analysis workspaces for coding agents</h1>
+    <p class="lead">Dynamic Circuits prepares a task directory, exposes reusable SOP Lang circuits from a separate knowledge base, and asks an external coding agent to create and execute the analysis. The reference kernel keeps circuit mechanics inspectable and independent from direct LLM APIs.</p>
+
+    <h2>Implemented system</h2>
+    <pre class="mermaid">flowchart LR
+      U[CLI invocation] --> W[Workspace preparation]
+      W --> M[Input manifest]
+      W --> S[Circuit skills link]
+      K[KB circuits] --> A[Coding-agent process]
+      M --> A
+      S --> A
+      A --> P[Task SOP files]
+      P --> R[Reference compiler and runtime]
+      R --> O[Receipts and reports]</pre>
+    <p>The CLI accepts independent KB and work paths. It inventories every regular input file, preserves user-owned guidance, and creates a maintained skill link. Codex is the included coding-agent adapter; a generic standard-input adapter is the extension seam for future tools.</p>
+    <p>The SOP kernel parses positional circuits, compiles immutable wire graphs, rejects invalid dependencies, and executes relevant slices with structured outcomes. Mandatory semantic matching, closure, persistent caches, and production isolation remain later milestones.</p>
+
+    <h2>Specifications and historical material</h2>
+    <p>The <a href="specsLoader.html?spec=matrix.md">current DS specification matrix</a> is authoritative for implemented behavior. <a href="specsLoader.html?spec=DS001-coding-style.md">DS001</a> defines coding style, source layout, file-size guidance, and test organization.</p>
+    <p>The repository also retains the first Romanian design package in <a href="../sop_lang_circuits_design_specs_v1/README.md">sop_lang_circuits_design_specs_v1</a>. It is immutable historical input: its broader roadmap informs later work but does not enlarge the current implementation contract.</p>
+
+    <h2>Source and verification layout</h2>
+    <table>
+      <thead><tr><th>Path</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><code>src/sop/</code></td><td>Parser, package registry, compiler, core commands, canonical values, and runtime.</td></tr>
+        <tr><td><code>src/agents/</code></td><td>External coding-agent adapter construction.</td></tr>
+        <tr><td><code>circuitSkills/</code></td><td>Project-owned skills linked into analysis and evaluation workspaces.</td></tr>
+        <tr><td><code>tests/</code></td><td>Deterministic unit suites organized by module boundary.</td></tr>
+        <tr><td><code>eval/evalN/</code></td><td>Reproducible agent-level workspaces with production topology.</td></tr>
+      </tbody>
+    </table>
+    <p>Run <code>npm test</code> for kernel and orchestration tests. Run <code>npm run check</code> to add specification matrix generation and documentation link validation.</p>
+  </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="partials-loader.js"></script>
+</body>
+</html>

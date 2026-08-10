@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Circuits Documentation</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs"><a href="index.html">Documentation</a> / SOP runtime</p>
+    <h1>A small executable circuit kernel</h1>
+    <p class="lead">The reference implementation preserves the stable syntax decisions from the historical design while limiting its claims to parser, compiler, and local execution behavior covered by tests.</p>
+
+    <h2>Authoring surface</h2>
+    <pre><code>@input left right
+@output total
+
+@add define left right
+    function run({ left, right }) { return left + right }
+    function check({ left, right }, output) { return output === left + right }
+    return { run, check }
+
+@total add $left $right</code></pre>
+    <p>Ports and calls are positional. String literals are JSON strings. Commands return one value; circuits may expose multiple ordered outputs. Wires are local and immutable, and nested circuits exchange values only through their declared interfaces.</p>
+
+    <h2>Compilation and execution</h2>
+    <pre class="mermaid">flowchart LR
+      F[.sop files] --> G[Package registry]
+      G --> P[Parser]
+      P --> C[Compiler]
+      C --> V{SSA, arity,
+      coverage, cycles}
+      V -->|valid| E[Slice executor]
+      V -->|invalid| D[Structured diagnostic]
+      E --> X[Structured receipt]</pre>
+    <p>The compiler resolves core, local, qualified, and nested circuit calls. It marks dead nodes outside output and assurance slices. The executor distinguishes success, refusal, rejection, and error; failed child circuits do not leak partial public outputs.</p>
+    <pre><code>dc-agent sop compile --root ./sop --package analysis
+dc-agent sop run --root ./sop --package analysis --inputs '["4","7"]'</code></pre>
+
+    <h2>Isolation boundary</h2>
+    <p>Command code runs in a Node <code>vm</code> context without process, filesystem, network, module loading, clocks, randomness, or oracle services. String and WebAssembly code generation are disabled and synchronous execution has a timeout. This is a development guard for reviewable code, not a production sandbox for hostile multi-tenant programs.</p>
+    <div class="callout">The runtime parses matcher metadata but does not yet execute semantic indexes, mandatory matchers, closure, persistent caches, trust profiles, or external effects. The exact current contract is in <a href="specsLoader.html?spec=DS005-compiler-runtime.md">DS005</a>.</div>
+  </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="partials-loader.js"></script>
+</body>
+</html>

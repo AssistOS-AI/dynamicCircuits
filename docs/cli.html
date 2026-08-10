@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic Circuits Documentation</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+</head>
+<body>
+  <div data-include="partials/header.html"></div>
+  <main class="page"><article class="page__panel">
+    <p class="breadcrumbs"><a href="index.html">Documentation</a> / CLI and workspaces</p>
+    <h1>One KB, one current task</h1>
+    <p class="lead">The CLI keeps reusable knowledge separate from the current analysis. It prepares the directory contract before any coding-agent process starts.</p>
+
+    <h2>Prepare and analyze</h2>
+    <pre><code>dc-agent prepare -kbdir ./kb -workdir /path/to/task
+dc-agent -kbdir ./kb -workdir /path/to/task -agent codex
+dc-agent run --kbdir ./kb --workdir /path/to/task --agent codex --learn</code></pre>
+    <p>Both single-dash and conventional double-dash forms are accepted for KB, workdir, and agent options. Preparation creates missing directories, inventories inputs, and links the project skill catalog. It refuses overlapping KB/work roots and conflicting skill-link paths.</p>
+
+    <pre class="mermaid">flowchart TD
+      K[KB root] --> KC[circuits: trusted]
+      K --> KN[candidates: review required]
+      W[Work root] --> I[input]
+      W --> P[sop]
+      W --> R[results]
+      W --> D[.dynamic-circuits manifests]
+      W --> L[circuitSkills symlink]</pre>
+
+    <h2>Agent authority</h2>
+    <p>Normal analysis treats the KB as read-only. Learning mode lets the Codex sandbox write under the KB root, while the generated instructions restrict reusable output to <code>candidates/</code>. This restriction is currently instructional rather than a host-mediated filesystem capability; <a href="specsLoader.html?spec=DS008-security-and-trust.md">DS008</a> records the limitation.</p>
+    <p><code>--prepare-only</code> stops before adapter construction. <code>--dry-run</code> prints the command, arguments, working directory, and prompt without launching a process. The <code>generic</code> adapter accepts a program through <code>--agent-command</code> and sends the prompt through standard input.</p>
+
+    <h2>Workspace skill catalog</h2>
+    <p><code>analyze-task</code> enforces complete input coverage and grounded results. <code>author-sop-circuit</code> supplies the implemented syntax and verification loop. <code>circuit-learner</code> separates reusable candidates from task-specific facts. The CLI links the catalog as one directory so the same instructions govern normal tasks and evaluation cases.</p>
+  </article></main>
+  <div data-include="partials/footer.html"></div>
+  <script src="partials-loader.js"></script>
+</body>
+</html>

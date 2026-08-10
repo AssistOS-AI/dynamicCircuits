@@ -1,0 +1,43 @@
+:root {
+  color-scheme: light;
+  --ink: #17212b;
+  --muted: #5d6874;
+  --paper: #fbfcfd;
+  --panel: #ffffff;
+  --line: #d7dfe7;
+  --accent: #176b68;
+  --code: #eef4f3;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); line-height: 1.65; }
+a { color: var(--accent); text-decoration-thickness: 0.09em; text-underline-offset: 0.16em; }
+.site-header { display: flex; align-items: center; gap: 2rem; padding: 1rem max(1.25rem, calc((100vw - 76rem) / 2)); border-bottom: 1px solid var(--line); background: var(--panel); }
+.brand { color: var(--ink); font-weight: 750; text-decoration: none; white-space: nowrap; }
+.site-header nav { display: flex; flex-wrap: wrap; gap: 0.85rem 1.2rem; }
+.site-header nav a { color: var(--muted); font-size: 0.94rem; }
+.page { max-width: 76rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+.page__panel { max-width: 55rem; }
+.breadcrumbs, .kicker { color: var(--muted); font-size: 0.88rem; letter-spacing: 0.02em; }
+h1 { max-width: 18ch; margin: 0.5rem 0 1rem; font-size: clamp(2.2rem, 5vw, 4.25rem); line-height: 1.05; letter-spacing: -0.035em; }
+h2 { margin-top: 2.7rem; font-size: 1.55rem; line-height: 1.25; }
+h3 { margin-top: 2rem; }
+p, li { max-width: 76ch; }
+.lead { color: #34424f; font-size: 1.18rem; }
+.callout { margin: 1.75rem 0; padding: 1rem 1.2rem; border-left: 0.3rem solid var(--accent); background: var(--code); }
+code { padding: 0.12rem 0.3rem; background: var(--code); border-radius: 0.2rem; }
+pre:not(.mermaid) { overflow-x: auto; padding: 1rem; background: #132326; color: #e9f4f3; border-radius: 0.35rem; }
+pre code { padding: 0; color: inherit; background: transparent; }
+.mermaid { margin: 2rem 0; padding: 1rem; overflow-x: auto; background: var(--panel); border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+th, td { padding: 0.65rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.site-footer { padding: 1.5rem max(1.25rem, calc((100vw - 76rem) / 2)); color: var(--muted); border-top: 1px solid var(--line); }
+.loader-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+.loading { color: var(--muted); }
+.status { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 2rem; background: var(--code); }
+@media (max-width: 760px) {
+  .site-header { align-items: flex-start; flex-direction: column; gap: 0.65rem; }
+  .loader-heading { display: block; }
+  h1 { font-size: 2.4rem; }
+}
